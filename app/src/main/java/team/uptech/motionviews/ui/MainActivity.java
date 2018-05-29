@@ -155,8 +155,8 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
                 .with(MainActivity.this)
                 .setTitle(R.string.select_color)
                 .initialColor(initialColor)
-                .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
-                .density(8) // magic number
+                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                .density(15) // magic number
                 .setPositiveButton(R.string.ok, new ColorPickerClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
@@ -292,5 +292,25 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
                 motionView.invalidate();
             }
         }
+    }
+
+    @Override
+    public void colorChanged(@NonNull int selectedColor) {
+        TextEntity textEntity = currentTextEntity();
+        if (textEntity != null) {
+            textEntity.getLayer().getFont().setColor(selectedColor);
+            textEntity.updateEntity();
+            motionView.invalidate();
+        }
+    }
+
+    @Nullable
+    @Override
+    public Integer currentTextColor() {
+        TextEntity textEntity = currentTextEntity();
+        if (textEntity == null) {
+            return null;
+        }
+        return textEntity.getLayer().getFont().getColor();
     }
 }

@@ -4,23 +4,35 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.builder.ColorPickerClickListener;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+
+import java.util.ArrayList;
 
 import team.uptech.motionviews.R;
 import team.uptech.motionviews.widget.Interfaces.OnTextLayerCallback;
+import team.uptech.motionviews.widget.entity.TextEntity;
 
 /**
  * Transparent Dialog Fragment, with no title and no background
@@ -84,9 +96,11 @@ public class TextEditorDialogFragment extends DialogFragment {
             text = args.getString(ARG_TEXT);
         }
 
-        editText = (EditText) view.findViewById(R.id.edit_text_view);
+        createColorSelections(view);
 
+        editText = (EditText) view.findViewById(R.id.edit_text_view);
         initWithTextEntity(text);
+        initEditedTextColor();
 
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -116,6 +130,75 @@ public class TextEditorDialogFragment extends DialogFragment {
         });
     }
 
+    private void createColorSelections (View context) {
+        String[] colors = {"#000000", "#20BBFC", "#2DFD2F", "#FD28F9", "#EA212E", "#FD7E24", "#FFFA38", "#FFFFFF"};
+
+        LinearLayout colorPicker = (LinearLayout) context.findViewById(R.id.color_picker);
+        Button colorPallette = (Button) context.findViewById(R.id.color_pallette);
+        colorPallette.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openColorPallette(v);
+            }
+        });
+        for (String color: colors) {
+            final int parsedColor = Color.parseColor(color);
+            LinearLayout colorButtonContainer = new LinearLayout(context.getContext());
+            colorButtonContainer.setLayoutParams(new LinearLayout.LayoutParams(0,  ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
+            colorButtonContainer.setGravity(Gravity.CENTER);
+            int diameter = context.getResources().getDimensionPixelSize(R.dimen.color_circle_diameter);
+            Button colorButton = new Button(context.getContext());
+            colorButton.setLayoutParams(new LinearLayout.LayoutParams(diameter, diameter));
+            colorButton.setBackgroundResource(R.drawable.circle);
+            colorButton.getBackground().mutate().setTint(parsedColor);
+            colorButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (callback == null) {
+                        return;
+                    }
+                    editText.setTextColor(parsedColor);
+                    callback.colorChanged(parsedColor);
+                }
+            });
+            colorButtonContainer.addView(colorButton);
+            colorPicker.addView(colorButtonContainer);
+        }
+        colorPicker.invalidate();
+    }
+
+
+    private void openColorPallette(View context) {
+        if (callback == null) {
+            return;
+        }
+        Integer initialColor = callback.currentTextColor();
+        if (initialColor == null) {
+            return;
+        }
+
+        ColorPickerDialogBuilder
+                .with(context.getContext())
+                .setTitle(R.string.select_color)
+                .initialColor(initialColor)
+                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                .density(15) // magic number
+                .setPositiveButton(R.string.ok, new ColorPickerClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
+                        editText.setTextColor(selectedColor);
+                        callback.colorChanged(selectedColor);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .build()
+                .show();
+    }
+
     private void initWithTextEntity(String text) {
         editText.setText(text);
         editText.post(new Runnable() {
@@ -127,11 +210,20 @@ public class TextEditorDialogFragment extends DialogFragment {
             }
         });
     }
+    private void initEditedTextColor() {
+        if (callback == null) {
+           return;
+        }
+        Integer initialColor = callback.currentTextColor();
+        if (initialColor == null) {
+            return;
+        }
+        editText.setTextColor(initialColor);
+    }
 
     @Override
     public void dismiss() {
         super.dismiss();
-
         // clearing memory on exit, cos manipulating with text uses bitmaps extensively
         // this does not frees memory immediately, but still can help
         System.gc();
@@ -164,11 +256,13 @@ public class TextEditorDialogFragment extends DialogFragment {
                 // remove background
                 window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+                //set to adjust screen height automatically, when soft keyboard appears on screen
+                window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
                 // remove dim
-                WindowManager.LayoutParams windowParams = window.getAttributes();
-                window.setDimAmount(0.0F);
-                window.setAttributes(windowParams);
+//                WindowManager.LayoutParams windowParams = window.getAttributes();
+//                window.setDimAmount(0.0F);
+//                window.setAttributes(windowParams);
             }
         }
     }
@@ -176,6 +270,7 @@ public class TextEditorDialogFragment extends DialogFragment {
     @Override
     public void onResume() {
         super.onResume();
+
         editText.post(new Runnable() {
             @Override
             public void run() {

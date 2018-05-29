@@ -1,6 +1,7 @@
 package team.uptech.motionviews.widget.Interfaces;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import team.uptech.motionviews.ui.TextEditorDialogFragment;
 
@@ -10,4 +11,7 @@ import team.uptech.motionviews.ui.TextEditorDialogFragment;
  */
 public interface OnTextLayerCallback {
     void textChanged(@NonNull String text);
+    void colorChanged(@NonNull int color);
+    @Nullable
+    Integer currentTextColor();
 }

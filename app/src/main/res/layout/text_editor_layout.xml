@@ -5,20 +5,43 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/transparentGray"
+    android:background="@color/transparent"
     android:clickable="true"
-    android:fitsSystemWindows="true">
-
+    android:fitsSystemWindows="true"
+    android:windowSoftInputMode="adjustResize">
     <EditText
         android:id="@+id/edit_text_view"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:alpha="0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:alpha="1"
         android:background="@color/transparent"
-        android:gravity="top"
+        android:gravity="center"
         android:inputType="textMultiLine|textNoSuggestions|textVisiblePassword"
         android:textColor="@android:color/white"
         android:textStyle="bold"
     />
+    <LinearLayout
+        android:id="@+id/color_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:padding="@dimen/padding">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+            <Button
+                android:id="@+id/color_pallette"
+                android:layout_width="@dimen/color_circle_diameter"
+                android:layout_height="@dimen/color_circle_diameter"
+                android:background="@drawable/ic_format_color_text"
+                />
+        </LinearLayout>
+    </LinearLayout>
 </RelativeLayout>
 
