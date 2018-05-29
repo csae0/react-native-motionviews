@@ -20,16 +20,17 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import team.uptech.motionviews.R;
+import team.uptech.motionviews.widget.Interfaces.OnTextLayerCallback;
 
 /**
  * Transparent Dialog Fragment, with no title and no background
  * <p>
  * The fragment imitates capturing input from keyboard, but does not display anything
- * the result from input from the keyboard is passed through {@link TextEditorDialogFragment.OnTextLayerCallback}
+ * the result from input from the keyboard is passed through {@link OnTextLayerCallback}
  * <p>
- * Activity that uses {@link TextEditorDialogFragment} must implement {@link TextEditorDialogFragment.OnTextLayerCallback}
+ * Activity that uses {@link TextEditorDialogFragment} must implement {@link OnTextLayerCallback}
  * <p>
- * If Activity does not implement {@link TextEditorDialogFragment.OnTextLayerCallback}, exception will be thrown at Runtime
+ * If Activity does not implement {@link OnTextLayerCallback}, exception will be thrown at Runtime
  */
 public class TextEditorDialogFragment extends DialogFragment {
 
@@ -194,13 +195,5 @@ public class TextEditorDialogFragment extends DialogFragment {
         }
         editText.setFocusableInTouchMode(gainFocus);
         editText.setFocusable(gainFocus);
-    }
-
-    /**
-     * Callback that passes all user input through the method
-     * {@link TextEditorDialogFragment.OnTextLayerCallback#textChanged(String)}
-     */
-    public interface OnTextLayerCallback {
-        void textChanged(@NonNull String text);
     }
 }

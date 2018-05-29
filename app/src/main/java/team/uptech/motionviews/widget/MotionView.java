@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import team.uptech.motionviews.R;
+import team.uptech.motionviews.widget.Interfaces.MotionViewCallback;
 import team.uptech.motionviews.widget.entity.MotionEntity;
 
 /**
@@ -38,11 +39,6 @@ public class MotionView  extends FrameLayout {
 
     public interface Constants {
         float SELECTED_LAYER_ALPHA = 0.15F;
-    }
-
-    public interface MotionViewCallback {
-        void onEntitySelected(@Nullable MotionEntity entity);
-        void onEntityDoubleTap(@NonNull MotionEntity entity);
     }
 
     // layers
@@ -331,16 +327,16 @@ public class MotionView  extends FrameLayout {
 
     private class TapsListener extends GestureDetector.SimpleOnGestureListener {
         @Override
-        public boolean onDoubleTap(MotionEvent e) {
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            updateSelectionOnTap(e);
             if (motionViewCallback != null && selectedEntity != null) {
-                motionViewCallback.onEntityDoubleTap(selectedEntity);
+                motionViewCallback.onEntitySingleTapConfirmed(selectedEntity);
             }
             return true;
         }
 
         @Override
         public void onLongPress(MotionEvent e) {
-            updateOnLongPress(e);
         }
 
         @Override

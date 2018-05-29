@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.view.MotionEvent;
 
+import team.uptech.motionviews.widget.Interfaces.OnMoveGestureListener;
+
 /**
  * @author Almer Thie (code.almeros.com)
  *         Copyright (c) 2013, Almer Thie (code.almeros.com)
@@ -132,21 +134,6 @@ public class MoveGestureDetector extends BaseGestureDetector {
 
     public PointF getFocusDelta() {
         return mFocusDeltaExternal;
-    }
-
-    /**
-     * Listener which must be implemented which is used by MoveGestureDetector
-     * to perform callbacks to any implementing class which is registered to a
-     * MoveGestureDetector via the constructor.
-     *
-     * @see MoveGestureDetector.SimpleOnMoveGestureListener
-     */
-    public interface OnMoveGestureListener {
-        public boolean onMove(MoveGestureDetector detector);
-
-        public boolean onMoveBegin(MoveGestureDetector detector);
-
-        public void onMoveEnd(MoveGestureDetector detector);
     }
 
     /**

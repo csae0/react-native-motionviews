@@ -3,6 +3,8 @@ package com.almeros.android.multitouch;
 import android.content.Context;
 import android.view.MotionEvent;
 
+import team.uptech.motionviews.widget.Interfaces.OnShoveGestureListener;
+
 /**
  * @author Robert Nordan (robert.nordan@norkart.no)
  *         <p>
@@ -163,21 +165,6 @@ public class ShoveGestureDetector extends TwoFingerGestureDetector {
         mSloppyGesture = false;
         mPrevAverageY = 0.0f;
         mCurrAverageY = 0.0f;
-    }
-
-    /**
-     * Listener which must be implemented which is used by ShoveGestureDetector
-     * to perform callbacks to any implementing class which is registered to a
-     * ShoveGestureDetector via the constructor.
-     *
-     * @see ShoveGestureDetector.SimpleOnShoveGestureListener
-     */
-    public interface OnShoveGestureListener {
-        public boolean onShove(ShoveGestureDetector detector);
-
-        public boolean onShoveBegin(ShoveGestureDetector detector);
-
-        public void onShoveEnd(ShoveGestureDetector detector);
     }
 
     /**

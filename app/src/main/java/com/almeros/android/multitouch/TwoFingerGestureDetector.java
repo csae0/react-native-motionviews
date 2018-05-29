@@ -175,5 +175,4 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
         }
         return 0f;
     }
-
 }

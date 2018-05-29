@@ -8,5 +8,6 @@
     <color name="stroke_color">#8cf437</color>
 
     <color name="transparent">#00FFFFFF</color>
+    <color name="transparentGray">#98000000</color>
 
 </resources>

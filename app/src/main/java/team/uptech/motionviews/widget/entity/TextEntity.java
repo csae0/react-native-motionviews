@@ -14,6 +14,7 @@ import android.text.TextPaint;
 
 import team.uptech.motionviews.utils.FontProvider;
 import team.uptech.motionviews.viewmodel.TextLayer;
+import team.uptech.motionviews.widget.Interfaces.Limits;
 
 public class TextEntity extends MotionEntity {
 
@@ -109,7 +110,7 @@ public class TextEntity extends MotionEntity {
         int boundsHeight = sl.getHeight();
 
         // create bitmap not smaller than TextLayer.Limits.MIN_BITMAP_HEIGHT
-        int bmpHeight = (int) (canvasHeight * Math.max(TextLayer.Limits.MIN_BITMAP_HEIGHT,
+        int bmpHeight = (int) (canvasHeight * Math.max(Limits.MIN_BITMAP_HEIGHT,
                 1.0F * boundsHeight / canvasHeight));
 
         // create bitmap where text will be drawn

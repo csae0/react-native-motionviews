@@ -3,10 +3,9 @@
 <RelativeLayout
     android:id="@+id/text_editor_root"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/transparent"
+    android:background="@color/transparentGray"
     android:clickable="true"
     android:fitsSystemWindows="true">
 
@@ -18,8 +17,8 @@
         android:background="@color/transparent"
         android:gravity="top"
         android:inputType="textMultiLine|textNoSuggestions|textVisiblePassword"
-        android:textSize="1sp"
-        tools:ignore="SmallSp"/>
-
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+    />
 </RelativeLayout>
 

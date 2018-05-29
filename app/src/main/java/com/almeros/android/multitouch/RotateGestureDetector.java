@@ -3,6 +3,8 @@ package com.almeros.android.multitouch;
 import android.content.Context;
 import android.view.MotionEvent;
 
+import team.uptech.motionviews.widget.Interfaces.OnRotateGestureListener;
+
 /**
  * @author Almer Thie (code.almeros.com)
  *         Copyright (c) 2013, Almer Thie (code.almeros.com)
@@ -131,21 +133,6 @@ public class RotateGestureDetector extends TwoFingerGestureDetector {
     public float getRotationDegreesDelta() {
         double diffRadians = Math.atan2(mPrevFingerDiffY, mPrevFingerDiffX) - Math.atan2(mCurrFingerDiffY, mCurrFingerDiffX);
         return (float) (diffRadians * 180 / Math.PI);
-    }
-
-    /**
-     * Listener which must be implemented which is used by RotateGestureDetector
-     * to perform callbacks to any implementing class which is registered to a
-     * RotateGestureDetector via the constructor.
-     *
-     * @see RotateGestureDetector.SimpleOnRotateGestureListener
-     */
-    public interface OnRotateGestureListener {
-        public boolean onRotate(RotateGestureDetector detector);
-
-        public boolean onRotateBegin(RotateGestureDetector detector);
-
-        public void onRotateEnd(RotateGestureDetector detector);
     }
 
     /**

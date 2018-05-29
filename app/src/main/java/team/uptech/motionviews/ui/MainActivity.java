@@ -27,18 +27,21 @@ import team.uptech.motionviews.utils.FontProvider;
 import team.uptech.motionviews.viewmodel.Font;
 import team.uptech.motionviews.viewmodel.Layer;
 import team.uptech.motionviews.viewmodel.TextLayer;
+import team.uptech.motionviews.widget.Interfaces.Limits;
+import team.uptech.motionviews.widget.Interfaces.MotionViewCallback;
+import team.uptech.motionviews.widget.Interfaces.OnTextLayerCallback;
 import team.uptech.motionviews.widget.MotionView;
 import team.uptech.motionviews.widget.entity.ImageEntity;
 import team.uptech.motionviews.widget.entity.MotionEntity;
 import team.uptech.motionviews.widget.entity.TextEntity;
 
-public class MainActivity extends AppCompatActivity implements TextEditorDialogFragment.OnTextLayerCallback {
+public class MainActivity extends AppCompatActivity implements OnTextLayerCallback {
 
     public static final int SELECT_STICKER_REQUEST_CODE = 123;
 
     protected MotionView motionView;
     protected View textEntityEditPanel;
-    private final MotionView.MotionViewCallback motionViewCallback = new MotionView.MotionViewCallback() {
+    private final MotionViewCallback motionViewCallback = new MotionViewCallback() {
         @Override
         public void onEntitySelected(@Nullable MotionEntity entity) {
             if (entity instanceof TextEntity) {
@@ -50,6 +53,10 @@ public class MainActivity extends AppCompatActivity implements TextEditorDialogF
 
         @Override
         public void onEntityDoubleTap(@NonNull MotionEntity entity) {
+
+        }
+        @Override
+        public void onEntitySingleTapConfirmed(@NonNull MotionEntity entity) {
             startTextEntityEditing();
         }
     };
@@ -121,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements TextEditorDialogF
     private void increaseTextEntitySize() {
         TextEntity textEntity = currentTextEntity();
         if (textEntity != null) {
-            textEntity.getLayer().getFont().increaseSize(TextLayer.Limits.FONT_SIZE_STEP);
+            textEntity.getLayer().getFont().increaseSize(Limits.FONT_SIZE_STEP);
             textEntity.updateEntity();
             motionView.invalidate();
         }
@@ -130,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements TextEditorDialogF
     private void decreaseTextEntitySize() {
         TextEntity textEntity = currentTextEntity();
         if (textEntity != null) {
-            textEntity.getLayer().getFont().decreaseSize(TextLayer.Limits.FONT_SIZE_STEP);
+            textEntity.getLayer().getFont().decreaseSize(Limits.FONT_SIZE_STEP);
             textEntity.updateEntity();
             motionView.invalidate();
         }
@@ -246,8 +253,8 @@ public class MainActivity extends AppCompatActivity implements TextEditorDialogF
         TextLayer textLayer = new TextLayer();
         Font font = new Font();
 
-        font.setColor(TextLayer.Limits.INITIAL_FONT_COLOR);
-        font.setSize(TextLayer.Limits.INITIAL_FONT_SIZE);
+        font.setColor(Limits.INITIAL_FONT_COLOR);
+        font.setSize(Limits.INITIAL_FONT_SIZE);
         font.setTypeface(fontProvider.getDefaultFontName());
 
         textLayer.setFont(font);
