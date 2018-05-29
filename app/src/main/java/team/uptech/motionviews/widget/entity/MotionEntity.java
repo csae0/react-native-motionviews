@@ -197,7 +197,7 @@ public abstract class MotionEntity {
      * @param canvas Canvas to draw
      * @param drawingPaint Paint to use during drawing
      */
-    public final void draw(@NonNull Canvas canvas, @Nullable Paint drawingPaint) {
+    public void draw(@NonNull Canvas canvas, @Nullable Paint drawingPaint) {
 
         updateMatrix();
 
@@ -211,7 +211,7 @@ public abstract class MotionEntity {
             if (drawingPaint != null) {
                 borderPaint.setAlpha(drawingPaint.getAlpha());
             }
-            drawSelectedBg(canvas);
+            // drawSelectedBg(canvas);
             // restore border alpha
             borderPaint.setAlpha(storedAlpha);
         }

@@ -134,13 +134,12 @@ public class MotionView  extends FrameLayout {
 
     private void initEntityBorder(@NonNull MotionEntity entity ) {
         // init stroke
-        int strokeSize = getResources().getDimensionPixelSize(R.dimen.stroke_size);
-        Paint borderPaint = new Paint();
-        borderPaint.setStrokeWidth(strokeSize);
-        borderPaint.setAntiAlias(true);
-        borderPaint.setColor(ContextCompat.getColor(getContext(), R.color.stroke_color));
-
-        entity.setBorderPaint(borderPaint);
+//        int strokeSize = getResources().getDimensionPixelSize(R.dimen.stroke_size);
+//        Paint borderPaint = new Paint();
+//        borderPaint.setStrokeWidth(strokeSize);
+//        borderPaint.setAntiAlias(true);
+//        borderPaint.setColor(ContextCompat.getColor(getContext(), R.color.stroke_color));
+//        entity.setBorderPaint(borderPaint);
     }
 
     @Override
