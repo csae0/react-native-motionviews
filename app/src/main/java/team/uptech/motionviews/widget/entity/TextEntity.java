@@ -27,14 +27,19 @@ public class TextEntity extends MotionEntity {
                       @IntRange(from = 1) int canvasWidth,
                       @IntRange(from = 1) int canvasHeight,
                       @NonNull FontProvider fontProvider) {
-        super(textLayer, canvasWidth, canvasHeight);
-        this.fontProvider = fontProvider;
-
-        this.textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-
-        updateEntity(false);
+        this(textLayer, canvasWidth, canvasHeight, fontProvider, true);
     }
 
+    public TextEntity(@NonNull TextLayer textLayer,
+                      @IntRange(from = 1) int canvasWidth,
+                      @IntRange(from = 1) int canvasHeight,
+                      @NonNull FontProvider fontProvider,
+                      boolean visible) {
+        super(textLayer, canvasWidth, canvasHeight, visible);
+        this.fontProvider = fontProvider;
+        this.textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        updateEntity(false);
+    }
     private void updateEntity(boolean moveToPreviousCenter) {
 
         // save previous center
@@ -91,7 +96,7 @@ public class TextEntity extends MotionEntity {
 
         // init params - size, color, typeface
         textPaint.setStyle(Paint.Style.FILL);
-        textPaint.setTextSize(textLayer.getFont().getSize() * canvasWidth);
+        textPaint.setTextSize(textLayer.getFont().getSize());
         textPaint.setColor(textLayer.getFont().getColor());
         textPaint.setTypeface(fontProvider.getTypeface(textLayer.getFont().getTypeface()));
 
@@ -115,8 +120,7 @@ public class TextEntity extends MotionEntity {
 
         // create bitmap where text will be drawn
         Bitmap bmp;
-        if (reuseBmp != null && reuseBmp.getWidth() == boundsWidth
-                && reuseBmp.getHeight() == bmpHeight) {
+        if (reuseBmp != null && reuseBmp.getWidth() == boundsWidth && reuseBmp.getHeight() == bmpHeight) {
             // if previous bitmap exists, and it's width/height is the same - reuse it
             bmp = reuseBmp;
             bmp.eraseColor(Color.TRANSPARENT); // erase color when reusing

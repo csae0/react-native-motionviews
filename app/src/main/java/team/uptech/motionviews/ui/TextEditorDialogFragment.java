@@ -6,13 +6,16 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.Selection;
+import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +33,11 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import java.util.ArrayList;
 
+import abak.tr.com.boxedverticalseekbar.BoxedVertical;
 import team.uptech.motionviews.R;
+import team.uptech.motionviews.utils.ConversionUtils;
+import team.uptech.motionviews.utils.FontProvider;
+import team.uptech.motionviews.widget.Interfaces.Limits;
 import team.uptech.motionviews.widget.Interfaces.OnTextLayerCallback;
 import team.uptech.motionviews.widget.entity.TextEntity;
 
@@ -47,25 +54,33 @@ import team.uptech.motionviews.widget.entity.TextEntity;
 public class TextEditorDialogFragment extends DialogFragment {
 
     public static final String ARG_TEXT = "editor_text_arg";
+    public static final String ARG_SIZE = "editor_size_arg";
+    public static final String ARG_COLOR = "editor_color_arg";
+    public static final String ARG_TYPEFACE = "editor_typeface_arg";
 
     protected EditText editText;
+    protected FontProvider fontProvider;
 
     private OnTextLayerCallback callback;
 
     /**
      * deprecated
-     * use {@link TextEditorDialogFragment#getInstance(String)}
+     * use {@link TextEditorDialogFragment#getInstance(String, int, int, String)}
      */
     @Deprecated
     public TextEditorDialogFragment() {
         // empty, use getInstance
     }
 
-    public static TextEditorDialogFragment getInstance(String textValue) {
+    public static TextEditorDialogFragment getInstance(String text, int size, int color, String typefaceName) {
         @SuppressWarnings("deprecation")
         TextEditorDialogFragment fragment = new TextEditorDialogFragment();
+
         Bundle args = new Bundle();
-        args.putString(ARG_TEXT, textValue);
+        args.putString(ARG_TEXT, text);
+        args.putString(ARG_SIZE, size+"");
+        args.putString(ARG_COLOR, color+"");
+        args.putString(ARG_TYPEFACE, typefaceName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -75,6 +90,7 @@ public class TextEditorDialogFragment extends DialogFragment {
         super.onAttach(activity);
         if (activity instanceof OnTextLayerCallback) {
             this.callback = (OnTextLayerCallback) activity;
+            this.fontProvider = ((OnTextLayerCallback) activity).getFontProvider();
         } else {
             throw new IllegalStateException(activity.getClass().getName()
                     + " must implement " + OnTextLayerCallback.class.getName());
@@ -92,49 +108,80 @@ public class TextEditorDialogFragment extends DialogFragment {
 
         Bundle args = getArguments();
         String text = "";
+        int size = ConversionUtils.dpToPx(Limits.FONT_SIZE_INITIAL_DP);
+        int color = Color.WHITE;
+        String typefaceName = "";
+
         if (args != null) {
             text = args.getString(ARG_TEXT);
+            size = Integer.parseInt(args.getString(ARG_SIZE));
+            color = Integer.parseInt(args.getString(ARG_COLOR));
+            typefaceName = args.getString(ARG_TYPEFACE);
         }
+        editText = view.findViewById(R.id.edit_text_view);
+        // Slider values
+        BoxedVertical boxedVertical = view.findViewById(R.id.boxed_vertical);
+        boxedVertical.setValue(ConversionUtils.pxToDp(size));
 
         createColorSelections(view);
+        initListeners(view);
 
-        editText = (EditText) view.findViewById(R.id.edit_text_view);
         initWithTextEntity(text);
-        initEditedTextColor();
 
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-            }
+        editText.setTextColor(color);
+        if (fontProvider != null) {
+            Typeface typeface = fontProvider.getTypeface(!typefaceName.equals("") || typefaceName != null ? typefaceName : fontProvider.getDefaultFontName());
+            editText.setTypeface(typeface);
+        }
+    }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (callback != null) {
-                    callback.textChanged(s.toString());
-                }
-            }
-        });
-
+    private void initListeners (View view) {
+        // Tap on background
         view.findViewById(R.id.text_editor_root).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // apply editText properties to textView
+                if (callback != null) {
+                    callback.multiTextChange(editText.getText().toString(), editText.getCurrentTextColor(), (int)editText.getTextSize());
+                }
                 // exit when clicking on background
                 dismiss();
             }
+        });
+
+        // Text change
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        // Text size change
+        ((BoxedVertical)view.findViewById(R.id.boxed_vertical)).setOnBoxedPointsChangeListener(new BoxedVertical.OnValuesChangeListener() {
+            @Override
+            public void onPointsChanged(BoxedVertical boxedPoints, final int value) {
+                int textSizePixel = (int)editText.getTextSize();
+                int valuePixel = ConversionUtils.dpToPx(value);
+                if (textSizePixel != valuePixel) {
+                    editText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, value);
+                }
+            }
+            @Override
+            public void onStartTrackingTouch(BoxedVertical boxedPoints) {}
+            @Override
+            public void onStopTrackingTouch(BoxedVertical boxedPoints) {}
         });
     }
 
     private void createColorSelections (View context) {
         String[] colors = {"#000000", "#20BBFC", "#2DFD2F", "#FD28F9", "#EA212E", "#FD7E24", "#FFFA38", "#FFFFFF"};
 
-        LinearLayout colorPicker = (LinearLayout) context.findViewById(R.id.color_picker);
-        Button colorPallette = (Button) context.findViewById(R.id.color_pallette);
+        LinearLayout colorPicker = context.findViewById(R.id.color_picker);
+        Button colorPallette = context.findViewById(R.id.color_pallette);
         colorPallette.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -158,7 +205,6 @@ public class TextEditorDialogFragment extends DialogFragment {
                         return;
                     }
                     editText.setTextColor(parsedColor);
-                    callback.colorChanged(parsedColor);
                 }
             });
             colorButtonContainer.addView(colorButton);
@@ -169,25 +215,16 @@ public class TextEditorDialogFragment extends DialogFragment {
 
 
     private void openColorPallette(View context) {
-        if (callback == null) {
-            return;
-        }
-        Integer initialColor = callback.currentTextColor();
-        if (initialColor == null) {
-            return;
-        }
-
         ColorPickerDialogBuilder
                 .with(context.getContext())
                 .setTitle(R.string.select_color)
-                .initialColor(initialColor)
+                .initialColor(editText.getCurrentTextColor())
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(15) // magic number
                 .setPositiveButton(R.string.ok, new ColorPickerClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
                         editText.setTextColor(selectedColor);
-                        callback.colorChanged(selectedColor);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -210,16 +247,6 @@ public class TextEditorDialogFragment extends DialogFragment {
             }
         });
     }
-    private void initEditedTextColor() {
-        if (callback == null) {
-           return;
-        }
-        Integer initialColor = callback.currentTextColor();
-        if (initialColor == null) {
-            return;
-        }
-        editText.setTextColor(initialColor);
-    }
 
     @Override
     public void dismiss() {
@@ -234,6 +261,9 @@ public class TextEditorDialogFragment extends DialogFragment {
     public void onDetach() {
         // release links
         this.callback = null;
+        this.editText = null;
+        this.fontProvider = null;
+
         super.onDetach();
     }
 

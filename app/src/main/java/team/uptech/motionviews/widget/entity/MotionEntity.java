@@ -29,7 +29,11 @@ public abstract class MotionEntity {
      * false - not selected, no need to draw it's border
      */
     private boolean isSelected;
-
+    /**
+     * true - draw entity
+     * false - hide entity
+     */
+    protected boolean visible;
     /**
      * maximum scale of the initial image, so that
      * the entity still fits within the parent canvas
@@ -69,6 +73,14 @@ public abstract class MotionEntity {
         this.layer = layer;
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
+    }
+
+    public MotionEntity(@NonNull Layer layer,
+                        @IntRange(from = 1) int canvasWidth,
+                        @IntRange(from = 1) int canvasHeight,
+                        boolean visible) {
+        this(layer, canvasWidth, canvasHeight);
+        this.visible = visible;
     }
 
     private boolean isSelected() {
@@ -199,24 +211,26 @@ public abstract class MotionEntity {
      */
     public void draw(@NonNull Canvas canvas, @Nullable Paint drawingPaint) {
 
-        updateMatrix();
+        if (visible) {
+            updateMatrix();
 
-        canvas.save();
+            canvas.save();
 
-        drawContent(canvas, drawingPaint);
+            drawContent(canvas, drawingPaint);
 
-        if (isSelected()) {
-            // get alpha from drawingPaint
-            int storedAlpha = borderPaint.getAlpha();
-            if (drawingPaint != null) {
-                borderPaint.setAlpha(drawingPaint.getAlpha());
+            if (isSelected()) {
+                // get alpha from drawingPaint
+                int storedAlpha = borderPaint.getAlpha();
+                if (drawingPaint != null) {
+                    borderPaint.setAlpha(drawingPaint.getAlpha());
+                }
+                // drawSelectedBg(canvas);
+                // restore border alpha
+                borderPaint.setAlpha(storedAlpha);
             }
-            // drawSelectedBg(canvas);
-            // restore border alpha
-            borderPaint.setAlpha(storedAlpha);
-        }
 
-        canvas.restore();
+            canvas.restore();
+        }
     }
 
     private void drawSelectedBg(Canvas canvas) {
@@ -254,5 +268,13 @@ public abstract class MotionEntity {
             //noinspection ThrowFromFinallyBlock
             super.finalize();
         }
+    }
+
+    public boolean getVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 }

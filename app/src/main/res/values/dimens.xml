@@ -3,4 +3,8 @@
     <dimen name="color_circle_diameter">30dp</dimen>
     <dimen name="padding">6dp</dimen>
     <dimen name="double_padding">12dp</dimen>
+    <dimen name="color_picker_height">36dp</dimen>
+    <dimen name="color_picker_height_and_padding">48dp</dimen>
+    <dimen name="slider_width">36dp</dimen>
+    <dimen name="slider_width_and_padding">48dp</dimen>
 </resources>

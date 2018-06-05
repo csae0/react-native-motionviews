@@ -1,5 +1,7 @@
 package team.uptech.motionviews.viewmodel;
 
+import team.uptech.motionviews.widget.Interfaces.Limits;
+
 public class TextLayer extends Layer {
 
     private String text;

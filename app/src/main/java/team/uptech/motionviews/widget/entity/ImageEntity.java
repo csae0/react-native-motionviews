@@ -18,7 +18,15 @@ public class ImageEntity extends MotionEntity {
                        @NonNull Bitmap bitmap,
                        @IntRange(from = 1) int canvasWidth,
                        @IntRange(from = 1) int canvasHeight) {
-        super(layer, canvasWidth, canvasHeight);
+        this(layer, bitmap, canvasWidth, canvasHeight, true);
+    }
+
+    public ImageEntity(@NonNull Layer layer,
+                       @NonNull Bitmap bitmap,
+                       @IntRange(from = 1) int canvasWidth,
+                       @IntRange(from = 1) int canvasHeight,
+                       boolean visible) {
+        super(layer, canvasWidth, canvasHeight, visible);
 
         this.bitmap = bitmap;
         float width = bitmap.getWidth();

@@ -46,7 +46,6 @@ public class FontsAdapter extends ArrayAdapter<String> {
     }
 
     private static class ViewHolder {
-
         TextView textView;
 
         ViewHolder(View rootView) {

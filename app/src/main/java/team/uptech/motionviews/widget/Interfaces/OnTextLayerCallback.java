@@ -3,7 +3,10 @@ package team.uptech.motionviews.widget.Interfaces;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.Map;
+
 import team.uptech.motionviews.ui.TextEditorDialogFragment;
+import team.uptech.motionviews.utils.FontProvider;
 
 /**
  * Callback that passes all user input through the method
@@ -11,7 +14,8 @@ import team.uptech.motionviews.ui.TextEditorDialogFragment;
  */
 public interface OnTextLayerCallback {
     void textChanged(@NonNull String text);
-    void colorChanged(@NonNull int color);
-    @Nullable
-    Integer currentTextColor();
+    void textColorChanged(@NonNull int color);
+    void textSizeChanged(@NonNull int size);
+    void multiTextChange(@Nullable String text, @Nullable Integer color, @Nullable Integer size);
+    @Nullable FontProvider getFontProvider();
 }

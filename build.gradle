@@ -22,3 +22,26 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+ext {
+    // App
+    appVersionMajor = 1
+    appVersionMinor = 0
+    appVersionPatch = 0
+    appVersionBuild = 0 // bump for dogfood builds, public betas, etc.
+
+    // Library
+    libVersionMajor = 1
+    libVersionMinor = 0
+    libVersionPatch = 1
+    libVersionBuild = 0 // bump for dogfood builds, public betas, etc.
+
+    // SDK and tools
+    minSdkVersion = 9
+    targetSdkVersion = 25
+    compileSdkVersion = 25
+    buildToolsVersion = "26.0.2"
+
+    // Module dependencies
+    supportLibraryVersion = "26.1.0"
+}

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
-    android:id="@+id/text_editor_root"
+<RelativeLayout android:id="@+id/text_editor_root"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/transparent"
     android:clickable="true"
     android:fitsSystemWindows="true"
-    android:windowSoftInputMode="adjustResize">
+    android:windowSoftInputMode="adjustResize"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <EditText
         android:id="@+id/edit_text_view"
         android:layout_width="wrap_content"
@@ -20,7 +20,8 @@
         android:gravity="center"
         android:inputType="textMultiLine|textNoSuggestions|textVisiblePassword"
         android:textColor="@android:color/white"
-        android:textStyle="bold"
+        android:paddingLeft="@dimen/slider_width_and_padding"
+        android:paddingBottom="@dimen/color_picker_height_and_padding"
     />
     <LinearLayout
         android:id="@+id/color_picker"
@@ -43,5 +44,28 @@
                 />
         </LinearLayout>
     </LinearLayout>
+    <abak.tr.com.boxedverticalseekbar.BoxedVertical
+        android:id="@+id/boxed_vertical"
+        android:layout_width="@dimen/slider_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_marginBottom="@dimen/color_picker_height_and_padding"
+        android:layout_marginTop="@dimen/color_picker_height_and_padding"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_weight="1"
+        app:backgroundColor="@color/color_background"
+        app:progressColor="@color/color_progress"
+        app:textColor="@color/color_background"
+        app:cornerRadius="20"
+        app:defaultValue="@integer/initial_font_size"
+        app:imageEnabled="false"
+        app:textEnabled="true"
+        app:max="@integer/max_font_size"
+        app:min="@integer/min_font_size"
+        app:step="@integer/font_size_steps"
+        app:textBottomPadding="20"
+        app:textSize="12sp"
+        app:touchDisabled="true" />
 </RelativeLayout>
 
