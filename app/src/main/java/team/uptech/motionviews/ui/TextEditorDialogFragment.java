@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
@@ -109,7 +110,7 @@ public class TextEditorDialogFragment extends DialogFragment {
         Bundle args = getArguments();
         String text = "";
         int size = ConversionUtils.dpToPx(Limits.FONT_SIZE_INITIAL_DP);
-        int color = Color.WHITE;
+        int color = Limits.INITIAL_FONT_COLOR;
         String typefaceName = "";
 
         if (args != null) {
@@ -123,7 +124,7 @@ public class TextEditorDialogFragment extends DialogFragment {
         BoxedVertical boxedVertical = view.findViewById(R.id.boxed_vertical);
         boxedVertical.setValue(ConversionUtils.pxToDp(size));
 
-        createColorSelections(view);
+        createColorSelections(view, color);
         initListeners(view);
 
         initWithTextEntity(text);
@@ -177,15 +178,16 @@ public class TextEditorDialogFragment extends DialogFragment {
         });
     }
 
-    private void createColorSelections (View context) {
+    private void createColorSelections (View context, int currentColor) {
         String[] colors = {"#000000", "#20BBFC", "#2DFD2F", "#FD28F9", "#EA212E", "#FD7E24", "#FFFA38", "#FFFFFF"};
 
         LinearLayout colorPicker = context.findViewById(R.id.color_picker);
-        Button colorPallette = context.findViewById(R.id.color_pallette);
-        colorPallette.setOnClickListener(new View.OnClickListener() {
+        final Button colorPalette = context.findViewById(R.id.color_pallette);
+        colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(currentColor))); // min API 21 needed
+        colorPalette.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openColorPallette(v);
+                openColorPalette(v);
             }
         });
         for (String color: colors) {
@@ -197,7 +199,7 @@ public class TextEditorDialogFragment extends DialogFragment {
             Button colorButton = new Button(context.getContext());
             colorButton.setLayoutParams(new LinearLayout.LayoutParams(diameter, diameter));
             colorButton.setBackgroundResource(R.drawable.circle);
-            colorButton.getBackground().mutate().setTint(parsedColor);
+            colorButton.getBackground().mutate().setTint(parsedColor); // min API 21 needed
             colorButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -205,6 +207,7 @@ public class TextEditorDialogFragment extends DialogFragment {
                         return;
                     }
                     editText.setTextColor(parsedColor);
+                    colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(editText.getCurrentTextColor()))); // min API 21 needed
                 }
             });
             colorButtonContainer.addView(colorButton);
@@ -214,9 +217,9 @@ public class TextEditorDialogFragment extends DialogFragment {
     }
 
 
-    private void openColorPallette(View context) {
+    private void openColorPalette(final View v) {
         ColorPickerDialogBuilder
-                .with(context.getContext())
+                .with(v.getContext())
                 .setTitle(R.string.select_color)
                 .initialColor(editText.getCurrentTextColor())
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
@@ -225,6 +228,7 @@ public class TextEditorDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
                         editText.setTextColor(selectedColor);
+                        v.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(selectedColor))); // min API 21 needed
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
