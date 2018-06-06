@@ -70,23 +70,23 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
 
         this.fontProvider = new FontProvider(getResources());
 
-        motionView = (MotionView) findViewById(R.id.main_motion_view);
+        motionView = findViewById(R.id.main_motion_view);
 //        textEntityEditPanel = findViewById(R.id.main_motion_text_entity_edit_panel);
         motionView.setMotionViewCallback(motionViewCallback);
 
-        addSticker(R.drawable.pikachu_2);
+        addSticker(R.drawable.pikachu_2, true);
 
 //        initTextEntitiesListeners();
     }
 
-    private void addSticker(final int stickerResId) {
+    private void addSticker(final int stickerResId, final boolean visible) {
         motionView.post(new Runnable() {
             @Override
             public void run() {
                 Layer layer = new Layer();
                 Bitmap pica = BitmapFactory.decodeResource(getResources(), stickerResId);
 
-                ImageEntity entity = new ImageEntity(layer, pica, motionView.getWidth(), motionView.getHeight());
+                ImageEntity entity = new ImageEntity(layer, pica, motionView.getWidth(), motionView.getHeight(), visible);
 
                 motionView.addEntityAndPosition(entity);
             }
@@ -235,15 +235,15 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
             startActivityForResult(intent, SELECT_STICKER_REQUEST_CODE);
             return true;
         } else if (item.getItemId() == R.id.main_add_text) {
-            addTextSticker();
+            addTextSticker(false);
         }
         return super.onOptionsItemSelected(item);
     }
 
-    protected void addTextSticker() {
+    protected void addTextSticker(boolean visible) {
         TextLayer textLayer = createTextLayer();
         TextEntity textEntity = new TextEntity(textLayer, motionView.getWidth(),
-                motionView.getHeight(), fontProvider, false);
+                motionView.getHeight(), fontProvider, visible);
         motionView.addEntityAndPosition(textEntity);
 
         // move text sticker up so that its not hidden under keyboard
@@ -282,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
                 if (data != null) {
                     int stickerId = data.getIntExtra(StickerSelectActivity.EXTRA_STICKER_ID, 0);
                     if (stickerId != 0) {
-                        addSticker(stickerId);
+                        addSticker(stickerId, true);
                     }
                 }
             }
@@ -325,6 +325,7 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
             }
             textEntity.setVisible(true);
             textEntity.updateEntity();
+            motionView.unselectEntity();
             motionView.invalidate();
         }
     }

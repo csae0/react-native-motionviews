@@ -233,6 +233,7 @@ public abstract class MotionEntity {
         }
     }
 
+
     private void drawSelectedBg(Canvas canvas) {
         matrix.mapPoints(destPoints, srcPoints);
         //noinspection Range

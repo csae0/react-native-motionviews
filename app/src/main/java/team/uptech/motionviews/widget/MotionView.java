@@ -252,12 +252,10 @@ public class MotionView  extends FrameLayout {
     }
 
     private void updateOnLongPress(MotionEvent e) {
-        // if layer is currently selected and point inside layer - move it to front
-        if (selectedEntity != null) {
-            PointF p = new PointF(e.getX(), e.getY());
-            if (selectedEntity.pointInLayerRect(p)) {
-                bringLayerToFront(selectedEntity);
-            }
+        // if point inside layer - move it to front
+        MotionEntity entity = findEntityAtPoint(e.getX(), e.getY());
+        if (entity.pointInLayerRect(new PointF(e.getX(), e.getY()))) {
+            bringLayerToFront(entity);
         }
     }
 
@@ -337,6 +335,7 @@ public class MotionView  extends FrameLayout {
 
         @Override
         public void onLongPress(MotionEvent e) {
+            updateOnLongPress(e);
         }
 
         @Override
@@ -374,6 +373,19 @@ public class MotionView  extends FrameLayout {
         public boolean onMove(MoveGestureDetector detector) {
             handleTranslate(detector.getFocusDelta());
             return true;
+        }
+
+        @Override
+        public boolean onMoveBegin(MoveGestureDetector detector) {
+            MotionEvent motionEvent = detector.getmCurrEvent();
+            MotionEntity entity = findEntityAtPoint(motionEvent.getX(), motionEvent.getY());
+            selectEntity(entity, true);
+            return true;
+        }
+
+        @Override
+        public void onMoveEnd(MoveGestureDetector detector) {
+            unselectEntity();
         }
     }
 }
