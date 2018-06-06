@@ -214,14 +214,17 @@ public class MotionView  extends FrameLayout {
     }
 
     private void selectEntity(@Nullable MotionEntity entity, boolean updateCallback) {
-        if (selectedEntity != null) {
-            selectedEntity.setIsSelected(false);
+
+        if (selectedEntity != entity) {
+            if (selectedEntity != null) {
+                selectedEntity.setIsSelected(false);
+            }
+            if (entity != null) {
+                entity.setIsSelected(true);
+            }
+            selectedEntity = entity;
+            invalidate();
         }
-        if (entity != null) {
-            entity.setIsSelected(true);
-        }
-        selectedEntity = entity;
-        invalidate();
         if (updateCallback && motionViewCallback != null) {
             motionViewCallback.onEntitySelected(entity);
         }
@@ -248,14 +251,18 @@ public class MotionView  extends FrameLayout {
 
     private void updateSelectionOnTap(MotionEvent e) {
         MotionEntity entity = findEntityAtPoint(e.getX(), e.getY());
-        selectEntity(entity, true);
+        if (entity != null) {
+            selectEntity(entity, true);
+        }
     }
 
     private void updateOnLongPress(MotionEvent e) {
         // if point inside layer - move it to front
         MotionEntity entity = findEntityAtPoint(e.getX(), e.getY());
-        if (entity.pointInLayerRect(new PointF(e.getX(), e.getY()))) {
-            bringLayerToFront(entity);
+        if (entity != null) {
+            if (entity.pointInLayerRect(new PointF(e.getX(), e.getY()))) {
+                bringLayerToFront(entity);
+            }
         }
     }
 
@@ -379,13 +386,15 @@ public class MotionView  extends FrameLayout {
         public boolean onMoveBegin(MoveGestureDetector detector) {
             MotionEvent motionEvent = detector.getmCurrEvent();
             MotionEntity entity = findEntityAtPoint(motionEvent.getX(), motionEvent.getY());
-            selectEntity(entity, true);
+            if (entity != null) {
+                selectEntity(entity, true);
+            }
             return true;
         }
 
         @Override
         public void onMoveEnd(MoveGestureDetector detector) {
-            unselectEntity();
+//            unselectEntity();
         }
     }
 }
