@@ -14,6 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
+        android:layout_centerHorizontal="false"
         android:alpha="1"
         android:background="@color/stroke_color"
         android:gravity="center"

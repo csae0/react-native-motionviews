@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
@@ -16,6 +17,7 @@ import android.text.Editable;
 import android.text.Selection;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -27,6 +29,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
@@ -120,7 +123,23 @@ public class TextEditorDialogFragment extends DialogFragment {
             typefaceName = args.getString(ARG_TYPEFACE);
         }
         editText = view.findViewById(R.id.edit_text_view);
-//        editText.setMaxWidth();
+
+        DisplayMetrics displayMetrics = view.getResources().getDisplayMetrics();
+        int padding = (int)(getResources().getDimension(R.dimen.padding) + 0.5f);
+        int margin = (int)(getResources().getDimension(R.dimen.slider_width_and_padding) + 0.5f);
+        boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+
+        int maxWidth = (isPortrait ? displayMetrics.widthPixels : displayMetrics.heightPixels) - margin - padding;
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) editText.getLayoutParams();
+        layoutParams.width = maxWidth;
+        if (isPortrait ) {
+            layoutParams.removeRule(RelativeLayout.CENTER_HORIZONTAL);
+        } else {
+            layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        }
+        editText.setLayoutParams(layoutParams);
+
+
         // Slider values
         BoxedVertical boxedVertical = view.findViewById(R.id.boxed_vertical);
         boxedVertical.setValue(ConversionUtils.pxToDp(size));

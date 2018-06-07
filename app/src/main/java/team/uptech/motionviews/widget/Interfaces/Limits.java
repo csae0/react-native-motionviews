@@ -16,11 +16,7 @@ public interface Limits {
 //    int FONT_SIZE_MIN = (int)(MIN_SCALE * FONT_SIZE_MULTIPLICATOR); // = TEXT SIZE 15 (defined in Integers.xml)
     int FONT_SIZE_INITIAL_DP = (int)(INITIAL_FONT_SIZE_SCALE * FONT_SIZE_MULTIPLICATOR); // = TEXT SIZE 30 (defined in Integers.xml)
 
-
-
-
     float MIN_BITMAP_HEIGHT = 0.13F;
     //    float FONT_SIZE_STEP = 0.008F;
     //float INITIAL_SCALE = 0.8F; // set the same to avoid text scaling
-
 }

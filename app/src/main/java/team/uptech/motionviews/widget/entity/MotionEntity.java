@@ -162,6 +162,9 @@ public abstract class MotionEntity {
         return new PointF(centerX, centerY);
     }
 
+    public PointF canvasCenter() {
+        return new PointF(canvasWidth * 0.5F, canvasHeight * 0.5F);
+    }
     public void moveToCanvasCenter() {
         moveCenterTo(new PointF(canvasWidth * 0.5F, canvasHeight * 0.5F));
     }

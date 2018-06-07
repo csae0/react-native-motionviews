@@ -46,7 +46,7 @@ public class TextEntity extends MotionEntity {
     private void updateEntity(boolean moveToPreviousCenter) {
 
         // save previous center
-        PointF oldCenter = absoluteCenter();
+        PointF oldCenter = canvasCenter();
 
         Bitmap newBmp = createBitmap(getLayer(), bitmap);
 
@@ -140,7 +140,7 @@ public class TextEntity extends MotionEntity {
             bmp = reuseBmp;
             bmp.eraseColor(Color.TRANSPARENT); // erase color when reusing
         } else {
-            bmp = Bitmap.createBitmap(boundsWidth, boundsHeight, Bitmap.Config.RGB_565);
+            bmp = Bitmap.createBitmap(boundsWidth, boundsHeight, Bitmap.Config.ARGB_8888);
         }
 
         Canvas canvas = new Canvas(bmp);
