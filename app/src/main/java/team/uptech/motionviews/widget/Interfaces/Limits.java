@@ -5,9 +5,9 @@ public interface Limits {
      * limit text size to view bounds
      * so that users don't put small font size and scale it 100+ times
      */
-    float MAX_SCALE = 1.5F; // = RESULTS IN TEXT SIZE 75 (defined in Integers.xml)
-    float MIN_SCALE = 0.3F; // = RESULTS IN TEXT SIZE 15 (defined in Integers.xml)
-    float INITIAL_SCALE = 1.0F; // set the same to avoid text scaling
+    float MAX_SCALE = 10.0F;
+    float MIN_SCALE = 0.2F;
+    float INITIAL_SCALE = 1.0F;
     float INITIAL_FONT_SIZE_SCALE = 0.6f;
     float FONT_SIZE_MULTIPLICATOR = 100 * 0.5f; // transform scale into correct font size
     int INITIAL_FONT_COLOR = 0xffededed;

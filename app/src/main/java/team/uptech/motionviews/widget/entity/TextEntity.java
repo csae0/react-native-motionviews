@@ -20,6 +20,8 @@ public class TextEntity extends MotionEntity {
 
     private final TextPaint textPaint;
     private final FontProvider fontProvider;
+    private int maxWidth;
+
     @Nullable
     private Bitmap bitmap;
 
@@ -38,6 +40,7 @@ public class TextEntity extends MotionEntity {
         super(textLayer, canvasWidth, canvasHeight, visible);
         this.fontProvider = fontProvider;
         this.textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        this.maxWidth = Integer.MIN_VALUE;
         updateEntity(false);
     }
     private void updateEntity(boolean moveToPreviousCenter) {
@@ -57,12 +60,11 @@ public class TextEntity extends MotionEntity {
         float width = bitmap.getWidth();
         float height = bitmap.getHeight();
 
-        @SuppressWarnings("UnnecessaryLocalVariable")
         float widthAspect = 1.0F * canvasWidth / width;
+        float heightAspect = 1.0F * canvasHeight / height;
 
-        // for text we always match text width with parent width
-        this.holyScale = widthAspect;
-
+        // fit the smallest size
+        holyScale = 1; // Math.min(widthAspect, heightAspect);
         // initial position of the entity
         srcPoints[0] = 0;
         srcPoints[1] = 0;
@@ -73,7 +75,7 @@ public class TextEntity extends MotionEntity {
         srcPoints[6] = 0;
         srcPoints[7] = height;
         srcPoints[8] = 0;
-        srcPoints[8] = 0;
+        srcPoints[9] = 0;
 
         if (moveToPreviousCenter) {
             // move to previous center
@@ -92,14 +94,25 @@ public class TextEntity extends MotionEntity {
     @NonNull
     private Bitmap createBitmap(@NonNull TextLayer textLayer, @Nullable Bitmap reuseBmp) {
 
-        int boundsWidth = canvasWidth;
-
         // init params - size, color, typeface
         textPaint.setStyle(Paint.Style.FILL);
         textPaint.setTextSize(textLayer.getFont().getSize());
         textPaint.setColor(textLayer.getFont().getColor());
         textPaint.setTypeface(fontProvider.getTypeface(textLayer.getFont().getTypeface()));
 
+        String text = textLayer.getText();
+        String [] lines = text.split("\n");
+        int boundsWidth = 0;
+        for(String s : lines) {
+             int lineWidth = (int)(textPaint.measureText(s) + 0.5f);
+             if (lineWidth > boundsWidth) {
+                 boundsWidth = lineWidth;
+             }
+        }
+        if (maxWidth > 0 && boundsWidth > maxWidth) {
+            boundsWidth = maxWidth;
+        }
+//        int boundsWidth = canvasWidth;
         // drawing text guide : http://ivankocijan.xyz/android-drawing-multiline-text-on-canvas/
         // Static layout which will be drawn on canvas
         StaticLayout sl = new StaticLayout(
@@ -112,32 +125,34 @@ public class TextEntity extends MotionEntity {
                 true); // true - include padding
 
         // calculate height for the entity, min - Limits.MIN_BITMAP_HEIGHT
+        int boundsHeight1 = sl.getBottomPadding();
+        int boundsHeight2 = sl.getTopPadding();
+        float mulz = sl.getSpacingMultiplier();
         int boundsHeight = sl.getHeight();
 
         // create bitmap not smaller than TextLayer.Limits.MIN_BITMAP_HEIGHT
-        int bmpHeight = (int) (canvasHeight * Math.max(Limits.MIN_BITMAP_HEIGHT,
-                1.0F * boundsHeight / canvasHeight));
+        // int bmpHeight = (int) (canvasHeight * Math.max(Limits.MIN_BITMAP_HEIGHT, 1.0F * boundsHeight / canvasHeight));
 
         // create bitmap where text will be drawn
         Bitmap bmp;
-        if (reuseBmp != null && reuseBmp.getWidth() == boundsWidth && reuseBmp.getHeight() == bmpHeight) {
+        if (reuseBmp != null && reuseBmp.getWidth() == boundsWidth && reuseBmp.getHeight() == boundsHeight) {
             // if previous bitmap exists, and it's width/height is the same - reuse it
             bmp = reuseBmp;
             bmp.eraseColor(Color.TRANSPARENT); // erase color when reusing
         } else {
-            bmp = Bitmap.createBitmap(boundsWidth, bmpHeight, Bitmap.Config.ARGB_8888);
+            bmp = Bitmap.createBitmap(boundsWidth, boundsHeight, Bitmap.Config.RGB_565);
         }
 
         Canvas canvas = new Canvas(bmp);
         canvas.save();
 
         // move text to center if bitmap is bigger that text
-        if (boundsHeight < bmpHeight) {
-            //calculate Y coordinate - In this case we want to draw the text in the
-            //center of the canvas so we move Y coordinate to center.
-            float textYCoordinate = (bmpHeight - boundsHeight) / 2;
-            canvas.translate(0, textYCoordinate);
-        }
+//        if (boundsHeight < bmpHeight) {
+//            //calculate Y coordinate - In this case we want to draw the text in the
+//            //center of the canvas so we move Y coordinate to center.
+//            float textYCoordinate = (bmpHeight - boundsHeight) / 2;
+//            canvas.translate(0, textYCoordinate);
+//        }
 
         //draws static layout on canvas
         sl.draw(canvas);
@@ -178,5 +193,12 @@ public class TextEntity extends MotionEntity {
         if (bitmap != null && !bitmap.isRecycled()) {
             bitmap.recycle();
         }
+    }
+
+    public void setMaxWidth(int maxWidth) {
+        this.maxWidth = maxWidth;
+    }
+    public int getMaxWidth() {
+        return this.maxWidth;
     }
 }

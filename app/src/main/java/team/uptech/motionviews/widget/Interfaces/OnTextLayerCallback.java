@@ -16,6 +16,6 @@ public interface OnTextLayerCallback {
     void textChanged(@NonNull String text);
     void textColorChanged(@NonNull int color);
     void textSizeChanged(@NonNull int size);
-    void multiTextChange(@Nullable String text, @Nullable Integer color, @Nullable Integer size);
+    void multiTextChange(@Nullable String text, @Nullable Integer color, @Nullable Integer size, @Nullable Integer maxWidth);
     @Nullable FontProvider getFontProvider();
 }

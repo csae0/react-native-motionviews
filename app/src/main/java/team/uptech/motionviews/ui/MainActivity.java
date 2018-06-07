@@ -291,21 +291,21 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
 
     @Override
     public void textChanged(@NonNull String text) {
-        multiTextChange(text, null, null);
+        multiTextChange(text, null, null, null);
     }
 
     @Override
     public void textColorChanged(@NonNull int selectedColor) {
-        multiTextChange(null, selectedColor, null);
+        multiTextChange(null, selectedColor, null, null);
     }
 
     @Override
     public void textSizeChanged(@NonNull int size) {
-        multiTextChange(null, null, size);
+        multiTextChange(null, null, size, null);
     }
 
     @Override
-    public void multiTextChange(@Nullable String text, @Nullable Integer color, @Nullable Integer sizeInPixel) {
+    public void multiTextChange(@Nullable String text, @Nullable Integer color, @Nullable Integer sizeInPixel,  @Nullable Integer maxWidth) {
         TextEntity textEntity = currentTextEntity();
         if (textEntity != null) {
             TextLayer textLayer = textEntity.getLayer();
@@ -323,9 +323,13 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
             if (sizeInPixel != null && sizeInPixel > 0 && sizeInPixel != font.getSize()) {
                 font.setSize((float)sizeInPixel);
             }
+            // Set maxWidth
+            if (maxWidth != null && maxWidth > 0 && textEntity.getMaxWidth() != maxWidth) {
+                textEntity.setMaxWidth(maxWidth);
+            }
             textEntity.setVisible(true);
             textEntity.updateEntity();
-            motionView.unselectEntity();
+//            motionView.unselectEntity();
             motionView.invalidate();
         }
     }

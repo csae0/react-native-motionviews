@@ -120,6 +120,7 @@ public class TextEditorDialogFragment extends DialogFragment {
             typefaceName = args.getString(ARG_TYPEFACE);
         }
         editText = view.findViewById(R.id.edit_text_view);
+//        editText.setMaxWidth();
         // Slider values
         BoxedVertical boxedVertical = view.findViewById(R.id.boxed_vertical);
         boxedVertical.setValue(ConversionUtils.pxToDp(size));
@@ -144,7 +145,7 @@ public class TextEditorDialogFragment extends DialogFragment {
             public void onClick(View view) {
                 // apply editText properties to textView
                 if (callback != null) {
-                    callback.multiTextChange(editText.getText().toString(), editText.getCurrentTextColor(), (int)editText.getTextSize());
+                    callback.multiTextChange(editText.getText().toString(), editText.getCurrentTextColor(), (int)editText.getTextSize(), editText.getWidth());
                 }
                 // exit when clicking on background
                 dismiss();
@@ -160,6 +161,32 @@ public class TextEditorDialogFragment extends DialogFragment {
             @Override
             public void afterTextChanged(Editable s) {}
         });
+//        editText.addTextChangedListener(new TextWatcher() {
+//            int currentLineCount = 1;
+//            @Override
+//            public void onTextChanged(CharSequence text, int start, int before, int count) {
+//                try {
+//                    int lines = editText.getLineCount(); //TODO: WAS TUT ES ?????
+//                    System.out.println("----LOG---- " + lines);
+//                    if (lines > currentLineCount) {
+//                        currentLineCount = lines;
+//                        String textWithLineBreak = text.subSequence(0, start-1).toString() + "\n" + text.charAt(start);
+//                        editText.setText(textWithLineBreak);
+//                        editText.setSelection(textWithLineBreak.length());// set cursor to last word
+//                    } else if (lines < currentLineCount && lines > 0) {
+//                        currentLineCount = lines;
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                } finally {
+//                    System.out.println("");
+//                }
+//            }
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+//            @Override
+//            public void afterTextChanged(Editable s) {}
+//        });
 
         // Text size change
         ((BoxedVertical)view.findViewById(R.id.boxed_vertical)).setOnBoxedPointsChangeListener(new BoxedVertical.OnValuesChangeListener() {

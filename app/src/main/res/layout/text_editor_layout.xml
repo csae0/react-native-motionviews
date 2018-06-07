@@ -11,17 +11,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <EditText
         android:id="@+id/edit_text_view"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:alpha="1"
-        android:background="@color/transparent"
+        android:background="@color/stroke_color"
         android:gravity="center"
         android:inputType="textMultiLine|textNoSuggestions|textVisiblePassword"
         android:textColor="@android:color/white"
-        android:paddingLeft="@dimen/slider_width_and_padding"
-        android:paddingBottom="@dimen/color_picker_height_and_padding"
+        android:layout_marginLeft="@dimen/slider_width_and_padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_marginVertical="@dimen/color_picker_height_and_padding"
     />
     <LinearLayout
         android:id="@+id/color_picker"

@@ -42,7 +42,7 @@ public class ImageEntity extends MotionEntity {
         srcPoints[2] = width; srcPoints[3] = 0;
         srcPoints[4] = width; srcPoints[5] = height;
         srcPoints[6] = 0; srcPoints[7] = height;
-        srcPoints[8] = 0; srcPoints[8] = 0;
+        srcPoints[8] = 0; srcPoints[9] = 0;
     }
 
     @Override
