@@ -17,6 +17,9 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.Button;
 import android.widget.FrameLayout;
 
 import com.almeros.android.multitouch.MoveGestureDetector;
@@ -57,6 +60,9 @@ public class MotionView  extends FrameLayout {
     private RotateGestureDetector rotateGestureDetector;
     private MoveGestureDetector moveGestureDetector;
     private GestureDetectorCompat gestureDetectorCompat;
+
+    //animation
+    private Button trashButton;
 
     // constructors
     public MotionView(Context context) {
@@ -112,6 +118,9 @@ public class MotionView  extends FrameLayout {
         this.motionViewCallback = callback;
     }
 
+    public void setTrashButton(Button b) {
+        trashButton = b;
+    }
     public void addEntity(@Nullable MotionEntity entity) {
         if (entity != null) {
             entities.add(entity);
@@ -314,6 +323,51 @@ public class MotionView  extends FrameLayout {
         }
     }
 
+    public void fadeOutTrashButton () {
+        AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
+        alphaAnimation.setDuration(500);
+        alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                trashButton.setAlpha(0);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+        if (trashButton != null) {
+            trashButton.startAnimation(alphaAnimation);
+        }
+    }
+
+    public void fadeInTrashButton () {
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
+        alphaAnimation.setDuration(500);
+        alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                trashButton.setAlpha(1);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+        if (trashButton != null) {
+            trashButton.startAnimation(alphaAnimation);
+        }
+
+        System.out.print(234);
+    }
+
     // gesture detectors
 
     private final View.OnTouchListener onTouchListener = new View.OnTouchListener() {
@@ -387,6 +441,7 @@ public class MotionView  extends FrameLayout {
             MotionEvent motionEvent = detector.getmCurrEvent();
             MotionEntity entity = findEntityAtPoint(motionEvent.getX(), motionEvent.getY());
             if (entity != null) {
+                fadeInTrashButton();
                 selectEntity(entity, true);
             }
             return true;
@@ -394,6 +449,7 @@ public class MotionView  extends FrameLayout {
 
         @Override
         public void onMoveEnd(MoveGestureDetector detector) {
+            fadeOutTrashButton();
 //            unselectEntity();
         }
     }

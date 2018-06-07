@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
         motionView = findViewById(R.id.main_motion_view);
 //        textEntityEditPanel = findViewById(R.id.main_motion_text_entity_edit_panel);
         motionView.setMotionViewCallback(motionViewCallback);
-
+        motionView.setTrashButton((Button)findViewById(R.id.trash_button));
         addSticker(R.drawable.pikachu_2, true);
 
 //        initTextEntitiesListeners();

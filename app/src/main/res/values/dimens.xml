@@ -7,4 +7,6 @@
     <dimen name="color_picker_height_and_padding">48dp</dimen>
     <dimen name="slider_width">36dp</dimen>
     <dimen name="slider_width_and_padding">48dp</dimen>
+    <dimen name="trash_circle">42dp</dimen>
+    <dimen name="trash_icon">36dp</dimen>
 </resources>
