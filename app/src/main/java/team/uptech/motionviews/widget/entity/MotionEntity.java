@@ -1,8 +1,10 @@
 package team.uptech.motionviews.widget.entity;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -141,6 +143,29 @@ public abstract class MotionEntity {
         matrix.preScale(holyScale, holyScale);
     }
 
+//    int aa = -1, bb = -1, cc = -1;
+
+//    public void setData(int a, int b, int c) {
+//        aa = a;
+//        bb = b;
+//        cc = c;
+//    }
+    public float[] entityCenter() {
+        float topLeftX = layer.getX();
+        float topLeftY = layer.getY();
+        float centerX = topLeftX + getWidth() * 0.5F;
+        float centerY = topLeftY + getHeight() * 0.5F;
+        float[] point = { centerX, centerY };
+
+        updateMatrix();
+        matrix.mapPoints(point);
+
+        return point;
+    }
+
+    public int[] canvasDimensions() {
+        return new int[]{canvasWidth, canvasHeight};
+    }
     public float absoluteCenterX() {
         float topLeftX = layer.getX() * canvasWidth;
         return topLeftX + getWidth() * holyScale * 0.5F;
@@ -220,6 +245,15 @@ public abstract class MotionEntity {
             canvas.save();
 
             drawContent(canvas, drawingPaint);
+
+            float[] center = entityCenter();
+            canvas.drawCircle(center[0], center[1], 5, new Paint(Color.GREEN));
+
+//            if (aa > 0 && bb > 0 && cc > 0) {
+//                canvas.drawCircle(bb, aa,  10, new Paint(Color.GREEN));
+//                canvas.drawCircle(cc, aa,  10, new Paint(Color.GREEN));
+////                canvas.save();
+//            }
 
             if (isSelected()) {
                 // get alpha from drawingPaint

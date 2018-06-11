@@ -1,5 +1,6 @@
 package team.uptech.motionviews.widget;
 
+import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -13,10 +14,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
@@ -29,8 +34,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import team.uptech.motionviews.R;
+import team.uptech.motionviews.viewmodel.Layer;
+import team.uptech.motionviews.widget.Interfaces.Limits;
 import team.uptech.motionviews.widget.Interfaces.MotionViewCallback;
+import team.uptech.motionviews.widget.Worker.ShrinkWorker;
 import team.uptech.motionviews.widget.entity.MotionEntity;
+import team.uptech.motionviews.widget.entity.TextEntity;
 
 /**
  * Created on 9/29/16.
@@ -211,6 +220,10 @@ public class MotionView  extends FrameLayout {
                 selectedEntity.getLayer().postTranslate(0.0F, delta.y / getHeight());
                 needUpdateUI = true;
             }
+
+            // handle move over trash check and actions
+            handleTrash();
+
             if (needUpdateUI) {
                 updateUI();
             }
@@ -323,6 +336,51 @@ public class MotionView  extends FrameLayout {
         }
     }
 
+    // Check if entity center moved into trash button
+    public boolean enteredTrashArea () {
+        if (selectedEntity != null) {
+            int[] canvasDimensions = selectedEntity.canvasDimensions();
+            int buttonTop = canvasDimensions[1] - trashButton.getHeight();
+            int buttonLeft = canvasDimensions[0] / 2 - trashButton.getWidth() / 2;
+            int buttonRight = canvasDimensions[0] / 2 + trashButton.getWidth() / 2;
+            float[] center = selectedEntity.entityCenter();
+
+            return center[1] > buttonTop && center[0] > buttonLeft && center[0] < buttonRight;
+        }
+        return false;
+    }
+
+    public void handleTrash() {
+        if (selectedEntity != null) {
+            ShrinkWorker shrinkWorker = ShrinkWorker.getInstance(selectedEntity);
+            if (shrinkWorker != null) {
+                if (enteredTrashArea()) {
+                    shrinkWorker.setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            selectedEntity.getLayer().setScale((float) animation.getAnimatedValue());
+                        }
+                    });
+                    shrinkWorker.start();
+                } else {
+                    shrinkWorker.reverseStart();
+                }
+            }
+            // TODO: ADD CASES FOR GROWING AGAIN, TEST
+
+//                Layer layer = selectedEntity.getLayer();
+//                ValueAnimator va = ValueAnimator.ofFloat(layer.getScale(), layer.getMinScale());
+//                va.setDuration(1000);
+//                va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//                    public void onAnimationUpdate(ValueAnimator animation) {
+//                        selectedEntity.getLayer().setScale((float) animation.getAnimatedValue());
+//                    }
+//                });
+//                va.setRepeatCount(0);
+//                va.start();
+//            }
+        }
+    }
+
     public void fadeOutTrashButton () {
         AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
         alphaAnimation.setDuration(500);
@@ -364,8 +422,6 @@ public class MotionView  extends FrameLayout {
         if (trashButton != null) {
             trashButton.startAnimation(alphaAnimation);
         }
-
-        System.out.print(234);
     }
 
     // gesture detectors
@@ -439,7 +495,12 @@ public class MotionView  extends FrameLayout {
         @Override
         public boolean onMoveBegin(MoveGestureDetector detector) {
             MotionEvent motionEvent = detector.getmCurrEvent();
-            MotionEntity entity = findEntityAtPoint(motionEvent.getX(), motionEvent.getY());
+            MotionEntity entity = findEntityAtPoint(motionEvent.getX(), motionEvent.getY());;
+
+            if (entity == null && selectedEntity != null) {
+                entity = selectedEntity;
+            }
+
             if (entity != null) {
                 fadeInTrashButton();
                 selectEntity(entity, true);

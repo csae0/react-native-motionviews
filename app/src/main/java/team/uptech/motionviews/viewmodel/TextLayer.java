@@ -18,12 +18,12 @@ public class TextLayer extends Layer {
     }
 
     @Override
-    protected float getMaxScale() {
+    public float getMaxScale() {
         return team.uptech.motionviews.widget.Interfaces.Limits.MAX_SCALE;
     }
 
     @Override
-    protected float getMinScale() {
+    public float getMinScale() {
         return team.uptech.motionviews.widget.Interfaces.Limits.MIN_SCALE;
     }
 

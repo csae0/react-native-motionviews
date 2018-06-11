@@ -2,6 +2,7 @@ package team.uptech.motionviews.widget.entity;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;

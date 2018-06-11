@@ -76,7 +76,7 @@ public class StickerSelectActivity extends AppCompatActivity {
         setContentView(R.layout.select_sticker_activity);
 
         //noinspection ConstantConditions
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.stickers_recycler_view);
         GridLayoutManager glm = new GridLayoutManager(this, 3);

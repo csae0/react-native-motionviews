@@ -37,17 +37,19 @@ public class Layer {
     }
 
     public void postScale(float scaleDiff) {
-        float newVal = scale + scaleDiff;
-        if (newVal >= getMinScale() && newVal <= getMaxScale()) {
-            scale = newVal;
+        if (scaleDiff != 0) {
+            float newVal = scale + scaleDiff;
+            if (newVal >= getMinScale() && newVal <= getMaxScale()) {
+                scale = newVal;
+            }
         }
     }
 
-    protected float getMaxScale() {
+    public float getMaxScale() {
         return Limits.MAX_SCALE;
     }
 
-    protected float getMinScale() {
+    public float getMinScale() {
         return Limits.MIN_SCALE;
     }
 
@@ -82,7 +84,9 @@ public class Layer {
     }
 
     public void setScale(float scale) {
-        this.scale = scale;
+        if (scale >= getMinScale() && scale <= getMaxScale() && this.scale != scale) {
+            this.scale = scale;
+        }
     }
 
     public float getX() {
