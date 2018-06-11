@@ -37,6 +37,7 @@ import team.uptech.motionviews.R;
 import team.uptech.motionviews.viewmodel.Layer;
 import team.uptech.motionviews.widget.Interfaces.Limits;
 import team.uptech.motionviews.widget.Interfaces.MotionViewCallback;
+import team.uptech.motionviews.widget.Interfaces.ShrinkWorkerCallback;
 import team.uptech.motionviews.widget.Worker.ShrinkWorker;
 import team.uptech.motionviews.widget.entity.MotionEntity;
 import team.uptech.motionviews.widget.entity.TextEntity;
@@ -111,6 +112,23 @@ public class MotionView  extends FrameLayout {
         this.gestureDetectorCompat = new GestureDetectorCompat(context, new TapsListener());
 
         setOnTouchListener(onTouchListener);
+
+        if (!ShrinkWorker.hasUpdateListener()) {
+            ShrinkWorker.setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    selectedEntity.getLayer().setScale((float) animation.getAnimatedValue());
+                    updateUI();
+                }
+            });
+        }
+        if (!ShrinkWorker.hasCallback()) {
+            ShrinkWorker.setCallback(new ShrinkWorkerCallback() {
+                @Override
+                public void deleteAfterAnimationEnd() {
+                    deleteSelectedEntity();
+                }
+            });
+        }
 
         updateUI();
     }
@@ -222,7 +240,7 @@ public class MotionView  extends FrameLayout {
             }
 
             // handle move over trash check and actions
-            handleTrash();
+            handleTrashMove();
 
             if (needUpdateUI) {
                 updateUI();
@@ -318,7 +336,7 @@ public class MotionView  extends FrameLayout {
         moveEntityToBack(selectedEntity);
     }
 
-    public void deletedSelectedEntity() {
+    public void deleteSelectedEntity() {
         if (selectedEntity == null) {
             return;
         }
@@ -350,34 +368,27 @@ public class MotionView  extends FrameLayout {
         return false;
     }
 
-    public void handleTrash() {
+    public void handleTrashMove() {
         if (selectedEntity != null) {
             ShrinkWorker shrinkWorker = ShrinkWorker.getInstance(selectedEntity);
             if (shrinkWorker != null) {
                 if (enteredTrashArea()) {
-                    shrinkWorker.setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        public void onAnimationUpdate(ValueAnimator animation) {
-                            selectedEntity.getLayer().setScale((float) animation.getAnimatedValue());
-                        }
-                    });
                     shrinkWorker.start();
                 } else {
                     shrinkWorker.reverseStart();
                 }
             }
-            // TODO: ADD CASES FOR GROWING AGAIN, TEST
+        }
+    }
 
-//                Layer layer = selectedEntity.getLayer();
-//                ValueAnimator va = ValueAnimator.ofFloat(layer.getScale(), layer.getMinScale());
-//                va.setDuration(1000);
-//                va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                    public void onAnimationUpdate(ValueAnimator animation) {
-//                        selectedEntity.getLayer().setScale((float) animation.getAnimatedValue());
-//                    }
-//                });
-//                va.setRepeatCount(0);
-//                va.start();
-//            }
+    public void handleTrashDelete () {
+        if (selectedEntity != null && enteredTrashArea()) {
+            ShrinkWorker shrinkWorker = ShrinkWorker.getInstance(selectedEntity);
+            if (shrinkWorker.isRunning()) {
+                shrinkWorker.deleteSelectedEntity();
+            } else {
+                deleteSelectedEntity();
+            }
         }
     }
 
@@ -511,6 +522,7 @@ public class MotionView  extends FrameLayout {
         @Override
         public void onMoveEnd(MoveGestureDetector detector) {
             fadeOutTrashButton();
+            handleTrashDelete();
 //            unselectEntity();
         }
     }

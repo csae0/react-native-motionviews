@@ -2,40 +2,49 @@ package team.uptech.motionviews.widget.Worker;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.util.Log;
 import android.view.animation.AccelerateInterpolator;
 
+import java.util.ArrayList;
+
 import team.uptech.motionviews.viewmodel.Layer;
+import team.uptech.motionviews.widget.Interfaces.ShrinkWorkerCallback;
 import team.uptech.motionviews.widget.entity.MotionEntity;
 
 public class ShrinkWorker {
     public interface Constants {
         int SHRINK_DURATION = 500;
         float ACCELERATE_FACTOR = 1.5f;
-
     }
+
+    // Static variables
     private static ShrinkWorker instance = null;
     private static MotionEntity selectedEntity = null;
 
-    private static boolean shrink = true;
-    private static boolean finished = false;
-    private static float minScale = 0;
-    private static float initialScale = 0;
+    private static boolean delete = false;
+    private static boolean started = false;
+    private static boolean hasCallback = false;
+    private static boolean hasUpdateListener;
+
+    private static float minScale;
+    private static float initialScale;
+
+    private static ShrinkWorkerCallback callback = null;
+    private static ValueAnimator.AnimatorUpdateListener updateListener = null;
 
     private ValueAnimator shrinkAnimator;
 
-
     private ShrinkWorker (MotionEntity entity) {
-        shrink = true;
-        finished = false;
         selectedEntity = entity;
-        Layer layer = entity.getLayer();
-        minScale = layer.getMinScale();
-        initialScale = layer.getScale();
+        started = false;
 
         AccelerateInterpolator accelerateInterpolator = new AccelerateInterpolator(Constants.ACCELERATE_FACTOR);
         shrinkAnimator = ValueAnimator.ofFloat(initialScale, minScale);
         shrinkAnimator.setDuration(Constants.SHRINK_DURATION);
         shrinkAnimator.setInterpolator(accelerateInterpolator);
+        if (hasUpdateListener) {
+            shrinkAnimator.addUpdateListener(updateListener);
+        }
         shrinkAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -43,60 +52,89 @@ public class ShrinkWorker {
 
             @Override
             public void onAnimationEnd(Animator animator) {
-                finished = true;
-//                reverse();
+                if (hasCallback && delete) {
+                    delete = false;
+                    callback.deleteAfterAnimationEnd();
+                }
             }
 
             @Override
             public void onAnimationCancel(Animator animator) {
-                finished = true;
-                //                reverse();
-//                start();
             }
 
             @Override
             public void onAnimationRepeat(Animator animator) {
-
             }
         });
     }
 
-    public static ShrinkWorker getInstance (MotionEntity entity) {
-        if (instance == null) {
-            instance = new ShrinkWorker(entity);
-        } else if (selectedEntity != entity) {
-            selectedEntity = entity;
-            shrink = true;
-            finished = false;
+    public static ShrinkWorker getInstance(MotionEntity entity) {
+        if (entity != null) {
+            if (instance == null) {
+                instance = new ShrinkWorker(entity);
+            } else if (selectedEntity != entity) {
+                selectedEntity = entity;
+                started = false;
+            }
+
             Layer layer = entity.getLayer();
             minScale = layer.getMinScale();
             initialScale = layer.getScale();
+            return instance;
         }
-        return instance;
+        return null;
     }
 
-    public void setUpdateListener(ValueAnimator.AnimatorUpdateListener updateListener) {
-        this.shrinkAnimator.addUpdateListener(updateListener);
+    public static void setUpdateListener(ValueAnimator.AnimatorUpdateListener updateListener) {
+        if (updateListener != null) {
+            hasUpdateListener = true;
+        }
+        ShrinkWorker.updateListener = updateListener;
     }
+
+    public static void setCallback(ShrinkWorkerCallback callback) {
+        if (callback != null) {
+            hasCallback = true;
+        }
+        ShrinkWorker.callback = callback;
+    }
+
+    public static boolean hasUpdateListener () {
+        return hasUpdateListener;
+    }
+
+    public static boolean hasCallback () {
+        return hasCallback;
+    }
+
 
     public void reverseStart () {
-        if (finished) {
-            finished = false;
-            shrink = !shrink;
+        if (isStarted()) {
+            started = false;
             shrinkAnimator.reverse();
-            start();
-        } else {
-            shrinkAnimator.cancel();
-            reverseStart();
         }
     }
 
     public void start () {
-        if (!shrinkAnimator.isRunning() && !finished) {
+        if (!isRunning() && !isStarted()) {
+            started = true;
+            instance.shrinkAnimator.setFloatValues(initialScale, minScale);
             shrinkAnimator.start();
         }
     }
-    public boolean isShrink() {
-        return shrink;
+
+    public boolean isStarted() {
+        return started;
+    }
+
+    public boolean isRunning() {
+        if (shrinkAnimator != null) {
+            return shrinkAnimator.isRunning();
+        }
+        return false;
+    }
+
+    public void deleteSelectedEntity() {
+        delete = true;
     }
 }
