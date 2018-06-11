@@ -1,10 +1,7 @@
 package team.uptech.motionviews.utils;
 
-import android.annotation.TargetApi;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 
 public class ConversionUtils {
 

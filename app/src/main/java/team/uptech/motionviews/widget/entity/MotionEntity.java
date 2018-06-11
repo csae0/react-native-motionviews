@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -143,13 +142,6 @@ public abstract class MotionEntity {
         matrix.preScale(holyScale, holyScale);
     }
 
-//    int aa = -1, bb = -1, cc = -1;
-
-//    public void setData(int a, int b, int c) {
-//        aa = a;
-//        bb = b;
-//        cc = c;
-//    }
     public float[] entityCenter() {
         float topLeftX = layer.getX();
         float topLeftY = layer.getY();
@@ -241,19 +233,11 @@ public abstract class MotionEntity {
 
         if (visible) {
             updateMatrix();
-
             canvas.save();
-
             drawContent(canvas, drawingPaint);
 
             float[] center = entityCenter();
             canvas.drawCircle(center[0], center[1], 5, new Paint(Color.GREEN));
-
-//            if (aa > 0 && bb > 0 && cc > 0) {
-//                canvas.drawCircle(bb, aa,  10, new Paint(Color.GREEN));
-//                canvas.drawCircle(cc, aa,  10, new Paint(Color.GREEN));
-////                canvas.save();
-//            }
 
             if (isSelected()) {
                 // get alpha from drawingPaint

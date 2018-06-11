@@ -60,9 +60,6 @@ public class TextEntity extends MotionEntity {
         float width = bitmap.getWidth();
         float height = bitmap.getHeight();
 
-        float widthAspect = 1.0F * canvasWidth / width;
-        float heightAspect = 1.0F * canvasHeight / height;
-
         // fit the smallest size
         holyScale = 1; // Math.min(widthAspect, heightAspect);
         // initial position of the entity
@@ -112,7 +109,6 @@ public class TextEntity extends MotionEntity {
         if (maxWidth > 0 && boundsWidth > maxWidth) {
             boundsWidth = maxWidth;
         }
-//        int boundsWidth = canvasWidth;
         // drawing text guide : http://ivankocijan.xyz/android-drawing-multiline-text-on-canvas/
         // Static layout which will be drawn on canvas
         StaticLayout sl = new StaticLayout(
@@ -125,14 +121,7 @@ public class TextEntity extends MotionEntity {
                 true); // true - include padding
 
         // calculate height for the entity, min - Limits.MIN_BITMAP_HEIGHT
-        int boundsHeight1 = sl.getBottomPadding();
-        int boundsHeight2 = sl.getTopPadding();
-        float mulz = sl.getSpacingMultiplier();
         int boundsHeight = sl.getHeight();
-
-        // create bitmap not smaller than TextLayer.Limits.MIN_BITMAP_HEIGHT
-        // int bmpHeight = (int) (canvasHeight * Math.max(Limits.MIN_BITMAP_HEIGHT, 1.0F * boundsHeight / canvasHeight));
-
         // create bitmap where text will be drawn
         Bitmap bmp;
         if (reuseBmp != null && reuseBmp.getWidth() == boundsWidth && reuseBmp.getHeight() == boundsHeight) {
@@ -142,17 +131,8 @@ public class TextEntity extends MotionEntity {
         } else {
             bmp = Bitmap.createBitmap(boundsWidth, boundsHeight, Bitmap.Config.ARGB_8888);
         }
-
         Canvas canvas = new Canvas(bmp);
         canvas.save();
-
-        // move text to center if bitmap is bigger that text
-//        if (boundsHeight < bmpHeight) {
-//            //calculate Y coordinate - In this case we want to draw the text in the
-//            //center of the canvas so we move Y coordinate to center.
-//            float textYCoordinate = (bmpHeight - boundsHeight) / 2;
-//            canvas.translate(0, textYCoordinate);
-//        }
 
         //draws static layout on canvas
         sl.draw(canvas);

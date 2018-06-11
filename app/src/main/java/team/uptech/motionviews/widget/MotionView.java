@@ -71,7 +71,7 @@ public class MotionView  extends FrameLayout {
     private MoveGestureDetector moveGestureDetector;
     private GestureDetectorCompat gestureDetectorCompat;
 
-    //animation
+    // animation
     private Button trashButton;
 
     // constructors
@@ -129,7 +129,6 @@ public class MotionView  extends FrameLayout {
                 }
             });
         }
-
         updateUI();
     }
 
@@ -157,7 +156,7 @@ public class MotionView  extends FrameLayout {
 
     public void addEntityAndPosition(@Nullable MotionEntity entity) {
         if (entity != null) {
-            initEntityBorder(entity);
+//            initEntityBorder(entity);
             initialTranslateAndScale(entity);
             entities.add(entity);
             selectEntity(entity, true);
@@ -166,12 +165,12 @@ public class MotionView  extends FrameLayout {
 
     private void initEntityBorder(@NonNull MotionEntity entity ) {
         // init stroke
-//        int strokeSize = getResources().getDimensionPixelSize(R.dimen.stroke_size);
-//        Paint borderPaint = new Paint();
-//        borderPaint.setStrokeWidth(strokeSize);
-//        borderPaint.setAntiAlias(true);
-//        borderPaint.setColor(ContextCompat.getColor(getContext(), R.color.stroke_color));
-//        entity.setBorderPaint(borderPaint);
+        int strokeSize = getResources().getDimensionPixelSize(R.dimen.stroke_size);
+        Paint borderPaint = new Paint();
+        borderPaint.setStrokeWidth(strokeSize);
+        borderPaint.setAntiAlias(true);
+        borderPaint.setColor(ContextCompat.getColor(getContext(), R.color.stroke_color));
+        entity.setBorderPaint(borderPaint);
     }
 
     @Override
@@ -436,7 +435,6 @@ public class MotionView  extends FrameLayout {
     }
 
     // gesture detectors
-
     private final View.OnTouchListener onTouchListener = new View.OnTouchListener() {
 
         @Override
@@ -523,7 +521,6 @@ public class MotionView  extends FrameLayout {
         public void onMoveEnd(MoveGestureDetector detector) {
             fadeOutTrashButton();
             handleTrashDelete();
-//            unselectEntity();
         }
     }
 }

@@ -2,10 +2,7 @@ package team.uptech.motionviews.widget.Worker;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
-import android.util.Log;
 import android.view.animation.AccelerateInterpolator;
-
-import java.util.ArrayList;
 
 import team.uptech.motionviews.viewmodel.Layer;
 import team.uptech.motionviews.widget.Interfaces.ShrinkWorkerCallback;

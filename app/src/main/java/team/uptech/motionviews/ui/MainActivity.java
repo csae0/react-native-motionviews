@@ -1,6 +1,5 @@
 package team.uptech.motionviews.ui;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,22 +7,12 @@ import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.builder.ColorPickerClickListener;
-import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
-
-import java.util.List;
-
 import team.uptech.motionviews.BuildConfig;
 import team.uptech.motionviews.R;
-import team.uptech.motionviews.ui.adapter.FontsAdapter;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
 import team.uptech.motionviews.viewmodel.Font;
@@ -42,20 +31,13 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
     public static final int SELECT_STICKER_REQUEST_CODE = 123;
 
     protected MotionView motionView;
-    protected View textEntityEditPanel;
     private final MotionViewCallback motionViewCallback = new MotionViewCallback() {
         @Override
         public void onEntitySelected(@Nullable MotionEntity entity) {
-//            if (entity instanceof TextEntity) {
-//                textEntityEditPanel.setVisibility(View.VISIBLE);
-//            } else {
-//                textEntityEditPanel.setVisibility(View.GONE);
-//            }
         }
 
         @Override
         public void onEntityDoubleTap(@NonNull MotionEntity entity) {
-
         }
         @Override
         public void onEntitySingleTapConfirmed(@NonNull MotionEntity entity) {
@@ -68,16 +50,12 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         this.fontProvider = new FontProvider(getResources());
 
         motionView = findViewById(R.id.main_motion_view);
-//        textEntityEditPanel = findViewById(R.id.main_motion_text_entity_edit_panel);
         motionView.setMotionViewCallback(motionViewCallback);
         motionView.setTrashButton((Button)findViewById(R.id.trash_button));
         addSticker(R.drawable.pikachu_2, true);
-
-//        initTextEntitiesListeners();
     }
 
     private void addSticker(final int stickerResId, final boolean visible) {
@@ -176,21 +154,6 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
     }
 
     @Override
-    public void textChanged(@NonNull String text) {
-        multiTextChange(text, null, null, null);
-    }
-
-    @Override
-    public void textColorChanged(@NonNull int selectedColor) {
-        multiTextChange(null, selectedColor, null, null);
-    }
-
-    @Override
-    public void textSizeChanged(@NonNull int size) {
-        multiTextChange(null, null, size, null);
-    }
-
-    @Override
     public void multiTextChange(@Nullable String text, @Nullable Integer color, @Nullable Integer sizeInPixel,  @Nullable Integer maxWidth) {
         TextEntity textEntity = currentTextEntity();
         if (textEntity != null) {
@@ -215,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
             }
             textEntity.setVisible(true);
             textEntity.updateEntity();
-//            motionView.unselectEntity();
             motionView.invalidate();
         }
     }

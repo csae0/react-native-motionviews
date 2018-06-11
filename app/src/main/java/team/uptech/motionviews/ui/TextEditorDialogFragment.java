@@ -10,12 +10,10 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.Selection;
-import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -35,15 +33,12 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
-import java.util.ArrayList;
-
 import abak.tr.com.boxedverticalseekbar.BoxedVertical;
 import team.uptech.motionviews.R;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
 import team.uptech.motionviews.widget.Interfaces.Limits;
 import team.uptech.motionviews.widget.Interfaces.OnTextLayerCallback;
-import team.uptech.motionviews.widget.entity.TextEntity;
 
 /**
  * Transparent Dialog Fragment, with no title and no background
@@ -139,7 +134,6 @@ public class TextEditorDialogFragment extends DialogFragment {
         }
         editText.setLayoutParams(layoutParams);
 
-
         // Slider values
         BoxedVertical boxedVertical = view.findViewById(R.id.boxed_vertical);
         boxedVertical.setValue(ConversionUtils.pxToDp(size));
@@ -148,7 +142,6 @@ public class TextEditorDialogFragment extends DialogFragment {
         initListeners(view);
 
         initWithTextEntity(text);
-
 
         editText.setTextColor(color);
         if (fontProvider != null) {
@@ -170,42 +163,6 @@ public class TextEditorDialogFragment extends DialogFragment {
                 dismiss();
             }
         });
-
-        // Text change
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-//        editText.addTextChangedListener(new TextWatcher() {
-//            int currentLineCount = 1;
-//            @Override
-//            public void onTextChanged(CharSequence text, int start, int before, int count) {
-//                try {
-//                    int lines = editText.getLineCount(); //TODO: WAS TUT ES ?????
-//                    System.out.println("----LOG---- " + lines);
-//                    if (lines > currentLineCount) {
-//                        currentLineCount = lines;
-//                        String textWithLineBreak = text.subSequence(0, start-1).toString() + "\n" + text.charAt(start);
-//                        editText.setText(textWithLineBreak);
-//                        editText.setSelection(textWithLineBreak.length());// set cursor to last word
-//                    } else if (lines < currentLineCount && lines > 0) {
-//                        currentLineCount = lines;
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                } finally {
-//                    System.out.println("");
-//                }
-//            }
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-//            @Override
-//            public void afterTextChanged(Editable s) {}
-//        });
 
         // Text size change
         ((BoxedVertical)view.findViewById(R.id.boxed_vertical)).setOnBoxedPointsChangeListener(new BoxedVertical.OnValuesChangeListener() {
@@ -338,11 +295,6 @@ public class TextEditorDialogFragment extends DialogFragment {
                 window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
                 //set to adjust screen height automatically, when soft keyboard appears on screen
                 window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-
-                // remove dim
-//                WindowManager.LayoutParams windowParams = window.getAttributes();
-//                window.setDimAmount(0.0F);
-//                window.setAttributes(windowParams);
             }
         }
     }
