@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "team.uptech.motionviews"
         minSdkVersion 19
@@ -20,27 +20,27 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // support
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.android.support:recyclerview-v7:26.1.0'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:recyclerview-v7:26.1.0'
 
     // color picker
-    compile 'com.github.QuadFlask:colorpicker:0.0.13'
+    implementation 'com.github.QuadFlask:colorpicker:0.0.13'
 
-    compile project(':BoxedVerticalSeekBarLib')
-//    compile 'com.github.alpbak:BoxedVerticalSeekBar:1b377fd8db'
+    implementation project(':BoxedVerticalSeekBarLib')
+//    implementation 'com.github.alpbak:BoxedVerticalSeekBar:1b377fd8db'
 
 
     // discrete slider
-    // compile project(':library')
-    // compile 'com.github.pinpong:discreteSeekBar:8c2ec706b9'
+    // implementation project(':library')
+    // implementation 'com.github.pinpong:discreteSeekBar:8c2ec706b9'
 
 
     // test
-    testCompile 'junit:junit:4.12'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 

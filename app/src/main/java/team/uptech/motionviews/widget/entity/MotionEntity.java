@@ -236,8 +236,8 @@ public abstract class MotionEntity {
             canvas.save();
             drawContent(canvas, drawingPaint);
 
-            float[] center = entityCenter();
-            canvas.drawCircle(center[0], center[1], 5, new Paint(Color.GREEN));
+//            float[] center = entityCenter();
+//            canvas.drawCircle(center[0], center[1], 5, new Paint(Color.GREEN));
 
             if (isSelected()) {
                 // get alpha from drawingPaint
