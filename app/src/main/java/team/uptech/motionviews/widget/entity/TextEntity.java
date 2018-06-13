@@ -1,5 +1,6 @@
 package team.uptech.motionviews.widget.entity;
 
+import android.app.FragmentManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,11 +13,14 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 
+import team.uptech.motionviews.ui.TextEditorDialogFragment;
 import team.uptech.motionviews.utils.FontProvider;
+import team.uptech.motionviews.viewmodel.Font;
 import team.uptech.motionviews.viewmodel.TextLayer;
 import team.uptech.motionviews.widget.Interfaces.Limits;
+import team.uptech.motionviews.widget.Interfaces.TextEntityActions;
 
-public class TextEntity extends MotionEntity {
+public class TextEntity extends MotionEntity implements TextEntityActions {
 
     private final TextPaint textPaint;
     private final FontProvider fontProvider;
@@ -180,5 +184,42 @@ public class TextEntity extends MotionEntity {
     }
     public int getMaxWidth() {
         return this.maxWidth;
+    }
+
+    @Override
+    public void startEditing(FragmentManager fragmentManager) {
+        setVisible(false);
+        TextLayer textLayer = getLayer();
+        Font font = textLayer.getFont();
+        String text = textLayer.getText();
+        int size = (int)(font.getSize() + 0.5f);
+        int color = font.getColor();
+        String typefaceName = font.getTypeface();
+        TextEditorDialogFragment fragment = TextEditorDialogFragment.getInstance(text, size, color, typefaceName);
+        fragment.show(fragmentManager, TextEditorDialogFragment.class.getName());
+    }
+
+    @Override
+    public void updateState(@Nullable String text, @Nullable Integer color, @Nullable Integer sizeInPixel, @Nullable Integer maxWidth) {
+        TextLayer textLayer = getLayer();
+        Font font = textLayer.getFont();
+        // Set text
+        if (text != null && text.length() > 0 && !text.equals(textLayer.getText())) {
+            textLayer.setText(text);
+        }
+        // Set color
+        if (color != null && color != font.getColor()) {
+            font.setColor(color);
+        }
+        // Set size
+        if (sizeInPixel != null && sizeInPixel > 0 && sizeInPixel != font.getSize()) {
+            font.setSize((float)sizeInPixel);
+        }
+        // Set maxWidth
+        if (maxWidth != null && maxWidth > 0 && getMaxWidth() != maxWidth) {
+            setMaxWidth(maxWidth);
+        }
+        setVisible(true);
+        updateEntity();
     }
 }

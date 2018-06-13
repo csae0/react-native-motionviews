@@ -50,5 +50,14 @@
             android:layout_marginTop="@dimen/padding"
             android:onClick="addSticker">
         </ImageButton>
+        <ImageButton
+            android:id="@+id/main_add_lines"
+            android:background="@drawable/pokeball"
+            android:title="@string/add_sticker"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="@dimen/padding"
+            android:onClick="addLines">
+        </ImageButton>
     </LinearLayout>
 </RelativeLayout>

@@ -17,16 +17,19 @@ import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
 import team.uptech.motionviews.viewmodel.Font;
 import team.uptech.motionviews.viewmodel.Layer;
+import team.uptech.motionviews.viewmodel.SketchLayer;
+import team.uptech.motionviews.viewmodel.Stroke;
 import team.uptech.motionviews.viewmodel.TextLayer;
+import team.uptech.motionviews.widget.Interfaces.EntityCallback;
 import team.uptech.motionviews.widget.Interfaces.Limits;
 import team.uptech.motionviews.widget.Interfaces.MotionViewCallback;
-import team.uptech.motionviews.widget.Interfaces.OnTextLayerCallback;
 import team.uptech.motionviews.widget.MotionView;
 import team.uptech.motionviews.widget.entity.ImageEntity;
 import team.uptech.motionviews.widget.entity.MotionEntity;
+import team.uptech.motionviews.widget.entity.SketchEntity;
 import team.uptech.motionviews.widget.entity.TextEntity;
 
-public class MainActivity extends AppCompatActivity implements OnTextLayerCallback {
+public class MainActivity extends AppCompatActivity implements EntityCallback {
 
     public static final int SELECT_STICKER_REQUEST_CODE = 123;
 
@@ -41,9 +44,10 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
         }
         @Override
         public void onEntitySingleTapConfirmed(@NonNull MotionEntity entity) {
-            startTextEntityEditing();
+            entity.startEditing(getFragmentManager());
         }
     };
+
     private FontProvider fontProvider;
 
     @Override
@@ -64,42 +68,43 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
             public void run() {
                 Layer layer = new Layer();
                 Bitmap pica = BitmapFactory.decodeResource(getResources(), stickerResId);
+                ImageEntity imageEntity = new ImageEntity(layer, pica, motionView.getWidth(), motionView.getHeight(), visible);
+                motionView.addEntityAndPosition(imageEntity);
 
-                ImageEntity entity = new ImageEntity(layer, pica, motionView.getWidth(), motionView.getHeight(), visible);
-
-                motionView.addEntityAndPosition(entity);
+                imageEntity.startEditing(getFragmentManager()); // Does nothing for imageEntity
             }
         });
-    }
-
-    private void startTextEntityEditing() {
-        TextEntity textEntity = currentTextEntity();
-        if (textEntity != null) {
-            textEntity.setVisible(false);
-            TextLayer textLayer = textEntity.getLayer();
-
-            String text = textLayer.getText();
-            int size = (int)(textLayer.getFont().getSize() + 0.5f);
-            int color = textLayer.getFont().getColor();
-            String typefaceName = textLayer.getFont().getTypeface();
-            TextEditorDialogFragment fragment = TextEditorDialogFragment.getInstance(text, size, color, typefaceName);
-            fragment.show(getFragmentManager(), TextEditorDialogFragment.class.getName());
-        }
-    }
-
-    @Nullable
-    private TextEntity currentTextEntity() {
-        if (motionView != null && motionView.getSelectedEntity() instanceof TextEntity) {
-            return ((TextEntity) motionView.getSelectedEntity());
-        } else {
-            return null;
-        }
     }
 
     public void addSticker(View v) {
         Intent intent = new Intent(this, StickerSelectActivity.class);
         startActivityForResult(intent, SELECT_STICKER_REQUEST_CODE);
     }
+
+    public void addSketch(View v) {
+        addTextSticker(false);
+    }
+
+    protected void addSketch(boolean visible) { //TODO
+        SketchLayer sketchLayer = createSketchLayer();
+        SketchEntity sketchEntity = new SketchEntity(sketchLayer, motionView.getWidth(), motionView.getHeight(), visible);
+        motionView.addEntityAndPosition(sketchEntity);
+
+        sketchEntity.startEditing(getFragmentManager());
+
+    }
+
+    private SketchLayer createSketchLayer() {
+        SketchLayer sketchLayer = new SketchLayer();
+        Stroke stroke = new Stroke();
+
+        stroke.setColor(Limits.INITIAL_SKETCH_COLOR);
+        stroke.setSize(ConversionUtils.dpToPx(Limits.FONT_SIZE_INITIAL_DP));
+        sketchLayer.setStroke(stroke);
+
+        return sketchLayer;
+    }
+
     public void addTextSticker(View v) {
         addTextSticker(false);
     }
@@ -110,15 +115,7 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
                 motionView.getHeight(), fontProvider, visible);
         motionView.addEntityAndPosition(textEntity);
 
-        // move text sticker up so that its not hidden under keyboard
-        PointF center = textEntity.absoluteCenter();
-        center.y = center.y * 0.5F;
-        textEntity.moveCenterTo(center);
-
-        // redraw
-        motionView.invalidate();
-
-        startTextEntityEditing();
+        textEntity.startEditing(getFragmentManager());
     }
 
     private TextLayer createTextLayer() {
@@ -154,30 +151,10 @@ public class MainActivity extends AppCompatActivity implements OnTextLayerCallba
     }
 
     @Override
-    public void multiTextChange(@Nullable String text, @Nullable Integer color, @Nullable Integer sizeInPixel,  @Nullable Integer maxWidth) {
-        TextEntity textEntity = currentTextEntity();
-        if (textEntity != null) {
-            TextLayer textLayer = textEntity.getLayer();
-            Font font = textLayer.getFont();
-
-            // Set text
-            if (text != null && text.length() > 0 && !text.equals(textLayer.getText())) {
-                textLayer.setText(text);
-            }
-            // Set color
-            if (color != null && color != font.getColor()) {
-                font.setColor(color);
-            }
-            // Set size
-            if (sizeInPixel != null && sizeInPixel > 0 && sizeInPixel != font.getSize()) {
-                font.setSize((float)sizeInPixel);
-            }
-            // Set maxWidth
-            if (maxWidth != null && maxWidth > 0 && textEntity.getMaxWidth() != maxWidth) {
-                textEntity.setMaxWidth(maxWidth);
-            }
-            textEntity.setVisible(true);
-            textEntity.updateEntity();
+    public void updateEntity(@Nullable String text, @Nullable Integer color, @Nullable Integer sizeInPixel, @Nullable Integer maxWidth) {
+        MotionEntity motionEntity = motionView.getSelectedEntity();
+        if (motionEntity != null && motionEntity instanceof TextEntity) {
+            ((TextEntity) motionEntity).updateState(text, color, sizeInPixel, maxWidth);
             motionView.invalidate();
         }
     }

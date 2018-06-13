@@ -11,5 +11,6 @@ public interface Limits {
     float INITIAL_FONT_SIZE_SCALE = 0.6f;
     float FONT_SIZE_MULTIPLICATOR = 100 * 0.5f; // transform scale into correct font size
     int INITIAL_FONT_COLOR = 0xffededed;
+    int INITIAL_SKETCH_COLOR = 0xffededed;
     int FONT_SIZE_INITIAL_DP = (int)(INITIAL_FONT_SIZE_SCALE * FONT_SIZE_MULTIPLICATOR); // = TEXT SIZE 30? (defined in Integers.xml)
 }

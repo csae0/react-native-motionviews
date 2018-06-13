@@ -35,6 +35,7 @@ import java.util.List;
 
 import team.uptech.motionviews.R;
 import team.uptech.motionviews.viewmodel.Layer;
+import team.uptech.motionviews.widget.Interfaces.EntityCallback;
 import team.uptech.motionviews.widget.Interfaces.Limits;
 import team.uptech.motionviews.widget.Interfaces.MotionViewCallback;
 import team.uptech.motionviews.widget.Interfaces.ShrinkWorkerCallback;

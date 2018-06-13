@@ -10,11 +10,11 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.text.Editable;
+import android.support.annotation.RequiresApi;
 import android.text.Selection;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -37,18 +37,18 @@ import abak.tr.com.boxedverticalseekbar.BoxedVertical;
 import team.uptech.motionviews.R;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
+import team.uptech.motionviews.widget.Interfaces.EntityCallback;
 import team.uptech.motionviews.widget.Interfaces.Limits;
-import team.uptech.motionviews.widget.Interfaces.OnTextLayerCallback;
 
 /**
  * Transparent Dialog Fragment, with no title and no background
  * <p>
  * The fragment imitates capturing input from keyboard, but does not display anything
- * the result from input from the keyboard is passed through {@link OnTextLayerCallback}
+ * the result from input from the keyboard is passed through {@link EntityCallback}
  * <p>
- * Activity that uses {@link TextEditorDialogFragment} must implement {@link OnTextLayerCallback}
+ * Activity that uses {@link TextEditorDialogFragment} must implement {@link EntityCallback}
  * <p>
- * If Activity does not implement {@link OnTextLayerCallback}, exception will be thrown at Runtime
+ * If Activity does not implement {@link EntityCallback}, exception will be thrown at Runtime
  */
 public class TextEditorDialogFragment extends DialogFragment {
 
@@ -60,7 +60,7 @@ public class TextEditorDialogFragment extends DialogFragment {
     protected EditText editText;
     protected FontProvider fontProvider;
 
-    private OnTextLayerCallback callback;
+    private EntityCallback callback;
 
     /**
      * deprecated
@@ -87,12 +87,12 @@ public class TextEditorDialogFragment extends DialogFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof OnTextLayerCallback) {
-            this.callback = (OnTextLayerCallback) activity;
-            this.fontProvider = ((OnTextLayerCallback) activity).getFontProvider();
+        if (activity instanceof EntityCallback) {
+            this.callback = (EntityCallback) activity;
+            this.fontProvider = ((EntityCallback) activity).getFontProvider();
         } else {
             throw new IllegalStateException(activity.getClass().getName()
-                    + " must implement " + OnTextLayerCallback.class.getName());
+                    + " must implement " + EntityCallback.class.getName());
         }
     }
 
@@ -101,6 +101,7 @@ public class TextEditorDialogFragment extends DialogFragment {
         return inflater.inflate(R.layout.text_editor_layout, container, false);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -157,7 +158,7 @@ public class TextEditorDialogFragment extends DialogFragment {
             public void onClick(View view) {
                 // apply editText properties to textView
                 if (callback != null) {
-                    callback.multiTextChange(editText.getText().toString(), editText.getCurrentTextColor(), (int)editText.getTextSize(), editText.getWidth());
+                    callback.updateEntity(editText.getText().toString(), editText.getCurrentTextColor(), (int)editText.getTextSize(), editText.getWidth());
                 }
                 // exit when clicking on background
                 dismiss();
@@ -181,6 +182,7 @@ public class TextEditorDialogFragment extends DialogFragment {
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void createColorSelections (View context, int currentColor) {
         String[] colors = {"#000000", "#20BBFC", "#2DFD2F", "#FD28F9", "#EA212E", "#FD7E24", "#FFFA38", "#FFFFFF"};
 
@@ -228,6 +230,7 @@ public class TextEditorDialogFragment extends DialogFragment {
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(15) // magic number
                 .setPositiveButton(R.string.ok, new ColorPickerClickListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
                         editText.setTextColor(selectedColor);

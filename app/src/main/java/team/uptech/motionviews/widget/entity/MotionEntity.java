@@ -1,7 +1,7 @@
 package team.uptech.motionviews.widget.entity;
 
+import android.app.FragmentManager;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
@@ -11,9 +11,10 @@ import android.support.annotation.Nullable;
 
 import team.uptech.motionviews.utils.MathUtils;
 import team.uptech.motionviews.viewmodel.Layer;
+import team.uptech.motionviews.widget.Interfaces.EntityActions;
 
 @SuppressWarnings({"WeakerAccess"})
-public abstract class MotionEntity {
+public abstract class MotionEntity implements EntityActions {
 
     /**
      * data
@@ -298,5 +299,10 @@ public abstract class MotionEntity {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    @Override
+    public void startEditing(FragmentManager fragmentManager) {
+        // Override in subclasses if there is a special editing logic
     }
 }

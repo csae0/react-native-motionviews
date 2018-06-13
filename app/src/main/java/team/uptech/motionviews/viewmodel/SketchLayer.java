@@ -1,19 +1,17 @@
 package team.uptech.motionviews.viewmodel;
 
-public class TextLayer extends Layer {
+public class SketchLayer extends Layer {
 
-    private String text;
-    private Font font;
+    private Stroke stroke;
 
-    public TextLayer() {
+    public SketchLayer() {
         reset();
     }
 
     @Override
     protected void reset() {
         super.reset();
-        this.text = "";
-        this.font = new Font();
+        this.stroke = new Stroke();
     }
 
     @Override
@@ -31,19 +29,11 @@ public class TextLayer extends Layer {
         return team.uptech.motionviews.widget.Interfaces.Limits.INITIAL_SCALE;
     }
 
-    public String getText() {
-        return text;
+    public Stroke getStroke() {
+        return stroke;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public Font getFont() {
-        return font;
-    }
-
-    public void setFont(Font font) {
-        this.font = font;
+    public void setStroke(Stroke stroke) {
+        this.stroke = stroke;
     }
 }

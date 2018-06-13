@@ -4,6 +4,11 @@ import android.support.annotation.FloatRange;
 
 public class Layer {
 
+    interface Limits {
+        float MIN_SCALE = 0.06F;
+        float MAX_SCALE = 4.0F;
+        float INITIAL_ENTITY_SCALE = 0.4F;
+    }
     /**
      * rotation relative to the layer center, in degrees
      */
@@ -111,11 +116,5 @@ public class Layer {
 
     public void setFlipped(boolean flipped) {
         isFlipped = flipped;
-    }
-
-    interface Limits {
-        float MIN_SCALE = 0.06F;
-        float MAX_SCALE = 4.0F;
-        float INITIAL_ENTITY_SCALE = 0.4F;
     }
 }
