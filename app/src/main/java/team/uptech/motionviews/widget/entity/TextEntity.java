@@ -1,6 +1,8 @@
 package team.uptech.motionviews.widget.entity;
 
+import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -53,7 +55,9 @@ public class TextEntity extends MotionEntity implements TextEntityActions {
         PointF oldCenter = canvasCenter();
 
         Bitmap newBmp = createBitmap(getLayer(), bitmap);
-
+        if (newBmp == null) {
+            return;
+        }
         // recycle previous bitmap (if not reused) as soon as possible
         if (bitmap != null && bitmap != newBmp && !bitmap.isRecycled()) {
             bitmap.recycle();
@@ -187,7 +191,7 @@ public class TextEntity extends MotionEntity implements TextEntityActions {
     }
 
     @Override
-    public void startEditing(FragmentManager fragmentManager) {
+    public void startEditing(Activity activity) {
         setVisible(false);
         TextLayer textLayer = getLayer();
         Font font = textLayer.getFont();
@@ -196,7 +200,7 @@ public class TextEntity extends MotionEntity implements TextEntityActions {
         int color = font.getColor();
         String typefaceName = font.getTypeface();
         TextEditorDialogFragment fragment = TextEditorDialogFragment.getInstance(text, size, color, typefaceName);
-        fragment.show(fragmentManager, TextEditorDialogFragment.class.getName());
+        fragment.show(activity.getFragmentManager(), TextEditorDialogFragment.class.getName());
     }
 
     @Override

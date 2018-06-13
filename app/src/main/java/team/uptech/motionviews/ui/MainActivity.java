@@ -3,7 +3,6 @@ package team.uptech.motionviews.ui;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -44,9 +43,18 @@ public class MainActivity extends AppCompatActivity implements EntityCallback {
         }
         @Override
         public void onEntitySingleTapConfirmed(@NonNull MotionEntity entity) {
-            entity.startEditing(getFragmentManager());
+            MotionEntity motionEntity = motionView.getSelectedEntity();
+            if (motionEntity != null) {
+                motionEntity.startEditing(getThis());
+                getFragmentManager();
+            }
         }
     };
+
+    // Workaround to access this inside callback class
+    private MainActivity getThis() {
+        return this;
+    }
 
     private FontProvider fontProvider;
 
@@ -71,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements EntityCallback {
                 ImageEntity imageEntity = new ImageEntity(layer, pica, motionView.getWidth(), motionView.getHeight(), visible);
                 motionView.addEntityAndPosition(imageEntity);
 
-                imageEntity.startEditing(getFragmentManager()); // Does nothing for imageEntity
+                imageEntity.startEditing(null); // Does nothing for imageEntity
             }
         });
     }
@@ -82,24 +90,24 @@ public class MainActivity extends AppCompatActivity implements EntityCallback {
     }
 
     public void addSketch(View v) {
-        addTextSticker(false);
+        addSketchView(false);
     }
 
-    protected void addSketch(boolean visible) { //TODO
+    protected void addSketchView(boolean visible) {
         SketchLayer sketchLayer = createSketchLayer();
         SketchEntity sketchEntity = new SketchEntity(sketchLayer, motionView.getWidth(), motionView.getHeight(), visible);
         motionView.addEntityAndPosition(sketchEntity);
 
-        sketchEntity.startEditing(getFragmentManager());
+        sketchEntity.startEditing(this);
 
     }
 
     private SketchLayer createSketchLayer() {
         SketchLayer sketchLayer = new SketchLayer();
         Stroke stroke = new Stroke();
-
         stroke.setColor(Limits.INITIAL_SKETCH_COLOR);
         stroke.setSize(ConversionUtils.dpToPx(Limits.FONT_SIZE_INITIAL_DP));
+
         sketchLayer.setStroke(stroke);
 
         return sketchLayer;
@@ -111,26 +119,21 @@ public class MainActivity extends AppCompatActivity implements EntityCallback {
 
     protected void addTextSticker(boolean visible) {
         TextLayer textLayer = createTextLayer();
-        TextEntity textEntity = new TextEntity(textLayer, motionView.getWidth(),
-                motionView.getHeight(), fontProvider, visible);
+        TextEntity textEntity = new TextEntity(textLayer, motionView.getWidth(), motionView.getHeight(), fontProvider, visible);
         motionView.addEntityAndPosition(textEntity);
 
-        textEntity.startEditing(getFragmentManager());
+        textEntity.startEditing(this);
     }
 
     private TextLayer createTextLayer() {
         TextLayer textLayer = new TextLayer();
         Font font = new Font();
-
         font.setColor(Limits.INITIAL_FONT_COLOR);
         font.setSize(ConversionUtils.dpToPx(Limits.FONT_SIZE_INITIAL_DP));
         font.setTypeface(fontProvider.getDefaultFontName());
 
         textLayer.setFont(font);
-
-        if (BuildConfig.DEBUG) {
-            textLayer.setText("DEBUG");
-        }
+        textLayer.setText("DEBUG");
 
         return textLayer;
     }
@@ -150,6 +153,12 @@ public class MainActivity extends AppCompatActivity implements EntityCallback {
         }
     }
 
+    @Nullable
+    @Override
+    public FontProvider getFontProvider() {
+        return fontProvider;
+    }
+
     @Override
     public void updateEntity(@Nullable String text, @Nullable Integer color, @Nullable Integer sizeInPixel, @Nullable Integer maxWidth) {
         MotionEntity motionEntity = motionView.getSelectedEntity();
@@ -159,9 +168,12 @@ public class MainActivity extends AppCompatActivity implements EntityCallback {
         }
     }
 
-    @Nullable
     @Override
-    public FontProvider getFontProvider() {
-        return fontProvider;
+    public void updateEntity(@Nullable Integer color, @Nullable Integer sizeInPixel, @Nullable Integer maxWidth) {
+        MotionEntity motionEntity = motionView.getSelectedEntity();
+        if (motionEntity != null && motionEntity instanceof SketchEntity) {
+            ((SketchEntity) motionEntity).updateState(color, sizeInPixel, maxWidth);
+            motionView.invalidate();
+        }
     }
 }

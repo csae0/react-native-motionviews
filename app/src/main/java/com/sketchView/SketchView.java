@@ -32,7 +32,8 @@ public class SketchView extends View {
         eraseTool = new EraseSketchTool(this);
         setToolType(SketchTool.TYPE_PEN);
 
-        setBackgroundColor(Color.TRANSPARENT);
+//        setBackgroundColor(Color.TRANSPARENT);
+        setBackgroundColor(Color.RED);
     }
 
     public void setToolType(int toolType) {

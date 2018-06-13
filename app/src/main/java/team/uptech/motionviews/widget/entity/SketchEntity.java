@@ -1,21 +1,25 @@
 package team.uptech.motionviews.widget.entity;
 
 
-import android.app.FragmentManager;
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.Layout;
-import android.text.StaticLayout;
+import android.widget.RelativeLayout;
 
+import com.sketchView.SketchViewContainer;
+
+import team.uptech.motionviews.ui.MainActivity;
 import team.uptech.motionviews.viewmodel.SketchLayer;
+import team.uptech.motionviews.viewmodel.Stroke;
+import team.uptech.motionviews.widget.Interfaces.SketchEntityActions;
+import team.uptech.motionviews.R;
 
-public class SketchEntity extends MotionEntity {
+public class SketchEntity extends MotionEntity implements SketchEntityActions {
 
     private final Paint sketchPaint;
     private int maxWidth;
@@ -48,7 +52,9 @@ public class SketchEntity extends MotionEntity {
         PointF oldCenter = canvasCenter();
 
         Bitmap newBmp = createBitmap(getLayer(), bitmap);
-
+        if (newBmp == null) {
+            return;
+        }
         // recycle previous bitmap (if not reused) as soon as possible
         if (bitmap != null && bitmap != newBmp && !bitmap.isRecycled()) {
             bitmap.recycle();
@@ -180,7 +186,41 @@ public class SketchEntity extends MotionEntity {
     }
 
     @Override
-    public void startEditing(FragmentManager fragmentManager) {
-        //TODO
+    public void startEditing(Activity activity) {
+        setVisible(false);
+        SketchLayer sketchLayer = getLayer();
+
+        Stroke stroke = sketchLayer.getStroke();
+        int size = (int) (stroke.getSize() + 0.5f);
+        int color = stroke.getColor();
+//
+//        SketchViewContainer sketchViewContainer = new SketchViewContainer(activity.getApplicationContext());
+//        RelativeLayout main = activity.findViewById(R.id.activity_main);
+//        main.addView(sketchViewContainer);
+
+        // TODO: OPEN FRGMENT OR SOMETHING
+//        TextEditorDialogFragment fragment = TextEditorDialogFragment.getInstance(text, size, color, typefaceName);
+//        fragment.show(activity.getFragmentManager(), TextEditorDialogFragment.class.getName());
+    }
+
+    @Override
+    public void updateState(@Nullable Integer color, @Nullable Integer sizeInPixel, @Nullable Integer maxWidth) {
+        SketchLayer sketchLayer = getLayer();
+        Stroke stroke = sketchLayer.getStroke();
+
+        // Set color
+        if (color != null && color != stroke.getColor()) {
+            stroke.setColor(color);
+        }
+        // Set size
+        if (sizeInPixel != null && sizeInPixel > 0 && sizeInPixel != stroke.getSize()) {
+            stroke.setSize((float)sizeInPixel);
+        }
+        // Set maxWidth
+        if (maxWidth != null && maxWidth > 0 && getMaxWidth() != maxWidth) {
+            setMaxWidth(maxWidth);
+        }
+        setVisible(true);
+        updateEntity();
     }
 }

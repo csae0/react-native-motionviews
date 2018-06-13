@@ -1,5 +1,6 @@
 package team.uptech.motionviews.widget.entity;
 
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -302,7 +303,7 @@ public abstract class MotionEntity implements EntityActions {
     }
 
     @Override
-    public void startEditing(FragmentManager fragmentManager) {
+    public void startEditing(Activity activity) {
         // Override in subclasses if there is a special editing logic
     }
 }

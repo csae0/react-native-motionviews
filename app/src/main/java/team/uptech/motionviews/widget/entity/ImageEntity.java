@@ -29,6 +29,9 @@ public class ImageEntity extends MotionEntity {
         super(layer, canvasWidth, canvasHeight, visible);
 
         this.bitmap = bitmap;
+        if (bitmap == null) {
+            return;
+        }
         float width = bitmap.getWidth();
         float height = bitmap.getHeight();
 
