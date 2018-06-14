@@ -14,14 +14,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.GestureDetector;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
@@ -34,14 +30,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import team.uptech.motionviews.R;
-import team.uptech.motionviews.viewmodel.Layer;
 import team.uptech.motionviews.widget.Interfaces.EntityCallback;
-import team.uptech.motionviews.widget.Interfaces.Limits;
 import team.uptech.motionviews.widget.Interfaces.MotionViewCallback;
 import team.uptech.motionviews.widget.Interfaces.ShrinkWorkerCallback;
 import team.uptech.motionviews.widget.Worker.ShrinkWorker;
 import team.uptech.motionviews.widget.entity.MotionEntity;
-import team.uptech.motionviews.widget.entity.TextEntity;
 
 /**
  * Created on 9/29/16.
@@ -75,6 +68,7 @@ public class MotionView  extends FrameLayout {
     // animation
     private Button trashButton;
 
+    private boolean hideAllEntities;
     // constructors
     public MotionView(Context context) {
         super(context);
@@ -130,6 +124,10 @@ public class MotionView  extends FrameLayout {
                 }
             });
         }
+
+        hideAllEntities = false;
+
+
         updateUI();
     }
 
@@ -148,8 +146,24 @@ public class MotionView  extends FrameLayout {
     public void setTrashButton(Button b) {
         trashButton = b;
     }
-    public void addEntity(@Nullable MotionEntity entity) {
+
+    private void setEntityCallback (@Nullable MotionEntity entity) {
+        if (!entity.hasEntityCallback()) {
+            entity.setEntityCallback(new EntityCallback() {
+                @Override
+                public void hideAllVisibleEntities(boolean show) {
+                    if (hideAllEntities != show) {
+                        hideAllEntities = show;
+                        updateUI();
+                    }
+                }
+            });
+        }
+    }
+
+    public void addEntity (@Nullable MotionEntity entity) {
         if (entity != null) {
+            setEntityCallback(entity);
             entities.add(entity);
             selectEntity(entity, false);
         }
@@ -157,7 +171,7 @@ public class MotionView  extends FrameLayout {
 
     public void addEntityAndPosition(@Nullable MotionEntity entity) {
         if (entity != null) {
-//            initEntityBorder(entity);
+            setEntityCallback(entity);
             initialTranslateAndScale(entity);
             entities.add(entity);
             selectEntity(entity, true);
@@ -189,7 +203,9 @@ public class MotionView  extends FrameLayout {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        drawAllEntities(canvas);
+        if (!hideAllEntities) {
+            drawAllEntities(canvas);
+        }
         super.onDraw(canvas);
     }
 
@@ -202,6 +218,7 @@ public class MotionView  extends FrameLayout {
             entities.get(i).draw(canvas, null);
         }
     }
+
 
     /**
      * as a side effect - the method deselects Entity (if any selected)

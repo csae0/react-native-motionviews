@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import team.uptech.motionviews.utils.MathUtils;
 import team.uptech.motionviews.viewmodel.Layer;
 import team.uptech.motionviews.widget.Interfaces.EntityActions;
+import team.uptech.motionviews.widget.Interfaces.EntityCallback;
 
 @SuppressWarnings({"WeakerAccess"})
 public abstract class MotionEntity implements EntityActions {
@@ -66,6 +67,10 @@ public abstract class MotionEntity implements EntityActions {
      * @see #destPoints
      */
     protected final float[] srcPoints = new float[10];  // x0, y0, x1, y1, x2, y2, x3, y3, x0, y0
+
+
+    // Callback to hide/ show all entities
+    private EntityCallback entityCallback;
 
     @NonNull
     private Paint borderPaint = new Paint();
@@ -300,6 +305,20 @@ public abstract class MotionEntity implements EntityActions {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public void setEntityCallback (EntityCallback callback) {
+        entityCallback = callback;
+    }
+
+    public boolean hasEntityCallback () {
+        return entityCallback != null;
+    }
+
+    protected void callEntityCallback (boolean hide) {
+        if (hasEntityCallback()) {
+            entityCallback.hideAllVisibleEntities(hide);
+        }
     }
 
     @Override

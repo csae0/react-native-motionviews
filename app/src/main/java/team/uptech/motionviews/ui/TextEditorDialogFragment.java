@@ -37,18 +37,18 @@ import abak.tr.com.boxedverticalseekbar.BoxedVertical;
 import team.uptech.motionviews.R;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
-import team.uptech.motionviews.widget.Interfaces.EntityCallback;
+import team.uptech.motionviews.widget.Interfaces.EditCallback;
 import team.uptech.motionviews.widget.Interfaces.Limits;
 
 /**
  * Transparent Dialog Fragment, with no title and no background
  * <p>
  * The fragment imitates capturing input from keyboard, but does not display anything
- * the result from input from the keyboard is passed through {@link EntityCallback}
+ * the result from input from the keyboard is passed through {@link EditCallback}
  * <p>
- * Activity that uses {@link TextEditorDialogFragment} must implement {@link EntityCallback}
+ * Activity that uses {@link TextEditorDialogFragment} must implement {@link EditCallback}
  * <p>
- * If Activity does not implement {@link EntityCallback}, exception will be thrown at Runtime
+ * If Activity does not implement {@link EditCallback}, exception will be thrown at Runtime
  */
 public class TextEditorDialogFragment extends DialogFragment {
 
@@ -60,7 +60,7 @@ public class TextEditorDialogFragment extends DialogFragment {
     protected EditText editText;
     protected FontProvider fontProvider;
 
-    private EntityCallback callback;
+    private EditCallback callback;
 
     /**
      * deprecated
@@ -87,12 +87,12 @@ public class TextEditorDialogFragment extends DialogFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof EntityCallback) {
-            this.callback = (EntityCallback) activity;
-            this.fontProvider = ((EntityCallback) activity).getFontProvider();
+        if (activity instanceof EditCallback) {
+            this.callback = (EditCallback) activity;
+            this.fontProvider = ((EditCallback) activity).getFontProvider();
         } else {
             throw new IllegalStateException(activity.getClass().getName()
-                    + " must implement " + EntityCallback.class.getName());
+                    + " must implement " + EditCallback.class.getName());
         }
     }
 

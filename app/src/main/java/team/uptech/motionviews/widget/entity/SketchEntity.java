@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.RelativeLayout;
 
+import com.sketchView.SketchView;
 import com.sketchView.SketchViewContainer;
 
 import team.uptech.motionviews.ui.MainActivity;
@@ -188,15 +189,18 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
     @Override
     public void startEditing(Activity activity) {
         setVisible(false);
+        callEntityCallback(true);
         SketchLayer sketchLayer = getLayer();
 
         Stroke stroke = sketchLayer.getStroke();
         int size = (int) (stroke.getSize() + 0.5f);
         int color = stroke.getColor();
-//
-//        SketchViewContainer sketchViewContainer = new SketchViewContainer(activity.getApplicationContext());
-//        RelativeLayout main = activity.findViewById(R.id.activity_main);
-//        main.addView(sketchViewContainer);
+
+        RelativeLayout main = activity.findViewById(R.id.activity_main);
+        SketchView sketchView = SketchView.getInstance(main.getContext());
+
+        main.removeView(sketchView);
+        main.addView(sketchView);
 
         // TODO: OPEN FRGMENT OR SOMETHING
 //        TextEditorDialogFragment fragment = TextEditorDialogFragment.getInstance(text, size, color, typefaceName);
@@ -205,6 +209,8 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
 
     @Override
     public void updateState(@Nullable Integer color, @Nullable Integer sizeInPixel, @Nullable Integer maxWidth) {
+
+
         SketchLayer sketchLayer = getLayer();
         Stroke stroke = sketchLayer.getStroke();
 
@@ -221,6 +227,7 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
             setMaxWidth(maxWidth);
         }
         setVisible(true);
+        callEntityCallback(false);
         updateEntity();
     }
 }

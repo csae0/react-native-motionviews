@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-import team.uptech.motionviews.BuildConfig;
 import team.uptech.motionviews.R;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
@@ -19,7 +18,7 @@ import team.uptech.motionviews.viewmodel.Layer;
 import team.uptech.motionviews.viewmodel.SketchLayer;
 import team.uptech.motionviews.viewmodel.Stroke;
 import team.uptech.motionviews.viewmodel.TextLayer;
-import team.uptech.motionviews.widget.Interfaces.EntityCallback;
+import team.uptech.motionviews.widget.Interfaces.EditCallback;
 import team.uptech.motionviews.widget.Interfaces.Limits;
 import team.uptech.motionviews.widget.Interfaces.MotionViewCallback;
 import team.uptech.motionviews.widget.MotionView;
@@ -28,7 +27,7 @@ import team.uptech.motionviews.widget.entity.MotionEntity;
 import team.uptech.motionviews.widget.entity.SketchEntity;
 import team.uptech.motionviews.widget.entity.TextEntity;
 
-public class MainActivity extends AppCompatActivity implements EntityCallback {
+public class MainActivity extends AppCompatActivity implements EditCallback {
 
     public static final int SELECT_STICKER_REQUEST_CODE = 123;
 
@@ -46,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements EntityCallback {
             MotionEntity motionEntity = motionView.getSelectedEntity();
             if (motionEntity != null) {
                 motionEntity.startEditing(getThis());
-                getFragmentManager();
             }
         }
     };
@@ -67,7 +65,8 @@ public class MainActivity extends AppCompatActivity implements EntityCallback {
         motionView = findViewById(R.id.main_motion_view);
         motionView.setMotionViewCallback(motionViewCallback);
         motionView.setTrashButton((Button)findViewById(R.id.trash_button));
-        addSticker(R.drawable.pikachu_2, true);
+        // addSticker(R.drawable.pikachu_2, true);
+        addSketch(true);
     }
 
     private void addSticker(final int stickerResId, final boolean visible) {
@@ -90,10 +89,10 @@ public class MainActivity extends AppCompatActivity implements EntityCallback {
     }
 
     public void addSketch(View v) {
-        addSketchView(false);
+        addSketch(false);
     }
 
-    protected void addSketchView(boolean visible) {
+    protected void addSketch(boolean visible) {
         SketchLayer sketchLayer = createSketchLayer();
         SketchEntity sketchEntity = new SketchEntity(sketchLayer, motionView.getWidth(), motionView.getHeight(), visible);
         motionView.addEntityAndPosition(sketchEntity);

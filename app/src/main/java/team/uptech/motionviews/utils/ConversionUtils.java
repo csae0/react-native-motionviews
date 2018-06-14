@@ -5,6 +5,10 @@ import android.graphics.Color;
 
 public class ConversionUtils {
 
+    public static int getDensity() {
+        return (int)Resources.getSystem().getDisplayMetrics().density;
+    }
+
     public static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
