@@ -40,6 +40,7 @@ public class SketchView extends View {
     SketchTool penTool;
     SketchTool eraseTool;
     Bitmap incrementalImage;
+    Rect imageBounds = null;
     private boolean blockEditedUpdates;
 
     public static SketchView getInstance(Context context) {
@@ -61,6 +62,7 @@ public class SketchView extends View {
         penTool = new PenSketchTool(this);
         eraseTool = new EraseSketchTool(this);
         setToolType(SketchTool.TYPE_PEN);
+        setToolThickness(20);
         // setToolColor(Color.BLUE);
         setBackgroundColor(Color.TRANSPARENT);
 //        setBackgroundColor(Color.RED);
@@ -118,11 +120,10 @@ public class SketchView extends View {
 
     @Nullable
     private Rect getImageBounds() {
-
         if (incrementalImage != null) {
             int density = ConversionUtils.getDensity();
             int toolThickness = (int)((ToolThickness)currentTool).getToolThickness();
-            int step = toolThickness * density;
+            int step = (toolThickness > 5 ? 5 : toolThickness) * density;
 
             Point maxRightP = new Point(Integer.MIN_VALUE,0);
             Point maxBottomP = new Point(0, Integer.MIN_VALUE);
@@ -183,129 +184,98 @@ public class SketchView extends View {
                 }
             }
 
-//            boolean topRight, topLeft, bottomRight, bottomLeft;
+// TODO: LOGIK FUNKTIONIERT, aber nur wenn user nicht nochmal zeichnet und dabei unter der schrittweite bleibt
+//            if (imageBounds != null && imageBounds.left == minLeftP.x - step && imageBounds.top == minTopP.y - step && imageBounds.right == maxRightP.x + step && imageBounds.bottom == maxBottomP.y + step) {
 //
-//            int minLeft = minLeftP.x;
-//            int minTop = minTopP.y;
-//            int maxRight = maxRightP.x;
-//            int maxBottom = maxBottomP.y;
-//            for (int i = 0; i < step; i++) {
-//                for(int j = 0; j < step; j++) {
-//                    leftTop = !isTransparent(minLeftP.x - j, minLeftP.y - i, true);
-//                    leftBottom = !isTransparent(minLeftP.x - j, minLeftP.y + i, true);
+//            if (imageBounds == null) {
+//                imageBounds = new Rect(minLeftP.x - step, minTopP.y - step, maxRightP.x + step, maxBottomP.y + step);
+//            } else if (!(imageBounds.left == minLeftP.x && imageBounds.top == minTopP.y && imageBounds.right == maxRightP.x && imageBounds.bottom == maxBottomP.y)) {
+//                imageBounds = new Rect(imageBounds.left != minLeftP.x ? minLeftP.x - step : imageBounds.left,
+//                        imageBounds.top != minTopP.y ? minTopP.y - step : imageBounds.top,
+//                        imageBounds.right != maxRightP.x ? maxRightP.x + step : imageBounds.right,
+//                        imageBounds.bottom != maxBottomP.y ? maxBottomP.y + step : imageBounds.bottom);
 //
-//                    rightTop = !isTransparent(maxRightP.x + j, maxRightP.y - i, true);
-//                    rightBottom = !isTransparent(maxRightP.x + j, maxRightP.y + i, true);
+//            }
+//            return imageBounds;
+        }
+        return null;
+    }
+
+
+//    private int[] findExactBounds (DIRECTION checkDirection, Point[] coordinates, int range, int density) {
 //
-//                    topLeft = !isTransparent(minTopP.x - i, minTopP.y - j, true);
-//                    topRight = !isTransparent(minTopP.x + i, minTopP.y - j, true);
 //
-//                    bottomLeft = !isTransparent(maxBottomP.x - i, maxBottomP.y + j, true);
-//                    bottomRight = !isTransparent(maxBottomP.x + i, maxBottomP.y + j, true);
+////            int[] horizontalBounds = findExactBounds(DIRECTION.HORIZONTAL, new Point[]{minLeftP, minTopP, maxRightP, maxBottomP}, step, 1);
+////            int[] verticalBounds = findExactBounds(DIRECTION.VERTICAL, new Point[]{minLeftP, minTopP, maxRightP, maxBottomP}, step, 1);
+////           if (horizontalBounds != null && verticalBounds != null) {
+////               return new Rect(horizontalBounds[0], verticalBounds[0], horizontalBounds[1], verticalBounds[1]);
+////           } else {
 //
+//        int minLeft;
+//        int minTop;
+//        int maxRight;
+//        int maxBottom;
+//        int dimensionRange;
+//        boolean leftTop, leftBottom, rightTop, rightBottom;
 //
-//                    if ((leftTop || leftBottom) && minLeftP.x - j < minLeft) {
-//                        minLeft = minLeftP.x - j;
-//                    }
+//        switch(checkDirection) {
+//            case VERTICAL: {
+//                minTop = coordinates[1].y;
+//                maxBottom = coordinates[3].y;
+//                dimensionRange = (coordinates[2].x - coordinates[0].x) + 2 * range;
 //
-//                    if ((topLeft || topRight) && minTopP.y - j < minTop) {
-//                        minTop = minTopP.y - j;
-//                    }
+//                for (int i = 0; i < range; i++) {
+//                    for (int j = coordinates[0].x - range; j < dimensionRange / 2; j += density) {
+//                        int topY = minTop - range + i;
+//                        int bottomY = maxBottom + range - i;
 //
-//                    if ((rightTop || rightBottom) && maxRightP.x + j > maxRight) {
-//                        maxRight = maxRightP.x + j;
-//                    }
+//                        leftTop = !isTransparent(j, topY, true);
+//                        rightTop = !isTransparent(dimensionRange - j, topY, true);
+//                        leftBottom = !isTransparent(j, bottomY, true);
+//                        rightBottom = !isTransparent(dimensionRange - j, bottomY, true);
 //
-//                    if ((bottomLeft || bottomRight) && maxBottomP.y + j > maxBottom) {
-//                        maxBottom = maxBottomP.y + j;
+//                        if ((leftTop || rightTop) && topY < minTop) {
+//                            minTop = topY;
+//                        }
+//                        if ((leftBottom || rightBottom) && bottomY > maxBottom) {
+//                            maxBottom = bottomY;
+//                        }
 //                    }
 //                }
+//                System.out.print("TOP: " + coordinates[1].y + " --> " + minTop + " | ");
+//                System.out.println("BOTTOM: " + coordinates[3].y + " --> " + maxBottom);
+//                return new int[]{minTop, maxBottom};
 //            }
-
-
-
-
-            int[] horizontalBounds = findExactBounds(DIRECTION.VERTICAL, new Point[]{minLeftP, minTopP, maxRightP, maxBottomP}, step, 1);
-            int[] verticalBounds = findExactBounds(DIRECTION.HORIZONTAL, new Point[]{minLeftP, minTopP, maxRightP, maxBottomP}, step, 1);
-           if (horizontalBounds != null && verticalBounds != null) {
-               return new Rect(horizontalBounds[0], verticalBounds[0], horizontalBounds[1], verticalBounds[1]);
-           } else {
-               return new Rect(minLeftP.x, minTopP.y, maxRightP.x, maxBottomP.y);
-           }
-        }
-        return null;
-
-        // TODO: for loop break wenn left und right gefunden wurden und neue loop von uben nach unten beginnen
-        // TODO: strichstärken history und kleinste strichstärke auswählen (oder mit grober nach innen und dann mit feiner von gefundenen bounds wieder nach außen???)
-    }
-
-    private int[] findExactBounds (DIRECTION checkDirection, Point[] coordinates, int range, int density) {
-
-        int minLeft;
-        int minTop;
-        int maxRight;
-        int maxBottom;
-        int dimensionRange;
-        boolean leftTop, leftBottom, rightTop, rightBottom;
-
-        switch(checkDirection) {
-            case VERTICAL: {
-                minTop = coordinates[1].y;
-                maxBottom = coordinates[3].y;
-                dimensionRange = (coordinates[2].x - coordinates[0].x) + 2 * range;
-
-                for (int i = 0; i < range; i++) {
-                    for (int j = coordinates[0].x - range; j < dimensionRange / 2; j += density) {
-                        int topY = minTop - range + i;
-                        int bottomY = maxBottom + range - i;
-
-                        leftTop = !isTransparent(j, topY, true);
-                        rightTop = !isTransparent(dimensionRange - j, topY, true);
-                        leftBottom = !isTransparent(j, bottomY, true);
-                        rightBottom = !isTransparent(dimensionRange - j, bottomY, true);
-
-                        if ((leftTop || rightTop) && topY < minTop) {
-                            minTop = topY;
-                        }
-                        if ((leftBottom || rightBottom) && bottomY > maxBottom) {
-                            maxBottom = bottomY;
-                        }
-                    }
-                }
-                System.out.print("TOP: " + coordinates[1].y + " --> " + minTop + " | ");
-                System.out.println("BOTTOM: " + coordinates[3].y + " --> " + maxBottom);
-                return new int[]{minTop, maxBottom};
-            }
-            case HORIZONTAL: {
-                minLeft = coordinates[0].x;
-                maxRight = coordinates[2].x;
-                dimensionRange = (coordinates[3].y - coordinates[1].y) + 2 * range;
-
-                for (int i = 0; i < range; i++) {
-                    for (int j = coordinates[1].y - range; j < dimensionRange / 2; j += density) {
-                        int leftX = minLeft - range + i;
-                        int rightX = maxRight + range - i;
-
-                        leftTop = !isTransparent(leftX, j, true);
-                        leftBottom = !isTransparent(leftX, dimensionRange - j, true);
-                        rightTop = !isTransparent(rightX, j, true);
-                        rightBottom = !isTransparent(rightX, dimensionRange - j, true);
-
-                        if ((leftTop || leftBottom) && leftX < minLeft) {
-                            minLeft = leftX;
-                        }
-                        if ((rightTop || rightBottom) && rightX > maxRight) {
-                            maxRight = rightX;
-                        }
-                    }
-                }
-                System.out.print("LEFT: " + coordinates[0].x + " --> " + minLeft + " | ");
-                System.out.println("RIGHT: " + coordinates[2].x + " --> " + maxRight);
-                return new int[]{minLeft, maxRight};
-            }
-        }
-        return null;
-    }
+//            case HORIZONTAL: {
+//                minLeft = coordinates[0].x;
+//                maxRight = coordinates[2].x;
+//                dimensionRange = (coordinates[3].y - coordinates[1].y) + 2 * range;
+//
+//                for (int i = 0; i < range; i++) {
+//                    for (int j = coordinates[1].y - range; j < dimensionRange / 2; j += density) {
+//                        int leftX = minLeft - range + i;
+//                        int rightX = maxRight + range - i;
+//
+//                        leftTop = !isTransparent(leftX, j, true);
+//                        leftBottom = !isTransparent(leftX, dimensionRange - j, true);
+//                        rightTop = !isTransparent(rightX, j, true);
+//                        rightBottom = !isTransparent(rightX, dimensionRange - j, true);
+//
+//                        if ((leftTop || leftBottom) && leftX < minLeft) {
+//                            minLeft = leftX;
+//                        }
+//                        if ((rightTop || rightBottom) && rightX > maxRight) {
+//                            maxRight = rightX;
+//                        }
+//                    }
+//                }
+//                System.out.print("LEFT: " + coordinates[0].x + " --> " + minLeft + " | ");
+//                System.out.println("RIGHT: " + coordinates[2].x + " --> " + maxRight);
+//                return new int[]{minLeft, maxRight};
+//            }
+//        }
+//        return null;
+//    }
 
     private boolean isTransparent(int x, int y) {
         return  isTransparent(x,y, false);
