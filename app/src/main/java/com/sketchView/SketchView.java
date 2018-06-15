@@ -75,8 +75,8 @@ public class SketchView extends View {
         setToolType(SketchTool.TYPE_PEN);
         // setToolThickness(20);
         // setToolColor(Color.BLUE);
-//        setBackgroundColor(Color.TRANSPARENT);
-        setBackgroundColor(Color.RED);
+        setBackgroundColor(Color.TRANSPARENT);
+        // setBackgroundColor(Color.RED);
     }
 
     @Override
@@ -165,7 +165,7 @@ public class SketchView extends View {
     }
 
     public Bitmap getImage() {
-        Rect bounds = getImageBounds();
+//        Rect bounds = getImageBounds();
 
         if (incrementalImage != null) {
             return BitmapFactory.decodeResource(getResources(), R.drawable.abra);
@@ -176,7 +176,7 @@ public class SketchView extends View {
 
 
     @Nullable
-    private Rect getImageBounds() {
+    private Rect[] getImageBounds() {
         if (incrementalImage != null) {
             Bitmap imageCopy = Bitmap.createScaledBitmap(incrementalImage, incrementalImage.getWidth(), incrementalImage.getHeight(), false);
 
@@ -247,23 +247,12 @@ public class SketchView extends View {
             Point maxRight = findExactBounds(imageCopy, RIGHT, maxRightP, 1);
             Point maxBottom = findExactBounds(imageCopy, BOTTOM, maxBottomP, 1);
             if (minLeftP != null && minTopP != null && maxRightP != null && maxBottomP != null) {
-                return new Rect(minLeft == null ? minLeftP.x : minLeft.x,
+                return new Rect[]{ new Rect(minLeft == null ? minLeftP.x : minLeft.x,
                         minTop == null ? minTopP.y : minTop.y,
                         maxRight == null ? maxRightP.x : maxRight.x,
-                        maxBottom == null ? maxBottomP.y : maxBottom.y);
+                        maxBottom == null ? maxBottomP.y : maxBottom.y),
+                new Rect(minLeftP.x, minTopP.y, maxRightP.x, maxBottomP.y)};
             }
-// TODO: LOGIK FUNKTIONIERT, aber nur wenn user nicht nochmal zeichnet und dabei unter der schrittweite bleibt
-//
-//            if (imageBounds == null) {
-//                imageBounds = new Rect(minLeftP.x - step, minTopP.y - step, maxRightP.x + step, maxBottomP.y + step);
-//            } else if (!(imageBounds.left == minLeftP.x && imageBounds.top == minTopP.y && imageBounds.right == maxRightP.x && imageBounds.bottom == maxBottomP.y)) { //            if (imageBounds != null && imageBounds.left == minLeftP.x - step && imageBounds.top == minTopP.y - step && imageBounds.right == maxRightP.x + step && imageBounds.bottom == maxBottomP.y + step)
-//                imageBounds = new Rect(imageBounds.left != minLeftP.x ? minLeftP.x - step : imageBounds.left,
-//                        imageBounds.top != minTopP.y ? minTopP.y - step : imageBounds.top,
-//                        imageBounds.right != maxRightP.x ? maxRightP.x + step : imageBounds.right,
-//                        imageBounds.bottom != maxBottomP.y ? maxBottomP.y + step : imageBounds.bottom);
-//
-//            }
-//            return imageBounds;
         }
         return null;
     }
@@ -291,19 +280,60 @@ public class SketchView extends View {
             newPoints[3] = findExactBounds(image, direction, new Point(curr.x ,curr.y + step), step); // BOTTOM
         }
 
+        Point p;
         switch(direction) {
             case LEFT:
-                return newPoints[0] != null && newPoints[0].x < curr.x ? newPoints[0] : curr;
+                p = getMax(newPoints, true, true, 2);
+                return p != null && p.x < curr.x ? p : curr;
             case TOP:
-                return newPoints[1] != null && newPoints[1].y < curr.y? newPoints[1] : curr;
+                p = getMax(newPoints, false, true, 3);
+                return p != null && p.y < curr.y ? p : curr;
             case RIGHT:
-                return newPoints[2] != null && newPoints[2].x > curr.x? newPoints[2] : curr;
+                p = getMax(newPoints, true, false, 0);
+                return p != null && p.x > curr.x ? p : curr;
             case BOTTOM:
-                return newPoints[3] != null && newPoints[3].y > curr.y? newPoints[3] : curr;
+                p = getMax(newPoints, false, false, 1);
+                return p != null && p.y > curr.y ? p : curr;
             default:
                 return curr;
         }
     }
+    private Point getMax (Point[] points, boolean x, boolean min, int ignoreIndex) {
+        Point result = null;
+        int index = 0;
+        for (Point p: points) {
+            if (index != ignoreIndex && p != null) {
+                if (result == null) {
+                    result = p;
+                } else {
+                    if (min) {
+                        if (x) {
+                            if (p.x < result.x) {
+                                result = p;
+                            }
+                        } else {
+                            if (p.y < result.y) {
+                                result = p;
+                            }
+                        }
+                    } else {
+                        if (x) {
+                            if (p.x > result.x) {
+                                result = p;
+                            }
+                        } else {
+                            if (p.y > result.y) {
+                                result = p;
+                            }
+                        }
+                    }
+                }
+            }
+            index++;
+        }
+        return result;
+    }
+
 //    private int[] findExactBounds (DIRECTION checkDirection, Point[] coordinates, int range, int density) {
 //
 //
@@ -412,15 +442,23 @@ public class SketchView extends View {
         }
 
         if (showBounds) {
-            Rect rect = getImageBounds();
+            Rect[] rect = getImageBounds();
             if (rect != null) {
                 Paint p = new Paint();
-                p.setColor(Color.RED);
+                Paint pp = new Paint();
 
-                canvas.drawLine(rect.left, rect.top, rect.left, rect.bottom, p);
-                canvas.drawLine(rect.right, rect.top, rect.right, rect.bottom, p);
-                canvas.drawLine(rect.left, rect.top, rect.right, rect.top, p);
-                canvas.drawLine(rect.left, rect.bottom, rect.right, rect.bottom, p);
+                p.setColor(Color.RED);
+                pp.setColor(Color.BLUE);
+
+                canvas.drawLine(rect[0].left, rect[0].top, rect[0].left, rect[0].bottom, p);
+                canvas.drawLine(rect[0].right, rect[0].top, rect[0].right, rect[0].bottom, p);
+                canvas.drawLine(rect[0].left, rect[0].top, rect[0].right, rect[0].top, p);
+                canvas.drawLine(rect[0].left, rect[0].bottom, rect[0].right, rect[0].bottom, p);
+
+                canvas.drawLine(rect[1].left, rect[1].top, rect[1].left, rect[1].bottom, pp);
+                canvas.drawLine(rect[1].right, rect[1].top, rect[1].right, rect[1].bottom, pp);
+                canvas.drawLine(rect[1].left, rect[1].top, rect[1].right, rect[1].top, pp);
+                canvas.drawLine(rect[1].left, rect[1].bottom, rect[1].right, rect[1].bottom, pp);
             }
         }
     }
