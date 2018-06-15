@@ -3,6 +3,7 @@ package team.uptech.motionviews.widget.entity;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
@@ -17,13 +18,14 @@ import com.sketchView.SketchViewContainer;
 import team.uptech.motionviews.ui.MainActivity;
 import team.uptech.motionviews.viewmodel.SketchLayer;
 import team.uptech.motionviews.viewmodel.Stroke;
+import team.uptech.motionviews.widget.Interfaces.EditCallback;
 import team.uptech.motionviews.widget.Interfaces.SketchEntityActions;
 import team.uptech.motionviews.R;
+import team.uptech.motionviews.widget.Interfaces.SketchViewCallback;
 
 public class SketchEntity extends MotionEntity implements SketchEntityActions {
 
     private final Paint sketchPaint;
-    private int maxWidth;
 
     @Nullable
     private Bitmap bitmap;
@@ -40,8 +42,8 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
                         boolean visible) {
         super(sketchLayer, canvasWidth, canvasHeight, visible);
         this.sketchPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        this.maxWidth = Integer.MIN_VALUE;
-        updateEntity(false);
+        this.bitmap = null;
+//        updateEntity(false);
     }
 
     public void updateEntity() {
@@ -52,16 +54,9 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
         // save previous center
         PointF oldCenter = canvasCenter();
 
-        Bitmap newBmp = createBitmap(getLayer(), bitmap);
-        if (newBmp == null) {
+        if (bitmap == null) {
             return;
         }
-        // recycle previous bitmap (if not reused) as soon as possible
-        if (bitmap != null && bitmap != newBmp && !bitmap.isRecycled()) {
-            bitmap.recycle();
-        }
-
-        this.bitmap = newBmp;
 
         float width = bitmap.getWidth();
         float height = bitmap.getHeight();
@@ -90,63 +85,27 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
      * If reuseBmp is not null, and size of the new bitmap matches the size of the reuseBmp,
      * new bitmap won't be created, reuseBmp it will be reused instead
      *
-     * @param sketchLayer sketch to draw
-     * @param reuseBmp  the bitmap that will be reused
+     * @param bitmap  the bitmap that will be reused
      * @return bitmap with the text
      */
-    @NonNull
-    private Bitmap createBitmap(@NonNull SketchLayer sketchLayer, @Nullable Bitmap reuseBmp) {
-        // TODO: REWORK
-        // init params - size, color, typeface
-//        sketchPaint.setStyle(Paint.Style.FILL);
-//        sketchPaint.setTextSize(sketchLayer.getFont().getSize());
-//        sketchPaint.setColor(sketchLayer.getFont().getColor());
-//        sketchPaint.setTypeface(fontProvider.getTypeface(sketchLayer.getFont().getTypeface()));
-//
-//        String text = sketchLayer.getText();
-//        String [] lines = text.split("\n");
-//        int boundsWidth = 0;
-//        for(String s : lines) {
-//            int lineWidth = (int)(sketchPaint.measureText(s) + 0.5f);
-//            if (lineWidth > boundsWidth) {
-//                boundsWidth = lineWidth;
-//            }
-//        }
-//        if (maxWidth > 0 && boundsWidth > maxWidth) {
-//            boundsWidth = maxWidth;
-//        }
-//        // drawing text guide : http://ivankocijan.xyz/android-drawing-multiline-text-on-canvas/
-//        // Static layout which will be drawn on canvas
-//        StaticLayout sl = new StaticLayout(
-//                sketchLayer.getText(), // - text which will be drawn
-//                sketchPaint,
-//                boundsWidth, // - width of the layout
-//                Layout.Alignment.ALIGN_CENTER, // - layout alignment
-//                1, // 1 - text spacing multiply
-//                1, // 1 - text spacing add
-//                true); // true - include padding
-//
-//        // calculate height for the entity, min - Limits.MIN_BITMAP_HEIGHT
-//        int boundsHeight = sl.getHeight();
-//        // create bitmap where text will be drawn
-//        Bitmap bmp;
-//        if (reuseBmp != null && reuseBmp.getWidth() == boundsWidth && reuseBmp.getHeight() == boundsHeight) {
-//            // if previous bitmap exists, and it's width/height is the same - reuse it
-//            bmp = reuseBmp;
-//            bmp.eraseColor(Color.TRANSPARENT); // erase color when reusing
-//        } else {
-//            bmp = Bitmap.createBitmap(boundsWidth, boundsHeight, Bitmap.Config.ARGB_8888);
-//        }
-//        Canvas canvas = new Canvas(bmp);
-//        canvas.save();
-//
-//        //draws static layout on canvas
-//        sl.draw(canvas);
-//        canvas.restore();
-//
-//        return bmp;
-        return null;
+    @Nullable
+    private boolean setBitmap(@Nullable Bitmap bitmap) {
+        boolean wasNull = false;
+
+        if (this.bitmap == null) {
+            wasNull = true;
+        }
+        // recycle previous bitmap (if not reused) as soon as possible
+        if (this.bitmap != null && this.bitmap != bitmap && !this.bitmap.isRecycled()) {
+            this.bitmap.recycle();
+        }
+
+        this.bitmap = bitmap;
+
+
+        return wasNull;
     }
+
 
     @Override
     @NonNull
@@ -178,42 +137,54 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
         }
     }
 
-    public void setMaxWidth(int maxWidth) {
-        this.maxWidth = maxWidth;
-    }
-
-    public int getMaxWidth() {
-        return this.maxWidth;
-    }
-
     @Override
-    public void startEditing(Activity activity) {
+    public void startEditing(final Activity activity) {
         setVisible(false);
-        callEntityCallback(true);
+        // callEntityCallback(true);
         SketchLayer sketchLayer = getLayer();
 
         Stroke stroke = sketchLayer.getStroke();
         int size = (int) (stroke.getSize() + 0.5f);
         int color = stroke.getColor();
+        // TODO: set size and color for sketchView!
+        final RelativeLayout main = activity.findViewById(R.id.activity_main);
+        if (main == null) {
+            return;
+        }
 
-        RelativeLayout main = activity.findViewById(R.id.activity_main);
-        SketchView sketchView = SketchView.getInstance(main.getContext());
+        final SketchView sketchView = SketchView.getInstance(main.getContext());
+        sketchView.setCallback(new SketchViewCallback() {
+            @Override
+            public void closeAndCreateEntity(@Nullable Bitmap bitmap, @Nullable Integer color, @Nullable Integer sizeInPixel) {
+                if (main != null && sketchView != null && main.indexOfChild(sketchView) >= 0) {
+                    main.removeView(sketchView);
+                    if (sketchView.linearLayout != null) {
+                        main.removeView(sketchView.linearLayout);
+                    }
+                }
+                ((EditCallback)activity).updateEntity(bitmap, color, sizeInPixel);
+            }
+        });
 
-        main.removeView(sketchView);
-        main.addView(sketchView);
+        if (sketchView != null && main.indexOfChild(sketchView) < 0) {
+            main.addView(sketchView);
+        }
 
-        // TODO: OPEN FRGMENT OR SOMETHING
+        // TODO: OPEN FRAGMENT OR SOMETHING
 //        TextEditorDialogFragment fragment = TextEditorDialogFragment.getInstance(text, size, color, typefaceName);
 //        fragment.show(activity.getFragmentManager(), TextEditorDialogFragment.class.getName());
     }
 
     @Override
-    public void updateState(@Nullable Integer color, @Nullable Integer sizeInPixel, @Nullable Integer maxWidth) {
-
+    public void updateState(@Nullable Bitmap bitmap, @Nullable Integer color, @Nullable Integer sizeInPixel) {
 
         SketchLayer sketchLayer = getLayer();
         Stroke stroke = sketchLayer.getStroke();
+        boolean moveToCenter = false;
 
+        if (bitmap != null && this.bitmap != bitmap) {
+            moveToCenter = setBitmap(bitmap);
+        }
         // Set color
         if (color != null && color != stroke.getColor()) {
             stroke.setColor(color);
@@ -222,12 +193,10 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
         if (sizeInPixel != null && sizeInPixel > 0 && sizeInPixel != stroke.getSize()) {
             stroke.setSize((float)sizeInPixel);
         }
-        // Set maxWidth
-        if (maxWidth != null && maxWidth > 0 && getMaxWidth() != maxWidth) {
-            setMaxWidth(maxWidth);
-        }
+
         setVisible(true);
         callEntityCallback(false);
-        updateEntity();
+        moveToCanvasCenter();
+        updateEntity(moveToCenter);
     }
 }

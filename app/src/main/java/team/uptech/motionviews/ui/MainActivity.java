@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
     public static final int SELECT_STICKER_REQUEST_CODE = 123;
 
     protected MotionView motionView;
+
+    // TODO: verschiebe das Interface in die MotionView (momentan wegen dem Fragment in der Main_Activity)
     private final MotionViewCallback motionViewCallback = new MotionViewCallback() {
         @Override
         public void onEntitySelected(@Nullable MotionEntity entity) {
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
         motionView = findViewById(R.id.main_motion_view);
         motionView.setMotionViewCallback(motionViewCallback);
         motionView.setTrashButton((Button)findViewById(R.id.trash_button));
-        // addSticker(R.drawable.pikachu_2, true);
+        addSticker(R.drawable.pikachu_2, true);
         addSketch(true);
     }
 
@@ -158,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
         return fontProvider;
     }
 
+    // TODO: verschiebe das Interface in die MotionView (momentan wegen dem Fragment in der Main_Activity)
     @Override
     public void updateEntity(@Nullable String text, @Nullable Integer color, @Nullable Integer sizeInPixel, @Nullable Integer maxWidth) {
         MotionEntity motionEntity = motionView.getSelectedEntity();
@@ -168,10 +171,10 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
     }
 
     @Override
-    public void updateEntity(@Nullable Integer color, @Nullable Integer sizeInPixel, @Nullable Integer maxWidth) {
+    public void updateEntity(Bitmap bitmap, @Nullable Integer color, @Nullable Integer sizeInPixel) {
         MotionEntity motionEntity = motionView.getSelectedEntity();
         if (motionEntity != null && motionEntity instanceof SketchEntity) {
-            ((SketchEntity) motionEntity).updateState(color, sizeInPixel, maxWidth);
+            ((SketchEntity) motionEntity).updateState(bitmap, color, sizeInPixel);
             motionView.invalidate();
         }
     }

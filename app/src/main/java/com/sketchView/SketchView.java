@@ -2,6 +2,7 @@ package com.sketchView;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -13,6 +14,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.sketchView.tools.EraseSketchTool;
@@ -22,6 +25,14 @@ import com.sketchView.tools.Blueprints.ToolColor;
 import com.sketchView.tools.Blueprints.ToolThickness;
 
 import team.uptech.motionviews.utils.ConversionUtils;
+import team.uptech.motionviews.widget.Interfaces.SketchViewCallback;
+
+import static com.sketchView.SketchView.DIRECTION.BOTTOM;
+import static com.sketchView.SketchView.DIRECTION.LEFT;
+import static com.sketchView.SketchView.DIRECTION.RIGHT;
+import static com.sketchView.SketchView.DIRECTION.TOP;
+
+import team.uptech.motionviews.R;
 
 /**
  * Created by keshav on 05/04/17.
@@ -29,10 +40,7 @@ import team.uptech.motionviews.utils.ConversionUtils;
 
 public class SketchView extends View {
 
-    enum DIRECTION {
-        HORIZONTAL,
-        VERTICAL
-    }
+    enum DIRECTION { HORIZONTAL, VERTICAL, LEFT, TOP, RIGHT, BOTTOM, UNDEFINED }
 
     static SketchView instance = null;
 
@@ -40,14 +48,17 @@ public class SketchView extends View {
     SketchTool penTool;
     SketchTool eraseTool;
     Bitmap incrementalImage;
-    Rect imageBounds = null;
     private boolean blockEditedUpdates;
+
+    private SketchViewCallback callback;
+
+    // TODO: remove debug variables
+    private boolean showBounds = false;
+    public LinearLayout linearLayout;
 
     public static SketchView getInstance(Context context) {
         if (instance == null) {
             instance = new SketchView(context);
-        } else {
-//            instance.setAlpha(1);
         }
         return instance;
     }
@@ -62,10 +73,49 @@ public class SketchView extends View {
         penTool = new PenSketchTool(this);
         eraseTool = new EraseSketchTool(this);
         setToolType(SketchTool.TYPE_PEN);
-        setToolThickness(20);
+        // setToolThickness(20);
         // setToolColor(Color.BLUE);
-        setBackgroundColor(Color.TRANSPARENT);
-//        setBackgroundColor(Color.RED);
+//        setBackgroundColor(Color.TRANSPARENT);
+        setBackgroundColor(Color.RED);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+
+        Context context = this.getContext();
+        linearLayout = new LinearLayout(context);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        linearLayout.setLayoutParams(layoutParams);
+
+        Button show = new Button(context);
+        show.setText("SHOW");
+        show.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showBounds = !showBounds;
+                invalidate();
+            }
+        });
+
+        Button save = new Button(context);
+        save.setText("SAVE");
+        save.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callback.closeAndCreateEntity(getImage(), getToolColor(), (int)getToolThickness());
+            }
+        });
+
+        RelativeLayout parentView = (RelativeLayout) getParent();
+
+        if (parentView != null) {
+            linearLayout.addView(show);
+            linearLayout.addView(save);
+            parentView.addView(linearLayout);
+            parentView.invalidate();
+        }
+        invalidate();
     }
 
     public void setToolType(int toolType) {
@@ -84,10 +134,16 @@ public class SketchView extends View {
     public void setToolColor(int toolColor) {
         ((ToolColor) penTool).setToolColor(toolColor);
     }
-
     public void setToolThickness(float toolThickness) {
         ((ToolThickness) penTool).setToolThickness(toolThickness);
         ((ToolThickness) eraseTool).setToolThickness(toolThickness);
+    }
+
+    public int getToolColor() {
+        return ((ToolColor) penTool).getToolColor();
+    }
+    public float getToolThickness() {
+        return ((ToolThickness) penTool).getToolThickness();
     }
 
     public void setViewImage(Bitmap bitmap) {
@@ -112,7 +168,8 @@ public class SketchView extends View {
         Rect bounds = getImageBounds();
 
         if (incrementalImage != null) {
-            return Bitmap.createBitmap(incrementalImage, bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top);
+            return BitmapFactory.decodeResource(getResources(), R.drawable.abra);
+//            return Bitmap.createBitmap(incrementalImage, bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top);
         }
         return null;
     }
@@ -121,6 +178,8 @@ public class SketchView extends View {
     @Nullable
     private Rect getImageBounds() {
         if (incrementalImage != null) {
+            Bitmap imageCopy = Bitmap.createScaledBitmap(incrementalImage, incrementalImage.getWidth(), incrementalImage.getHeight(), false);
+
             int density = ConversionUtils.getDensity();
             int toolThickness = (int)((ToolThickness)currentTool).getToolThickness();
             int step = (toolThickness > 5 ? 5 : toolThickness) * density;
@@ -183,13 +242,21 @@ public class SketchView extends View {
                     }
                 }
             }
-
+            Point minLeft = findExactBounds(imageCopy, LEFT, minLeftP, 1);
+            Point minTop = findExactBounds(imageCopy, TOP, minTopP, 1);
+            Point maxRight = findExactBounds(imageCopy, RIGHT, maxRightP, 1);
+            Point maxBottom = findExactBounds(imageCopy, BOTTOM, maxBottomP, 1);
+            if (minLeftP != null && minTopP != null && maxRightP != null && maxBottomP != null) {
+                return new Rect(minLeft == null ? minLeftP.x : minLeft.x,
+                        minTop == null ? minTopP.y : minTop.y,
+                        maxRight == null ? maxRightP.x : maxRight.x,
+                        maxBottom == null ? maxBottomP.y : maxBottom.y);
+            }
 // TODO: LOGIK FUNKTIONIERT, aber nur wenn user nicht nochmal zeichnet und dabei unter der schrittweite bleibt
-//            if (imageBounds != null && imageBounds.left == minLeftP.x - step && imageBounds.top == minTopP.y - step && imageBounds.right == maxRightP.x + step && imageBounds.bottom == maxBottomP.y + step) {
 //
 //            if (imageBounds == null) {
 //                imageBounds = new Rect(minLeftP.x - step, minTopP.y - step, maxRightP.x + step, maxBottomP.y + step);
-//            } else if (!(imageBounds.left == minLeftP.x && imageBounds.top == minTopP.y && imageBounds.right == maxRightP.x && imageBounds.bottom == maxBottomP.y)) {
+//            } else if (!(imageBounds.left == minLeftP.x && imageBounds.top == minTopP.y && imageBounds.right == maxRightP.x && imageBounds.bottom == maxBottomP.y)) { //            if (imageBounds != null && imageBounds.left == minLeftP.x - step && imageBounds.top == minTopP.y - step && imageBounds.right == maxRightP.x + step && imageBounds.bottom == maxBottomP.y + step)
 //                imageBounds = new Rect(imageBounds.left != minLeftP.x ? minLeftP.x - step : imageBounds.left,
 //                        imageBounds.top != minTopP.y ? minTopP.y - step : imageBounds.top,
 //                        imageBounds.right != maxRightP.x ? maxRightP.x + step : imageBounds.right,
@@ -201,7 +268,42 @@ public class SketchView extends View {
         return null;
     }
 
+    private Point findExactBounds (Bitmap image, DIRECTION direction, Point curr, int step) {
 
+        Point[] newPoints = new Point[4];
+
+        if (isTransparentOrColor(image, curr.x, curr.y , Color.GREEN, true)) {
+            return null;
+        }
+
+        incrementalImage.setPixel(curr.x, curr.y, Color.GREEN);
+
+        if (direction != RIGHT) {
+            newPoints[0] = findExactBounds(image, direction, new Point(curr.x - step, curr.y), step); // LEFT
+        }
+        if (direction != BOTTOM) {
+            newPoints[1] = findExactBounds(image, direction, new Point(curr.x ,curr.y - step), step); // TOP
+        }
+        if (direction != LEFT) {
+            newPoints[2] = findExactBounds(image, direction, new Point(curr.x + step ,curr.y), step); // RIGHT
+        }
+        if (direction != TOP) {
+            newPoints[3] = findExactBounds(image, direction, new Point(curr.x ,curr.y + step), step); // BOTTOM
+        }
+
+        switch(direction) {
+            case LEFT:
+                return newPoints[0] != null && newPoints[0].x < curr.x ? newPoints[0] : curr;
+            case TOP:
+                return newPoints[1] != null && newPoints[1].y < curr.y? newPoints[1] : curr;
+            case RIGHT:
+                return newPoints[2] != null && newPoints[2].x > curr.x? newPoints[2] : curr;
+            case BOTTOM:
+                return newPoints[3] != null && newPoints[3].y > curr.y? newPoints[3] : curr;
+            default:
+                return curr;
+        }
+    }
 //    private int[] findExactBounds (DIRECTION checkDirection, Point[] coordinates, int range, int density) {
 //
 //
@@ -287,7 +389,18 @@ public class SketchView extends View {
         }
         return Color.alpha(incrementalImage.getPixel(x, y)) == 0;
     }
+    private boolean isTransparentOrColor(Bitmap image, int x, int y, int color, boolean checkCoordinates) {
+        if (checkCoordinates && !(x >= 0 && x < incrementalImage.getWidth() && y >= 0 && y < incrementalImage.getWidth())) {
+            return true;
+        }
+        int pixel = incrementalImage.getPixel(x, y);
+        return Color.alpha(pixel) == 0 || pixel == color;
+    }
 
+    private void closeSketchView () {
+        ((RelativeLayout)getParentForAccessibility()).removeView(this);
+        //TODO: close
+    }
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -298,15 +411,17 @@ public class SketchView extends View {
             currentTool.render(canvas);
         }
 
-        Rect rect = getImageBounds();
-        if (rect != null) {
-            Paint p = new Paint();
-            p.setColor(Color.RED);
-            
-            canvas.drawLine(rect.left, rect.top, rect.left, rect.bottom, p);
-            canvas.drawLine(rect.right, rect.top, rect.right, rect.bottom, p);
-            canvas.drawLine(rect.left, rect.top, rect.right, rect.top, p);
-            canvas.drawLine(rect.left, rect.bottom, rect.right, rect.bottom, p);
+        if (showBounds) {
+            Rect rect = getImageBounds();
+            if (rect != null) {
+                Paint p = new Paint();
+                p.setColor(Color.RED);
+
+                canvas.drawLine(rect.left, rect.top, rect.left, rect.bottom, p);
+                canvas.drawLine(rect.right, rect.top, rect.right, rect.bottom, p);
+                canvas.drawLine(rect.left, rect.top, rect.right, rect.top, p);
+                canvas.drawLine(rect.left, rect.bottom, rect.right, rect.bottom, p);
+            }
         }
     }
 
@@ -320,11 +435,12 @@ public class SketchView extends View {
             setViewImage(drawBitmap());
             currentTool.clear();
             blockEditedUpdates = false;
-
-            // getImage();
-//            setAlpha(0);
         }
 
         return value;
+    }
+
+    public void setCallback(SketchViewCallback callback) {
+        this.callback = callback;
     }
 }

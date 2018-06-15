@@ -151,9 +151,9 @@ public class MotionView  extends FrameLayout {
         if (!entity.hasEntityCallback()) {
             entity.setEntityCallback(new EntityCallback() {
                 @Override
-                public void hideAllVisibleEntities(boolean show) {
-                    if (hideAllEntities != show) {
-                        hideAllEntities = show;
+                public void hideAllVisibleEntities(boolean hide) {
+                    if (hideAllEntities != hide) {
+                        hideAllEntities = hide;
                         updateUI();
                     }
                 }
