@@ -8,21 +8,21 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.sketchView.model.MultiPoint;
 import com.sketchView.tools.EraseSketchTool;
 import com.sketchView.tools.PenSketchTool;
 import com.sketchView.tools.Blueprints.SketchTool;
 import com.sketchView.tools.Blueprints.ToolColor;
 import com.sketchView.tools.Blueprints.ToolThickness;
+
+import java.util.ArrayList;
 
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.widget.Interfaces.SketchViewCallback;
@@ -190,17 +190,16 @@ public class SketchView extends View {
                 imageCopy.recycle();
                 imageCopy = null;
             }
-//            Bitmap imageCopy = Bitmap.createScaledBitmap(incrementalImage, incrementalImage.getWidth(), incrementalImage.getHeight(), false);
             imageCopy = incrementalImage.copy(incrementalImage.getConfig(), incrementalImage.isMutable());
 
             int density = ConversionUtils.getDensity();
             int toolThickness = (int)((ToolThickness)currentTool).getToolThickness();
             int step = (toolThickness > 5 ? 5 : toolThickness > 1 ? toolThickness - 1 : 1) * density;
 
-            Point maxRightP = new Point(Integer.MIN_VALUE,0);
-            Point maxBottomP = new Point(0, Integer.MIN_VALUE);
-            Point minLeftP = new Point(Integer.MAX_VALUE, 0);
-            Point minTopP = new Point(0, Integer.MAX_VALUE);
+            MultiPoint<Integer, ArrayList<Integer>> maxRightP = MultiPoint.createMultiYPoint(Integer.MIN_VALUE);
+            MultiPoint<Integer, ArrayList<Integer>> minLeftP = MultiPoint.createMultiYPoint(Integer.MAX_VALUE);
+            MultiPoint<ArrayList<Integer>, Integer> maxBottomP = MultiPoint.createMultiXPoint(Integer.MIN_VALUE);
+            MultiPoint<ArrayList<Integer>, Integer> minTopP = MultiPoint.createMultiXPoint(Integer.MAX_VALUE);
 
             int width = imageCopy.getWidth() - 1;
             int height = imageCopy.getHeight() - 1;
@@ -214,62 +213,75 @@ public class SketchView extends View {
                     rightBottom = !isTransparent(width - left, height - top);
 
                     if (leftTop || leftBottom) {
-                        if (left < minLeftP.x) {
-                            minLeftP.x = left;
-                            minLeftP.y = leftTop ? top : height - top;
+                        if (left <= minLeftP.getPoint()) {
+                            minLeftP.setPoint(left);
+                            minLeftP.add(leftTop ? top : height - top);
                         }
-                        if (left > maxRightP.x) {
-                            maxRightP.x = left;
-                            maxRightP.y = leftTop ? top : height - top;
+                        if (left >= maxRightP.getPoint()) {
+                            maxRightP.setPoint(left);
+                            maxRightP.add(leftTop ? top : height - top);
                         }
                     }
                     if (leftTop || rightTop) {
-                        if (top < minTopP.y) {
-                            minTopP.y = top;
-                            minTopP.x = leftTop ? left : width - left;
+                        if (top <= minTopP.getPoint()) {
+                            minTopP.setPoint(top);
+                            minTopP.add(leftTop ? left : width - left);
                         }
-                        if (top > maxBottomP.y) {
-                            maxBottomP.y = top;
-                            maxBottomP.x = leftTop ? left : width - left;
+                        if (top >= maxBottomP.getPoint()) {
+                            maxBottomP.setPoint(top);
+                            maxBottomP.add(leftTop ? left : width - left);
                         }
                     }
                     if (leftBottom || rightBottom) {
-                        if (height - top < minTopP.y) {
-                            minTopP.y = height - top;
-                            minTopP.x = leftBottom ? left : width - left;
+                        if (height - top <= minTopP.getPoint()) {
+                            minTopP.setPoint(height - top);
+                            minTopP.add(leftBottom ? left : width - left);
                         }
-                        if (height - top > maxBottomP.y) {
-                            maxBottomP.y = height - top;
-                            maxBottomP.x = leftBottom ? left : width - left;
+                        if (height - top >= maxBottomP.getPoint()) {
+                            maxBottomP.setPoint(height - top);
+                            maxBottomP.add(leftBottom ? left : width - left);
                         }
                     }
                     if (rightTop || rightBottom) {
-                        if (width - left < minLeftP.x) {
-                            minLeftP.x = width - left;
-                            minLeftP.y = rightTop ? top : height - top;
+                        if (width - left <= minLeftP.getPoint()) {
+                            minLeftP.setPoint(width - left);
+                            minLeftP.add(rightTop ? top : height - top);
                         }
-                        if (width - left > maxRightP.x) {
-                            maxRightP.x = width - left;
-                            maxRightP.y = rightTop ? top : height - top;
+                        if (width - left >= maxRightP.getPoint()) {
+                            maxRightP.setPoint(width - left);
+                            maxRightP.add(rightTop ? top : height - top);
                         }
                     }
                 }
             }
 
-            // TODO: mehrere Punkte die dann in floodfill gecheckt werden ob noch weiter nach außen geht!
-            boolean test;
-            test = isTransparentOrColor(minLeftP.x, minLeftP.y, Color.GREEN, true);
+            ArrayList<Point> minLefts = new ArrayList<>();
+            ArrayList<Point> minTops = new ArrayList<>();
+            ArrayList<Point> maxRights = new ArrayList<>();
+            ArrayList<Point> maxBottoms = new ArrayList<>();
+            for (Point p: minLeftP.getPairs()) {
+                minLefts.add(findExactBounds(LEFT, p, 1));
+            }
+            for (Point p: minTopP.getPairs()) {
+                minTops.add(findExactBounds(TOP, p, 1));
+            }
+            for (Point p: maxRightP.getPairs()) {
+                maxRights.add(findExactBounds(RIGHT, p, 1));
+            }
+            for (Point p: maxBottomP.getPairs()) {
+                maxBottoms.add(findExactBounds(BOTTOM, p, 1));
+            }
 
-            Point minLeft = findExactBounds(LEFT, minLeftP, 1);
-            Point minTop = findExactBounds(TOP, minTopP, 1);
-            Point maxRight = findExactBounds(RIGHT, maxRightP, 1);
-            Point maxBottom = findExactBounds(BOTTOM, maxBottomP, 1);
-
+            Point minLeft = getMinOrMax(minLefts.toArray(new Point[minLefts.size()]), true, true, -1);
+            Point minTop = getMinOrMax(minTops.toArray(new Point[minTops.size()]), false, true, -1);
+            Point maxRight = getMinOrMax(maxRights.toArray(new Point[maxRights.size()]), true, false, -1);
+            Point maxBottom = getMinOrMax(maxBottoms.toArray(new Point[maxBottoms.size()]), false, false, -1);
+            
             if (minLeftP != null && minTopP != null && maxRightP != null && maxBottomP != null) {
-                return new Rect((minLeft != null ? minLeft.x : minLeftP.x),
-                        (minTop != null ? minTop.y : minTopP.y),
-                        (maxRight != null ? maxRight.x : maxRightP.x),
-                        (maxBottom != null ? maxBottom.y : maxBottomP.y));
+                return new Rect((minLeft != null ? minLeft.x : minLeftP.getPoint()),
+                        (minTop != null ? minTop.y : minTopP.getPoint()),
+                        (maxRight != null ? maxRight.x : maxRightP.getPoint()),
+                        (maxBottom != null ? maxBottom.y : maxBottomP.getPoint()));
             }
         }
         return null;
