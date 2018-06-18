@@ -48,6 +48,7 @@ public class SketchView extends View {
     SketchTool penTool;
     SketchTool eraseTool;
     Bitmap incrementalImage;
+    Bitmap imageCopy;
     private boolean blockEditedUpdates;
 
     private SketchViewCallback callback;
@@ -159,7 +160,14 @@ public class SketchView extends View {
     }
 
     public void clear() {
-        incrementalImage = null;
+        if (incrementalImage != null) {
+            incrementalImage.recycle();
+            incrementalImage = null;
+        }
+        if (imageCopy != null) {
+            imageCopy.recycle();
+            imageCopy = null;
+        }
         currentTool.clear();
         invalidate();
     }
@@ -176,21 +184,26 @@ public class SketchView extends View {
 
 
     @Nullable
-    private Rect[] getImageBounds() {
+    private Rect getImageBounds() {
         if (incrementalImage != null) {
-            Bitmap imageCopy = Bitmap.createScaledBitmap(incrementalImage, incrementalImage.getWidth(), incrementalImage.getHeight(), false);
+            if (imageCopy != null) {
+                imageCopy.recycle();
+                imageCopy = null;
+            }
+//            Bitmap imageCopy = Bitmap.createScaledBitmap(incrementalImage, incrementalImage.getWidth(), incrementalImage.getHeight(), false);
+            imageCopy = incrementalImage.copy(incrementalImage.getConfig(), incrementalImage.isMutable());
 
             int density = ConversionUtils.getDensity();
             int toolThickness = (int)((ToolThickness)currentTool).getToolThickness();
-            int step = (toolThickness > 5 ? 5 : toolThickness) * density;
+            int step = (toolThickness > 5 ? 5 : toolThickness > 1 ? toolThickness - 1 : 1) * density;
 
             Point maxRightP = new Point(Integer.MIN_VALUE,0);
             Point maxBottomP = new Point(0, Integer.MIN_VALUE);
             Point minLeftP = new Point(Integer.MAX_VALUE, 0);
             Point minTopP = new Point(0, Integer.MAX_VALUE);
 
-            int width = incrementalImage.getWidth() - 1;
-            int height = incrementalImage.getHeight() - 1;
+            int width = imageCopy.getWidth() - 1;
+            int height = imageCopy.getHeight() - 1;
             boolean leftTop, leftBottom, rightTop, rightBottom;
 
             for (int left = 0; left < width / 2; left += step) {
@@ -203,11 +216,11 @@ public class SketchView extends View {
                     if (leftTop || leftBottom) {
                         if (left < minLeftP.x) {
                             minLeftP.x = left;
-                            minLeftP.y = leftTop ? left : height - top;
+                            minLeftP.y = leftTop ? top : height - top;
                         }
                         if (left > maxRightP.x) {
                             maxRightP.x = left;
-                            maxRightP.y = leftTop ? left : height - top;
+                            maxRightP.y = leftTop ? top : height - top;
                         }
                     }
                     if (leftTop || rightTop) {
@@ -242,63 +255,69 @@ public class SketchView extends View {
                     }
                 }
             }
-            Point minLeft = findExactBounds(imageCopy, LEFT, minLeftP, 1);
-            Point minTop = findExactBounds(imageCopy, TOP, minTopP, 1);
-            Point maxRight = findExactBounds(imageCopy, RIGHT, maxRightP, 1);
-            Point maxBottom = findExactBounds(imageCopy, BOTTOM, maxBottomP, 1);
+
+            // TODO: mehrere Punkte die dann in floodfill gecheckt werden ob noch weiter nach außen geht!
+            boolean test;
+            test = isTransparentOrColor(minLeftP.x, minLeftP.y, Color.GREEN, true);
+
+            Point minLeft = findExactBounds(LEFT, minLeftP, 1);
+            Point minTop = findExactBounds(TOP, minTopP, 1);
+            Point maxRight = findExactBounds(RIGHT, maxRightP, 1);
+            Point maxBottom = findExactBounds(BOTTOM, maxBottomP, 1);
+
             if (minLeftP != null && minTopP != null && maxRightP != null && maxBottomP != null) {
-                return new Rect[]{ new Rect(minLeft == null ? minLeftP.x : minLeft.x,
-                        minTop == null ? minTopP.y : minTop.y,
-                        maxRight == null ? maxRightP.x : maxRight.x,
-                        maxBottom == null ? maxBottomP.y : maxBottom.y),
-                new Rect(minLeftP.x, minTopP.y, maxRightP.x, maxBottomP.y)};
+                return new Rect((minLeft != null ? minLeft.x : minLeftP.x),
+                        (minTop != null ? minTop.y : minTopP.y),
+                        (maxRight != null ? maxRight.x : maxRightP.x),
+                        (maxBottom != null ? maxBottom.y : maxBottomP.y));
             }
         }
         return null;
     }
 
-    private Point findExactBounds (Bitmap image, DIRECTION direction, Point curr, int step) {
+    private Point findExactBounds (DIRECTION direction, Point curr, int step) {
 
         Point[] newPoints = new Point[4];
 
-        if (isTransparentOrColor(image, curr.x, curr.y , Color.GREEN, true)) {
+        if (isTransparentOrColor(curr.x, curr.y, Color.GREEN, true)) {
             return null;
         }
 
-        incrementalImage.setPixel(curr.x, curr.y, Color.GREEN);
+//        incrementalImage.setPixel(curr.x, curr.y, Color.CYAN);
+        imageCopy.setPixel(curr.x, curr.y, Color.GREEN);
 
         if (direction != RIGHT) {
-            newPoints[0] = findExactBounds(image, direction, new Point(curr.x - step, curr.y), step); // LEFT
+            newPoints[0] = findExactBounds(direction, new Point(curr.x - step, curr.y), step); // LEFT
         }
         if (direction != BOTTOM) {
-            newPoints[1] = findExactBounds(image, direction, new Point(curr.x ,curr.y - step), step); // TOP
+            newPoints[1] = findExactBounds(direction, new Point(curr.x ,curr.y - step), step); // TOP
         }
         if (direction != LEFT) {
-            newPoints[2] = findExactBounds(image, direction, new Point(curr.x + step ,curr.y), step); // RIGHT
+            newPoints[2] = findExactBounds(direction, new Point(curr.x + step ,curr.y), step); // RIGHT
         }
         if (direction != TOP) {
-            newPoints[3] = findExactBounds(image, direction, new Point(curr.x ,curr.y + step), step); // BOTTOM
+            newPoints[3] = findExactBounds(direction, new Point(curr.x ,curr.y + step), step); // BOTTOM
         }
 
         Point p;
         switch(direction) {
             case LEFT:
-                p = getMax(newPoints, true, true, 2);
+                p = getMinOrMax(newPoints, true, true, 2);
                 return p != null && p.x < curr.x ? p : curr;
             case TOP:
-                p = getMax(newPoints, false, true, 3);
+                p = getMinOrMax(newPoints, false, true, 3);
                 return p != null && p.y < curr.y ? p : curr;
             case RIGHT:
-                p = getMax(newPoints, true, false, 0);
+                p = getMinOrMax(newPoints, true, false, 0);
                 return p != null && p.x > curr.x ? p : curr;
             case BOTTOM:
-                p = getMax(newPoints, false, false, 1);
+                p = getMinOrMax(newPoints, false, false, 1);
                 return p != null && p.y > curr.y ? p : curr;
             default:
                 return curr;
         }
     }
-    private Point getMax (Point[] points, boolean x, boolean min, int ignoreIndex) {
+    private Point getMinOrMax (Point[] points, boolean x, boolean min, int ignoreIndex) {
         Point result = null;
         int index = 0;
         for (Point p: points) {
@@ -334,96 +353,30 @@ public class SketchView extends View {
         return result;
     }
 
-//    private int[] findExactBounds (DIRECTION checkDirection, Point[] coordinates, int range, int density) {
-//
-//
-////            int[] horizontalBounds = findExactBounds(DIRECTION.HORIZONTAL, new Point[]{minLeftP, minTopP, maxRightP, maxBottomP}, step, 1);
-////            int[] verticalBounds = findExactBounds(DIRECTION.VERTICAL, new Point[]{minLeftP, minTopP, maxRightP, maxBottomP}, step, 1);
-////           if (horizontalBounds != null && verticalBounds != null) {
-////               return new Rect(horizontalBounds[0], verticalBounds[0], horizontalBounds[1], verticalBounds[1]);
-////           } else {
-//
-//        int minLeft;
-//        int minTop;
-//        int maxRight;
-//        int maxBottom;
-//        int dimensionRange;
-//        boolean leftTop, leftBottom, rightTop, rightBottom;
-//
-//        switch(checkDirection) {
-//            case VERTICAL: {
-//                minTop = coordinates[1].y;
-//                maxBottom = coordinates[3].y;
-//                dimensionRange = (coordinates[2].x - coordinates[0].x) + 2 * range;
-//
-//                for (int i = 0; i < range; i++) {
-//                    for (int j = coordinates[0].x - range; j < dimensionRange / 2; j += density) {
-//                        int topY = minTop - range + i;
-//                        int bottomY = maxBottom + range - i;
-//
-//                        leftTop = !isTransparent(j, topY, true);
-//                        rightTop = !isTransparent(dimensionRange - j, topY, true);
-//                        leftBottom = !isTransparent(j, bottomY, true);
-//                        rightBottom = !isTransparent(dimensionRange - j, bottomY, true);
-//
-//                        if ((leftTop || rightTop) && topY < minTop) {
-//                            minTop = topY;
-//                        }
-//                        if ((leftBottom || rightBottom) && bottomY > maxBottom) {
-//                            maxBottom = bottomY;
-//                        }
-//                    }
-//                }
-//                System.out.print("TOP: " + coordinates[1].y + " --> " + minTop + " | ");
-//                System.out.println("BOTTOM: " + coordinates[3].y + " --> " + maxBottom);
-//                return new int[]{minTop, maxBottom};
-//            }
-//            case HORIZONTAL: {
-//                minLeft = coordinates[0].x;
-//                maxRight = coordinates[2].x;
-//                dimensionRange = (coordinates[3].y - coordinates[1].y) + 2 * range;
-//
-//                for (int i = 0; i < range; i++) {
-//                    for (int j = coordinates[1].y - range; j < dimensionRange / 2; j += density) {
-//                        int leftX = minLeft - range + i;
-//                        int rightX = maxRight + range - i;
-//
-//                        leftTop = !isTransparent(leftX, j, true);
-//                        leftBottom = !isTransparent(leftX, dimensionRange - j, true);
-//                        rightTop = !isTransparent(rightX, j, true);
-//                        rightBottom = !isTransparent(rightX, dimensionRange - j, true);
-//
-//                        if ((leftTop || leftBottom) && leftX < minLeft) {
-//                            minLeft = leftX;
-//                        }
-//                        if ((rightTop || rightBottom) && rightX > maxRight) {
-//                            maxRight = rightX;
-//                        }
-//                    }
-//                }
-//                System.out.print("LEFT: " + coordinates[0].x + " --> " + minLeft + " | ");
-//                System.out.println("RIGHT: " + coordinates[2].x + " --> " + maxRight);
-//                return new int[]{minLeft, maxRight};
-//            }
-//        }
-//        return null;
-//    }
-
     private boolean isTransparent(int x, int y) {
-        return  isTransparent(x,y, false);
+        return  isTransparent(x,y,true);
     }
+
 
     private boolean isTransparent(int x, int y, boolean checkCoordinates) {
-        if (checkCoordinates && !(x >= 0 && x < incrementalImage.getWidth() && y >= 0 && y < incrementalImage.getWidth())) {
+        int width = imageCopy.getWidth() - 1;
+        int height = imageCopy.getHeight() - 1;
+        if (checkCoordinates && !(x >= 0 && x < width && y >= 0 && y < height)) {
             return true;
         }
-        return Color.alpha(incrementalImage.getPixel(x, y)) == 0;
+        int pixel = imageCopy.getPixel(x, y);
+        return Color.alpha(pixel) == 0;
     }
-    private boolean isTransparentOrColor(Bitmap image, int x, int y, int color, boolean checkCoordinates) {
-        if (checkCoordinates && !(x >= 0 && x < incrementalImage.getWidth() && y >= 0 && y < incrementalImage.getWidth())) {
+
+    private boolean isTransparentOrColor(int x, int y, int color, boolean checkCoordinates) {
+        int width = imageCopy.getWidth() - 1;
+        int height = imageCopy.getHeight() - 1;
+        if (checkCoordinates && !(x >= 0 && x < width && y >= 0 && y < height)) {
             return true;
         }
-        int pixel = incrementalImage.getPixel(x, y);
+        int pixel = imageCopy.getPixel(x, y);
+        boolean result = Color.alpha(pixel) == 0 || pixel == color;
+
         return Color.alpha(pixel) == 0 || pixel == color;
     }
 
@@ -442,7 +395,7 @@ public class SketchView extends View {
         }
 
         if (showBounds) {
-            Rect[] rect = getImageBounds();
+            Rect rect = getImageBounds();
             if (rect != null) {
                 Paint p = new Paint();
                 Paint pp = new Paint();
@@ -450,15 +403,10 @@ public class SketchView extends View {
                 p.setColor(Color.RED);
                 pp.setColor(Color.BLUE);
 
-                canvas.drawLine(rect[0].left, rect[0].top, rect[0].left, rect[0].bottom, p);
-                canvas.drawLine(rect[0].right, rect[0].top, rect[0].right, rect[0].bottom, p);
-                canvas.drawLine(rect[0].left, rect[0].top, rect[0].right, rect[0].top, p);
-                canvas.drawLine(rect[0].left, rect[0].bottom, rect[0].right, rect[0].bottom, p);
-
-                canvas.drawLine(rect[1].left, rect[1].top, rect[1].left, rect[1].bottom, pp);
-                canvas.drawLine(rect[1].right, rect[1].top, rect[1].right, rect[1].bottom, pp);
-                canvas.drawLine(rect[1].left, rect[1].top, rect[1].right, rect[1].top, pp);
-                canvas.drawLine(rect[1].left, rect[1].bottom, rect[1].right, rect[1].bottom, pp);
+                canvas.drawLine(rect.left, rect.top, rect.left, rect.bottom, p);
+                canvas.drawLine(rect.right, rect.top, rect.right, rect.bottom, p);
+                canvas.drawLine(rect.left, rect.top, rect.right, rect.top, p);
+                canvas.drawLine(rect.left, rect.bottom, rect.right, rect.bottom, p);
             }
         }
     }
