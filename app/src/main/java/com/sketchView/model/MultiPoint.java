@@ -2,10 +2,8 @@ package com.sketchView.model;
 
 import android.graphics.Point;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * MultiYPoint holds two integer coordinates

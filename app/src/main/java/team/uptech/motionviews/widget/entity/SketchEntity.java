@@ -5,11 +5,14 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.sketchView.SketchView;
@@ -140,14 +143,14 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
     @Override
     public void startEditing(final Activity activity) {
         setVisible(false);
-        // callEntityCallback(true);
+        callEntityCallback(true);
         SketchLayer sketchLayer = getLayer();
 
         Stroke stroke = sketchLayer.getStroke();
         int size = (int) (stroke.getSize() + 0.5f);
         int color = stroke.getColor();
         // TODO: set size and color for sketchView!
-        final RelativeLayout main = activity.findViewById(R.id.activity_main);
+        RelativeLayout main = activity.findViewById(R.id.activity_main);
         if (main == null) {
             return;
         }
@@ -156,6 +159,7 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
         sketchView.setCallback(new SketchViewCallback() {
             @Override
             public void closeAndCreateEntity(@Nullable Bitmap bitmap, @Nullable Integer color, @Nullable Integer sizeInPixel) {
+                RelativeLayout main = activity.findViewById(R.id.activity_main);
                 if (main != null && sketchView != null && main.indexOfChild(sketchView) >= 0) {
                     main.removeView(sketchView);
                     if (sketchView.linearLayout != null) {
@@ -169,10 +173,6 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
         if (sketchView != null && main.indexOfChild(sketchView) < 0) {
             main.addView(sketchView);
         }
-
-        // TODO: OPEN FRAGMENT OR SOMETHING
-//        TextEditorDialogFragment fragment = TextEditorDialogFragment.getInstance(text, size, color, typefaceName);
-//        fragment.show(activity.getFragmentManager(), TextEditorDialogFragment.class.getName());
     }
 
     @Override

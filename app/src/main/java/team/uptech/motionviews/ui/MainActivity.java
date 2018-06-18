@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.List;
+
 import team.uptech.motionviews.R;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
@@ -38,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
         @Override
         public void onEntitySelected(@Nullable MotionEntity entity) {
         }
-
         @Override
         public void onEntityDoubleTap(@NonNull MotionEntity entity) {
         }
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
         motionView.setMotionViewCallback(motionViewCallback);
         motionView.setTrashButton((Button)findViewById(R.id.trash_button));
         addSticker(R.drawable.pikachu_2, true);
-        addSketch(true);
+        // addSketch(true);
     }
 
     private void addSticker(final int stickerResId, final boolean visible) {
@@ -171,8 +172,9 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
     }
 
     @Override
-    public void updateEntity(Bitmap bitmap, @Nullable Integer color, @Nullable Integer sizeInPixel) {
+    public void updateEntity(final Bitmap bitmap, @Nullable Integer color, @Nullable Integer sizeInPixel) {
         MotionEntity motionEntity = motionView.getSelectedEntity();
+
         if (motionEntity != null && motionEntity instanceof SketchEntity) {
             ((SketchEntity) motionEntity).updateState(bitmap, color, sizeInPixel);
             motionView.invalidate();

@@ -2,7 +2,6 @@ package com.sketchView;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -31,8 +30,6 @@ import static com.sketchView.SketchView.DIRECTION.BOTTOM;
 import static com.sketchView.SketchView.DIRECTION.LEFT;
 import static com.sketchView.SketchView.DIRECTION.RIGHT;
 import static com.sketchView.SketchView.DIRECTION.TOP;
-
-import team.uptech.motionviews.R;
 
 /**
  * Created by keshav on 05/04/17.
@@ -80,9 +77,7 @@ public class SketchView extends View {
         // setBackgroundColor(Color.RED);
     }
 
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
+    public LinearLayout getButtons() {
 
         Context context = this.getContext();
         linearLayout = new LinearLayout(context);
@@ -108,15 +103,10 @@ public class SketchView extends View {
             }
         });
 
-        RelativeLayout parentView = (RelativeLayout) getParent();
+        linearLayout.addView(show);
+        linearLayout.addView(save);
 
-        if (parentView != null) {
-            linearLayout.addView(show);
-            linearLayout.addView(save);
-            parentView.addView(linearLayout);
-            parentView.invalidate();
-        }
-        invalidate();
+        return linearLayout;
     }
 
     public void setToolType(int toolType) {
@@ -173,11 +163,10 @@ public class SketchView extends View {
     }
 
     public Bitmap getImage() {
-//        Rect bounds = getImageBounds();
+        Rect bounds = getImageBounds();
 
         if (incrementalImage != null) {
-            return BitmapFactory.decodeResource(getResources(), R.drawable.abra);
-//            return Bitmap.createBitmap(incrementalImage, bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top);
+            return Bitmap.createBitmap(incrementalImage, bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top);
         }
         return null;
     }
@@ -410,10 +399,7 @@ public class SketchView extends View {
             Rect rect = getImageBounds();
             if (rect != null) {
                 Paint p = new Paint();
-                Paint pp = new Paint();
-
                 p.setColor(Color.RED);
-                pp.setColor(Color.BLUE);
 
                 canvas.drawLine(rect.left, rect.top, rect.left, rect.bottom, p);
                 canvas.drawLine(rect.right, rect.top, rect.right, rect.bottom, p);
