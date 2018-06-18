@@ -142,36 +142,39 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
 
     @Override
     public void startEditing(final Activity activity) {
-        setVisible(false);
-        callEntityCallback(true);
-        SketchLayer sketchLayer = getLayer();
+        if (bitmap == null) {
+            setVisible(false);
+            callEntityCallback(true);
+            SketchLayer sketchLayer = getLayer();
 
-        Stroke stroke = sketchLayer.getStroke();
-        int size = (int) (stroke.getSize() + 0.5f);
-        int color = stroke.getColor();
-        // TODO: set size and color for sketchView!
-        RelativeLayout main = activity.findViewById(R.id.activity_main);
-        if (main == null) {
-            return;
-        }
-
-        final SketchView sketchView = SketchView.getInstance(main.getContext());
-        sketchView.setCallback(new SketchViewCallback() {
-            @Override
-            public void closeAndCreateEntity(@Nullable Bitmap bitmap, @Nullable Integer color, @Nullable Integer sizeInPixel) {
-                RelativeLayout main = activity.findViewById(R.id.activity_main);
-                if (main != null && sketchView != null && main.indexOfChild(sketchView) >= 0) {
-                    main.removeView(sketchView);
-                    if (sketchView.linearLayout != null) {
-                        main.removeView(sketchView.linearLayout);
-                    }
-                }
-                ((EditCallback)activity).updateEntity(bitmap, color, sizeInPixel);
+            Stroke stroke = sketchLayer.getStroke();
+            int size = (int) (stroke.getSize() + 0.5f);
+            int color = stroke.getColor();
+            // TODO: set size and color for sketchView!
+            RelativeLayout main = activity.findViewById(R.id.activity_main);
+            if (main == null) {
+                return;
             }
-        });
 
-        if (sketchView != null && main.indexOfChild(sketchView) < 0) {
-            main.addView(sketchView);
+            final SketchView sketchView = SketchView.getInstance(main.getContext());
+            sketchView.setCallback(new SketchViewCallback() {
+                @Override
+                public void closeAndCreateEntity(@Nullable Bitmap bitmap, @Nullable Integer color, @Nullable Integer sizeInPixel) {
+                    RelativeLayout main = activity.findViewById(R.id.activity_main);
+                    if (main != null && sketchView != null && main.indexOfChild(sketchView) >= 0) {
+                        main.removeView(sketchView);
+                        if (sketchView.linearLayout != null) {
+                            main.removeView(sketchView.linearLayout);
+                        }
+                    }
+                    ((EditCallback) activity).updateEntity(bitmap, color, sizeInPixel);
+                }
+            });
+
+            if (sketchView != null && main.indexOfChild(sketchView) < 0) {
+                main.addView(sketchView);
+                main.addView(sketchView.getButtons());
+            }
         }
     }
 

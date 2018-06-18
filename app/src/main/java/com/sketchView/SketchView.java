@@ -100,6 +100,7 @@ public class SketchView extends View {
             @Override
             public void onClick(View v) {
                 callback.closeAndCreateEntity(getImage(), getToolColor(), (int)getToolThickness());
+                clear();
             }
         });
 
@@ -381,10 +382,6 @@ public class SketchView extends View {
         return Color.alpha(pixel) == 0 || pixel == color;
     }
 
-    private void closeSketchView () {
-        ((RelativeLayout)getParentForAccessibility()).removeView(this);
-        //TODO: close
-    }
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
