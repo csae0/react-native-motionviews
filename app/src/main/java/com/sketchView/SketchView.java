@@ -49,7 +49,7 @@ public class SketchView extends View {
     private boolean blockEditedUpdates;
 
     private SketchViewCallback callback;
-
+    private Rect croppedImageBounds;
     // TODO: remove debug variables
     private boolean showBounds = false;
     public LinearLayout linearLayout;
@@ -68,6 +68,8 @@ public class SketchView extends View {
 //        setLayoutParams(layoutParams);
 
         blockEditedUpdates = false;
+        croppedImageBounds = null;
+
         penTool = new PenSketchTool(this);
         eraseTool = new EraseSketchTool(this);
         setToolType(SketchTool.TYPE_PEN);
@@ -99,7 +101,7 @@ public class SketchView extends View {
         save.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback.closeAndCreateEntity(getImage(), getToolColor(), (int)getToolThickness());
+                callback.closeAndCreateEntity(getImage(), croppedImageBounds, getToolColor(), (int)getToolThickness());
                 clear();
             }
         });
@@ -164,14 +166,13 @@ public class SketchView extends View {
     }
 
     public Bitmap getImage() {
-        Rect bounds = getImageBounds();
+        croppedImageBounds = getImageBounds();
 
         if (incrementalImage != null) {
-            return Bitmap.createBitmap(incrementalImage, bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top);
+            return Bitmap.createBitmap(incrementalImage, croppedImageBounds.left, croppedImageBounds.top, croppedImageBounds.right - croppedImageBounds.left, croppedImageBounds.bottom - croppedImageBounds.top);
         }
         return null;
     }
-
 
     @Nullable
     private Rect getImageBounds() {
@@ -392,6 +393,7 @@ public class SketchView extends View {
             currentTool.render(canvas);
         }
 
+        // TODO: REMOVE
         if (showBounds) {
             Rect rect = getImageBounds();
             if (rect != null) {

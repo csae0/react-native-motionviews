@@ -3,22 +3,17 @@ package team.uptech.motionviews.widget.entity;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.View;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.sketchView.SketchView;
-import com.sketchView.SketchViewContainer;
 
-import team.uptech.motionviews.ui.MainActivity;
 import team.uptech.motionviews.viewmodel.SketchLayer;
 import team.uptech.motionviews.viewmodel.Stroke;
 import team.uptech.motionviews.widget.Interfaces.EditCallback;
@@ -92,21 +87,13 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
      * @return bitmap with the text
      */
     @Nullable
-    private boolean setBitmap(@Nullable Bitmap bitmap) {
-        boolean wasNull = false;
-
-        if (this.bitmap == null) {
-            wasNull = true;
-        }
+    private void setBitmap(@Nullable Bitmap bitmap) {
         // recycle previous bitmap (if not reused) as soon as possible
         if (this.bitmap != null && this.bitmap != bitmap && !this.bitmap.isRecycled()) {
             this.bitmap.recycle();
         }
 
         this.bitmap = bitmap;
-
-
-        return wasNull;
     }
 
 
@@ -159,7 +146,7 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
             final SketchView sketchView = SketchView.getInstance(main.getContext());
             sketchView.setCallback(new SketchViewCallback() {
                 @Override
-                public void closeAndCreateEntity(@Nullable Bitmap bitmap, @Nullable Integer color, @Nullable Integer sizeInPixel) {
+                public void closeAndCreateEntity(@Nullable Bitmap bitmap, @Nullable Rect position, @Nullable Integer color, @Nullable Integer sizeInPixel) {
                     RelativeLayout main = activity.findViewById(R.id.activity_main);
                     if (main != null && sketchView != null && main.indexOfChild(sketchView) >= 0) {
                         main.removeView(sketchView);
@@ -167,7 +154,7 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
                             main.removeView(sketchView.linearLayout);
                         }
                     }
-                    ((EditCallback) activity).updateEntity(bitmap, color, sizeInPixel);
+                    ((EditCallback) activity).updateEntity(bitmap, position, color, sizeInPixel);
                 }
             });
 
@@ -179,15 +166,26 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
     }
 
     @Override
-    public void updateState(@Nullable Bitmap bitmap, @Nullable Integer color, @Nullable Integer sizeInPixel) {
+    public void updateState(@Nullable Bitmap bitmap, @Nullable Rect position, @Nullable Integer color, @Nullable Integer sizeInPixel) {
 
         SketchLayer sketchLayer = getLayer();
         Stroke stroke = sketchLayer.getStroke();
-        boolean moveToCenter = false;
 
+        // Set image
         if (bitmap != null && this.bitmap != bitmap) {
-            moveToCenter = setBitmap(bitmap);
+            setBitmap(bitmap);
         }
+
+        // Set image position
+        if (position != null) {
+            float[] center = entityCenter();
+            float topLeftX = layer.getX() + position.left;
+            float topLeftY = layer.getY() + position.top;
+
+            layer.postTranslate(1.0F * (topLeftX - center[0]) / canvasWidth,
+                    1.0F * (topLeftY - center[1]) / canvasHeight);
+        }
+
         // Set color
         if (color != null && color != stroke.getColor()) {
             stroke.setColor(color);
@@ -199,7 +197,6 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
 
         setVisible(true);
         callEntityCallback(false);
-        moveToCanvasCenter();
-        updateEntity(moveToCenter);
+        updateEntity(false);
     }
 }

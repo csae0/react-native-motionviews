@@ -3,6 +3,8 @@ package team.uptech.motionviews.ui;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -172,11 +174,11 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
     }
 
     @Override
-    public void updateEntity(final Bitmap bitmap, @Nullable Integer color, @Nullable Integer sizeInPixel) {
+    public void updateEntity(@Nullable Bitmap bitmap, @Nullable Rect position, @Nullable Integer color, @Nullable Integer sizeInPixel) {
         MotionEntity motionEntity = motionView.getSelectedEntity();
 
         if (motionEntity != null && motionEntity instanceof SketchEntity) {
-            ((SketchEntity) motionEntity).updateState(bitmap, color, sizeInPixel);
+            ((SketchEntity) motionEntity).updateState(bitmap, position, color, sizeInPixel);
             motionView.invalidate();
         }
     }
