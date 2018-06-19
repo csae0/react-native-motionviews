@@ -537,8 +537,12 @@ public class MotionView  extends FrameLayout {
 
         @Override
         public void onMoveEnd(MoveGestureDetector detector) {
-            fadeOutTrashButton();
-            handleTrashDelete();
+            MotionEvent motionEvent = detector.getmCurrEvent();
+            MotionEntity entity = findEntityAtPoint(motionEvent.getX(), motionEvent.getY());;
+            if (entity != null) {
+                fadeOutTrashButton();
+                handleTrashDelete();
+            }
         }
     }
 }

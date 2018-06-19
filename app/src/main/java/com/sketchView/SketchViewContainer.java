@@ -17,12 +17,16 @@ import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.almeros.android.multitouch.MoveGestureDetector;
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
@@ -31,6 +35,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import abak.tr.com.boxedverticalseekbar.BoxedVertical;
@@ -38,6 +43,7 @@ import team.uptech.motionviews.R;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.widget.Interfaces.Limits;
 import team.uptech.motionviews.widget.Interfaces.SketchViewCallback;
+import team.uptech.motionviews.widget.entity.MotionEntity;
 
 /**
  * Created by keshav on 06/04/17.
@@ -50,8 +56,6 @@ public class SketchViewContainer extends RelativeLayout {
     private SketchViewCallback sketchViewCallback;
 
     private LinearLayout colorPickerContainer;
-    private LinearLayout colorPickerSubContainer;
-    private Button colorPalette;
     private BoxedVertical boxedVertical;
 
     /**
@@ -60,17 +64,17 @@ public class SketchViewContainer extends RelativeLayout {
      */
     private SketchViewContainer(Context context) {
         super(context);
+
+        colorPickerContainer = null;
+        boxedVertical = null;
         createLayout(context);
     }
-
     public static SketchViewContainer getInstance (Context context) {
         if (instance == null) {
             instance = new SketchViewContainer(context);
         }
         return instance;
     }
-
-
     /**
      * Create Views
      * @return
@@ -102,8 +106,16 @@ public class SketchViewContainer extends RelativeLayout {
     }
 
     // SketchView
-    private void addSketchView (Context context) {
+    private void addSketchView (final Context context) {
         sketchView = SketchView.getInstance(context);
+        sketchView.setOnTouchListener(new OnTouchListener() {
+            MoveGestureDetector moveDetector = new MoveGestureDetector(context, new MoveListener());
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                moveDetector.onTouchEvent(event);
+                return false;
+            }
+        });
         addView(sketchView);
     }
 
@@ -136,7 +148,6 @@ public class SketchViewContainer extends RelativeLayout {
         addView(show);
         addView(save);
     }
-
     private void addToolThicknessSlider (Context context) {
         // boxed vertical seekbar
         boxedVertical = new BoxedVertical(context);
@@ -194,7 +205,6 @@ public class SketchViewContainer extends RelativeLayout {
 
         addView(boxedVertical);
     }
-
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void addColorSelections (Context context) {
         // LinearLayout
@@ -207,13 +217,13 @@ public class SketchViewContainer extends RelativeLayout {
         colorPickerContainer.setPadding(padding, padding, padding, padding); // TODO: find solution that works with react native
 
         // LinearLayout
-        colorPickerSubContainer = new LinearLayout(context);
+        LinearLayout colorPickerSubContainer = new LinearLayout(context);
         LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
         colorPickerSubContainer.setLayoutParams(linearLayoutParams);
         colorPickerSubContainer.setGravity(Gravity.CENTER);
 
         // Button
-        colorPalette = new Button(context);
+        Button colorPalette = new Button(context);
         int colorCircleDiameter = getResources().getDimensionPixelSize(R.dimen.color_circle_diameter);
         layoutParams = new RelativeLayout.LayoutParams(colorCircleDiameter, colorCircleDiameter); // TODO: find solution that works with react native
         colorPalette.setLayoutParams(layoutParams);
@@ -229,13 +239,12 @@ public class SketchViewContainer extends RelativeLayout {
         });
         colorPickerSubContainer.addView(colorPalette);
         colorPickerContainer.addView(colorPickerSubContainer);
-        addDynamicColorSelections(colorPickerContainer, colorCircleDiameter);
+        addDynamicColorSelections(colorPickerContainer, colorPalette, colorCircleDiameter);
 
         addView(colorPickerContainer);
     }
-
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void addDynamicColorSelections (LinearLayout colorPickerContainer, int colorCircleDiameter) {
+    private void addDynamicColorSelections (LinearLayout colorPickerContainer, final Button colorPalette, int colorCircleDiameter) {
         String[] colors = {"#000000", "#20BBFC", "#2DFD2F", "#FD28F9", "#EA212E", "#FD7E24", "#FFFA38", "#FFFFFF"};
         Context context = colorPickerContainer.getContext();
         for (String color: colors) {
@@ -262,7 +271,6 @@ public class SketchViewContainer extends RelativeLayout {
             colorPickerContainer.addView(colorButtonContainer);
         }
     }
-
     private void openColorPalette(final View v) {
         ColorPickerDialogBuilder
                 .with(v.getContext())
@@ -276,7 +284,7 @@ public class SketchViewContainer extends RelativeLayout {
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
                         if (sketchView != null) {
                             sketchView.setToolColor(selectedColor);
-                            colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(selectedColor))); // min API 21 needed TODO: find solution
+                            v.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(selectedColor))); // min API 21 needed TODO: find solution
                         }
                     }
                 })
@@ -288,15 +296,12 @@ public class SketchViewContainer extends RelativeLayout {
                 .build()
                 .show();
     }
-
     /**
      * Setter and getter
      */
     public void setCallback(SketchViewCallback sketchViewCallback) {
         this.sketchViewCallback = sketchViewCallback;
     }
-
-
     /**
      * Save image on device
      *
@@ -321,7 +326,6 @@ public class SketchViewContainer extends RelativeLayout {
             return sketchFile;
         }
         return null;
-
     }
     @Nullable
     public String getBase64() {
@@ -336,7 +340,6 @@ public class SketchViewContainer extends RelativeLayout {
         }
         return null;
     }
-
     public boolean openSketchFile(String localFilePath) {
         if (sketchView != null) {
             BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
@@ -360,9 +363,113 @@ public class SketchViewContainer extends RelativeLayout {
         }
         sketchViewCallback = null;
         colorPickerContainer = null;
-        colorPickerSubContainer = null;
-        colorPalette = null;
         boxedVertical = null;
         instance = null;
+    }
+
+    /**
+     * Animation
+     */
+    private void startMultipleAnimations(View[] views, Animation animation) {
+        for (View v: views) {
+            if (v != null) {
+                v.startAnimation(animation);
+            }
+        }
+    }
+    private void setMultipleAlpha(View[] views, float alpha) {
+        for (View v: views) {
+            if (v != null) {
+                v.setAlpha(alpha);
+            }
+        }
+    }
+    private void setMultipleEnabled(View[] views, boolean enabled) {
+        for (View v: views) {
+            if (v != null) {
+                if (v instanceof ViewGroup) {
+                    ArrayList<View> children = new ArrayList<>();
+                    ViewGroup vg = (ViewGroup)v;
+                    int childCount = vg.getChildCount();
+                    for (int index = 0; index < childCount; ++index) {
+                        children.add(vg.getChildAt(index));
+                    }
+                    setMultipleEnabled(children.toArray(new View[childCount]), enabled);
+                }
+                v.setEnabled(enabled);
+            }
+        }
+    }
+    public void fadeOutSettings () {
+        final View[] views = { colorPickerContainer, boxedVertical };
+
+        AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
+        alphaAnimation.setDuration(300);
+        alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                setMultipleEnabled(views, false);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                setMultipleAlpha(views,0);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+        startMultipleAnimations(views, alphaAnimation);
+    }
+
+    public void fadeInSettings () {
+        final View[] views = { colorPickerContainer, boxedVertical };
+
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
+        alphaAnimation.setDuration(300);
+        alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                setMultipleAlpha(views,1);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                setMultipleEnabled(views, true);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+        startMultipleAnimations(views, alphaAnimation);
+    }
+
+    /**
+     * Move gesture detector listener
+     */
+    private class MoveListener extends MoveGestureDetector.SimpleOnMoveGestureListener {
+        boolean visible = true;
+
+        @Override
+        public boolean onMove(MoveGestureDetector detector) {
+            return false;
+        }
+
+        @Override
+        public boolean onMoveBegin(MoveGestureDetector detector) {
+            if (visible) {
+                visible = false;
+                fadeOutSettings();
+            }
+            return true;
+        }
+
+        @Override
+        public void onMoveEnd(MoveGestureDetector detector) {
+            if (!visible) {
+                visible = true;
+                fadeInSettings();
+            }
+        }
     }
 }

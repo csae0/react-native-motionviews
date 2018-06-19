@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.almeros.android.multitouch.MoveGestureDetector;
 import com.sketchView.model.MultiPoint;
 import com.sketchView.tools.EraseSketchTool;
 import com.sketchView.tools.PenSketchTool;
@@ -22,6 +23,7 @@ import com.sketchView.tools.Blueprints.ToolThickness;
 import java.util.ArrayList;
 
 import team.uptech.motionviews.utils.ConversionUtils;
+import team.uptech.motionviews.widget.entity.MotionEntity;
 
 import static com.sketchView.SketchView.DIRECTION.BOTTOM;
 import static com.sketchView.SketchView.DIRECTION.LEFT;
@@ -44,7 +46,6 @@ public class SketchView extends View {
     Bitmap incrementalImage;
     Bitmap imageCopy;
     private boolean blockEditedUpdates;
-
     private Rect croppedImageBounds;
     // TODO: remove debug variables
     public boolean showBounds = false;
@@ -317,7 +318,7 @@ public class SketchView extends View {
     }
 
     /**
-     *  eventListener
+     *  eventListeners
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -332,6 +333,10 @@ public class SketchView extends View {
         }
 
         return value;
+    }
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 
     /**
