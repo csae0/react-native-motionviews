@@ -208,9 +208,6 @@ public class TextEditorDialogFragment extends DialogFragment {
             colorButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (callback == null) {
-                        return;
-                    }
                     editText.setTextColor(parsedColor);
                     colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(editText.getCurrentTextColor()))); // min API 21 needed
                 }

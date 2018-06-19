@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.widget.RelativeLayout;
 
 import com.sketchView.SketchView;
+import com.sketchView.SketchViewContainer;
 
 import team.uptech.motionviews.viewmodel.SketchLayer;
 import team.uptech.motionviews.viewmodel.Stroke;
@@ -143,24 +144,20 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
                 return;
             }
 
-            final SketchView sketchView = SketchView.getInstance(main.getContext());
-            sketchView.setCallback(new SketchViewCallback() {
+            final SketchViewContainer sketchViewContainer = SketchViewContainer.getInstance(main.getContext());
+            sketchViewContainer.setCallback(new SketchViewCallback() {
                 @Override
                 public void closeAndCreateEntity(@Nullable Bitmap bitmap, @Nullable Rect position, @Nullable Integer color, @Nullable Integer sizeInPixel) {
                     RelativeLayout main = activity.findViewById(R.id.activity_main);
-                    if (main != null && sketchView != null && main.indexOfChild(sketchView) >= 0) {
-                        main.removeView(sketchView);
-                        if (sketchView.linearLayout != null) {
-                            main.removeView(sketchView.linearLayout);
-                        }
+                    if (main != null && sketchViewContainer != null && main.indexOfChild(sketchViewContainer) >= 0) {
+                        main.removeView(sketchViewContainer);
                     }
                     ((EditCallback) activity).updateEntity(bitmap, position, color, sizeInPixel);
                 }
             });
 
-            if (sketchView != null && main.indexOfChild(sketchView) < 0) {
-                main.addView(sketchView);
-                main.addView(sketchView.getButtons());
+            if (sketchViewContainer != null && main.indexOfChild(sketchViewContainer) < 0) {
+                main.addView(sketchViewContainer);
             }
         }
     }

@@ -14,7 +14,6 @@ public abstract class SketchTool implements View.OnTouchListener {
     public static final int TYPE_ERASE = 1;
 
     protected View touchView;
-
     public SketchTool(View touchView) {
         this.touchView = touchView;
     }

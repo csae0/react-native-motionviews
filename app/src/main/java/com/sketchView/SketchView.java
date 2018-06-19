@@ -10,8 +10,6 @@ import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.sketchView.model.MultiPoint;
@@ -24,7 +22,6 @@ import com.sketchView.tools.Blueprints.ToolThickness;
 import java.util.ArrayList;
 
 import team.uptech.motionviews.utils.ConversionUtils;
-import team.uptech.motionviews.widget.Interfaces.SketchViewCallback;
 
 import static com.sketchView.SketchView.DIRECTION.BOTTOM;
 import static com.sketchView.SketchView.DIRECTION.LEFT;
@@ -39,7 +36,7 @@ public class SketchView extends View {
 
     enum DIRECTION { HORIZONTAL, VERTICAL, LEFT, TOP, RIGHT, BOTTOM, UNDEFINED }
 
-    static SketchView instance = null;
+    private static SketchView instance = null;
 
     SketchTool currentTool;
     SketchTool penTool;
@@ -48,24 +45,21 @@ public class SketchView extends View {
     Bitmap imageCopy;
     private boolean blockEditedUpdates;
 
-    private SketchViewCallback callback;
     private Rect croppedImageBounds;
     // TODO: remove debug variables
-    private boolean showBounds = false;
-    public LinearLayout linearLayout;
+    public boolean showBounds = false;
 
+    /**
+     *  Constructor (allowing only one instance)
+     */
     public static SketchView getInstance(Context context) {
         if (instance == null) {
             instance = new SketchView(context);
         }
         return instance;
     }
-
-    public SketchView(Context context) {
+    private SketchView(Context context) {
         super(context);
-
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(500, 500);
-//        setLayoutParams(layoutParams);
 
         blockEditedUpdates = false;
         croppedImageBounds = null;
@@ -79,101 +73,9 @@ public class SketchView extends View {
         // setBackgroundColor(Color.RED);
     }
 
-    public LinearLayout getButtons() {
-
-        Context context = this.getContext();
-        linearLayout = new LinearLayout(context);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        linearLayout.setLayoutParams(layoutParams);
-
-        Button show = new Button(context);
-        show.setText("SHOW");
-        show.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showBounds = !showBounds;
-                invalidate();
-            }
-        });
-
-        Button save = new Button(context);
-        save.setText("SAVE");
-        save.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                callback.closeAndCreateEntity(getImage(), croppedImageBounds, getToolColor(), (int)getToolThickness());
-                clear();
-            }
-        });
-
-        linearLayout.addView(show);
-        linearLayout.addView(save);
-
-        return linearLayout;
-    }
-
-    public void setToolType(int toolType) {
-        switch (toolType) {
-            case SketchTool.TYPE_PEN:
-                currentTool = penTool;
-                break;
-            case SketchTool.TYPE_ERASE:
-                currentTool = eraseTool;
-                break;
-            default:
-                currentTool = penTool;
-        }
-    }
-
-    public void setToolColor(int toolColor) {
-        ((ToolColor) penTool).setToolColor(toolColor);
-    }
-    public void setToolThickness(float toolThickness) {
-        ((ToolThickness) penTool).setToolThickness(toolThickness);
-        ((ToolThickness) eraseTool).setToolThickness(toolThickness);
-    }
-
-    public int getToolColor() {
-        return ((ToolColor) penTool).getToolColor();
-    }
-    public float getToolThickness() {
-        return ((ToolThickness) penTool).getToolThickness();
-    }
-
-    public void setViewImage(Bitmap bitmap) {
-        incrementalImage = bitmap;
-        invalidate();
-    }
-
-    Bitmap drawBitmap() {
-        Bitmap viewBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(viewBitmap);
-        draw(canvas);
-        return viewBitmap;
-    }
-
-    public void clear() {
-        if (incrementalImage != null) {
-            incrementalImage.recycle();
-            incrementalImage = null;
-        }
-        if (imageCopy != null) {
-            imageCopy.recycle();
-            imageCopy = null;
-        }
-        currentTool.clear();
-        invalidate();
-    }
-
-    public Bitmap getImage() {
-        croppedImageBounds = getImageBounds();
-
-        if (incrementalImage != null) {
-            return Bitmap.createBitmap(incrementalImage, croppedImageBounds.left, croppedImageBounds.top, croppedImageBounds.right - croppedImageBounds.left, croppedImageBounds.bottom - croppedImageBounds.top);
-        }
-        return null;
-    }
-
+    /**
+     *  Crop image correctly with good performance
+     */
     @Nullable
     private Rect getImageBounds() {
         if (incrementalImage != null) {
@@ -277,7 +179,6 @@ public class SketchView extends View {
         }
         return null;
     }
-
     private Point findExactBounds (DIRECTION direction, Point curr, int step) {
 
         Point[] newPoints = new Point[4];
@@ -355,12 +256,9 @@ public class SketchView extends View {
         }
         return result;
     }
-
     private boolean isTransparent(int x, int y) {
         return  isTransparent(x,y,true);
     }
-
-
     private boolean isTransparent(int x, int y, boolean checkCoordinates) {
         int width = imageCopy.getWidth() - 1;
         int height = imageCopy.getHeight() - 1;
@@ -370,7 +268,6 @@ public class SketchView extends View {
         int pixel = imageCopy.getPixel(x, y);
         return Color.alpha(pixel) == 0;
     }
-
     private boolean isTransparentOrColor(int x, int y, int color, boolean checkCoordinates) {
         int width = imageCopy.getWidth() - 1;
         int height = imageCopy.getHeight() - 1;
@@ -383,6 +280,10 @@ public class SketchView extends View {
         return Color.alpha(pixel) == 0 || pixel == color;
     }
 
+
+    /**
+     *  Render
+     */
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -408,6 +309,16 @@ public class SketchView extends View {
         }
     }
 
+    Bitmap drawBitmap() {
+        Bitmap viewBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(viewBitmap);
+        draw(canvas);
+        return viewBitmap;
+    }
+
+    /**
+     *  eventListener
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (!blockEditedUpdates) {
@@ -423,7 +334,64 @@ public class SketchView extends View {
         return value;
     }
 
-    public void setCallback(SketchViewCallback callback) {
-        this.callback = callback;
+    /**
+     *  cleanup
+     */
+    public void clear() {
+        if (incrementalImage != null) {
+            incrementalImage.recycle();
+            incrementalImage = null;
+        }
+        if (imageCopy != null) {
+            imageCopy.recycle();
+            imageCopy = null;
+        }
+        currentTool.clear();
+        invalidate();
+    }
+
+    /**
+     *  getters and setters
+     */
+    public void setToolType(int toolType) {
+        switch (toolType) {
+            case SketchTool.TYPE_PEN:
+                currentTool = penTool;
+                break;
+            case SketchTool.TYPE_ERASE:
+                currentTool = eraseTool;
+                break;
+            default:
+                currentTool = penTool;
+        }
+    }
+    public void setToolColor(int toolColor) {
+        ((ToolColor) penTool).setToolColor(toolColor);
+    }
+    public void setToolThickness(float toolThickness) {
+        ((ToolThickness) penTool).setToolThickness(toolThickness);
+        ((ToolThickness) eraseTool).setToolThickness(toolThickness);
+    }
+    public void setViewImage(Bitmap bitmap) {
+        incrementalImage = bitmap;
+        invalidate();
+    }
+
+    public int getToolColor() {
+        return ((ToolColor) penTool).getToolColor();
+    }
+    public float getToolThickness() {
+        return ((ToolThickness) penTool).getToolThickness();
+    }
+    public Bitmap getImage() {
+        croppedImageBounds = getImageBounds();
+
+        if (incrementalImage != null) {
+            return Bitmap.createBitmap(incrementalImage, croppedImageBounds.left, croppedImageBounds.top, croppedImageBounds.right - croppedImageBounds.left, croppedImageBounds.bottom - croppedImageBounds.top);
+        }
+        return null;
+    }
+    public Rect getCroppedImageBounds () {
+        return croppedImageBounds;
     }
 }

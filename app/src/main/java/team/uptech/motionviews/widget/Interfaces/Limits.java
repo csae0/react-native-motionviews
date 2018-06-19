@@ -13,4 +13,5 @@ public interface Limits {
     int INITIAL_FONT_COLOR = 0xffededed;
     int INITIAL_SKETCH_COLOR = 0xffededed;
     int FONT_SIZE_INITIAL_DP = (int)(INITIAL_FONT_SIZE_SCALE * FONT_SIZE_MULTIPLICATOR); // = TEXT SIZE 30? (defined in Integers.xml)
+
 }
