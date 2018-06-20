@@ -3,20 +3,14 @@ package com.sketchView;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.Base64;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,12 +25,15 @@ import com.almeros.android.multitouch.MoveGestureDetector;
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+import com.sketchView.tools.Blueprints.SketchTool;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.UUID;
 
 import abak.tr.com.boxedverticalseekbar.BoxedVertical;
@@ -92,9 +89,6 @@ public class SketchViewContainer extends RelativeLayout {
         setClickable(true);
         setFitsSystemWindows(true);
 //        ((Activity)vg.getContext()).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE); //TODO: needed ???
-        
-        // SketchView (needs to be first because of values other views get from SketchView)
-        addSketchView(context);
 
         // buttons
         addButtons(context);
@@ -104,6 +98,9 @@ public class SketchViewContainer extends RelativeLayout {
 
         // Color selections
         addColorSelections(context);
+
+        // SketchView (needs to be first because of values other views get from SketchView)
+        addSketchView(context);
 
         // Update UI (to be on the safe side)
         invalidate();
@@ -115,6 +112,7 @@ public class SketchViewContainer extends RelativeLayout {
         sketchView.setOnTouchListener(new OnTouchListener() {
             MoveGestureDetector moveDetector = new MoveGestureDetector(context, new OnMoveGestureListener() {
                 boolean visible = true;
+                View[] views = new View[]{ colorPickerContainer, boxedVertical, buttons };
                 @Override
                 public boolean onMove(MoveGestureDetector detector) {
                     return false;
@@ -124,7 +122,7 @@ public class SketchViewContainer extends RelativeLayout {
                 public boolean onMoveBegin(MoveGestureDetector detector) {
                     if (visible) {
                         visible = false;
-                        fadeOutSettings();
+                        fadeOutViews(views, null);
                     }
                     return true;
                 }
@@ -133,7 +131,7 @@ public class SketchViewContainer extends RelativeLayout {
                 public void onMoveEnd(MoveGestureDetector detector) {
                     if (!visible) {
                         visible = true;
-                        fadeInSettings();
+                        fadeInViews(views, null);
                     }
                 }
             });
@@ -143,7 +141,7 @@ public class SketchViewContainer extends RelativeLayout {
                 return false;
             }
         });
-        addView(sketchView);
+        addView(sketchView, 0);
     }
 
     // buttons
@@ -208,12 +206,51 @@ public class SketchViewContainer extends RelativeLayout {
 
         buttons = new LinearLayout(context);
         buttons.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        buttons.setGravity(Gravity.RIGHT);
-        buttons.addView(cancel);
-        buttons.addView(clear);
-        buttons.addView(save);
+        buttons.setOrientation(LinearLayout.VERTICAL);
+        
+        LinearLayout editButtons = new LinearLayout(context);
+        editButtons.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        editButtons.setGravity(Gravity.RIGHT);
+        editButtons.addView(cancel);
+        editButtons.addView(clear);
+        editButtons.addView(save);
 //        buttons.addView(box);
 
+
+        Button pen = new Button(context);
+        pen.setLayoutParams(layoutParams);
+        pen.setText("PEN");
+        pen.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (sketchView != null) {
+                    setColorPickerContainerEnabled(true);
+                    sketchView.setToolType(SketchTool.TYPE_PEN);
+                }
+            }
+        });
+
+        Button eraser = new Button(context);
+        eraser.setLayoutParams(layoutParams);
+        eraser.setText("ERASE");
+        eraser.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (sketchView != null) {
+                    setColorPickerContainerEnabled(false);
+                    sketchView.setToolType(SketchTool.TYPE_ERASE);
+                }
+            }
+        });
+        
+        LinearLayout toolButtons = new LinearLayout(context);
+        toolButtons.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        toolButtons.setGravity(Gravity.RIGHT);
+        toolButtons.addView(pen);
+        toolButtons.addView(eraser);
+
+        buttons.addView(editButtons);
+        buttons.addView(toolButtons);
         addView(buttons);
     }
     private void addToolThicknessSlider (Context context) {
@@ -226,7 +263,7 @@ public class SketchViewContainer extends RelativeLayout {
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(width, RelativeLayout.LayoutParams.MATCH_PARENT);
         layoutParams.leftMargin = paddingHorizontal;
         layoutParams.rightMargin = paddingHorizontal;
-        layoutParams.topMargin = paddingVertical;
+        layoutParams.topMargin = paddingVertical * 2;
         layoutParams.bottomMargin = paddingVertical;
         layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
         boxedVertical.setLayoutParams(layoutParams);
@@ -371,6 +408,54 @@ public class SketchViewContainer extends RelativeLayout {
     public void setCallback(SketchViewCallback sketchViewCallback) {
         this.sketchViewCallback = sketchViewCallback;
     }
+
+    public void setToolThickness (float thickness) {
+        sketchView.setToolThickness(thickness);
+        boxedVertical.setValue((int) thickness);
+    }
+
+    public void setColorPickerContainerEnabled (boolean enabled) {
+        View[] views = new View[]{ colorPickerContainer };
+        if (enabled) {
+            fadeInViews(null, views);
+        } else {
+            fadeOutViews(null, views);
+        }
+
+
+    }
+
+    private void startMultipleAnimations (ArrayList<View> views, Animation animation) {
+        for (View v: views) {
+            if (v != null) {
+                v.startAnimation(animation);
+            }
+        }
+    }
+
+    private void setMultipleAlpha (ArrayList<View> views, float alpha) {
+        for (View v: views) {
+            if (v != null) {
+                v.setAlpha(alpha);
+            }
+        }
+    }
+    private void setMultipleEnabled (ArrayList<View> views, boolean enabled) {
+        for (View v: views) {
+            if (v != null) {
+                if (v instanceof ViewGroup) {
+                    ArrayList<View> children = new ArrayList<>();
+                    ViewGroup vg = (ViewGroup)v;
+                    int childCount = vg.getChildCount();
+                    for (int index = 0; index < childCount; ++index) {
+                        children.add(vg.getChildAt(index));
+                    }
+                    setMultipleEnabled(children, enabled);
+                }
+                v.setEnabled(enabled);
+            }
+        }
+    }
     /**
      * Save image on device
      *
@@ -439,77 +524,70 @@ public class SketchViewContainer extends RelativeLayout {
     /**
      * Animation
      */
-    private void startMultipleAnimations(View[] views, Animation animation) {
-        for (View v: views) {
-            if (v != null) {
-                v.startAnimation(animation);
-            }
+    public void fadeOutViews (@Nullable final View[] views, @Nullable final View[] removeViews) {
+        final ArrayList<View> allViews = new ArrayList<>();
+        if (views != null) {
+            allViews.addAll(Arrays.asList(views));
         }
-    }
-    private void setMultipleAlpha(View[] views, float alpha) {
-        for (View v: views) {
-            if (v != null) {
-                v.setAlpha(alpha);
-            }
+        if (removeViews != null) {
+            allViews.addAll(Arrays.asList(removeViews));
         }
-    }
-    private void setMultipleEnabled(View[] views, boolean enabled) {
-        for (View v: views) {
-            if (v != null) {
-                if (v instanceof ViewGroup) {
-                    ArrayList<View> children = new ArrayList<>();
-                    ViewGroup vg = (ViewGroup)v;
-                    int childCount = vg.getChildCount();
-                    for (int index = 0; index < childCount; ++index) {
-                        children.add(vg.getChildAt(index));
-                    }
-                    setMultipleEnabled(children.toArray(new View[childCount]), enabled);
-                }
-                v.setEnabled(enabled);
-            }
-        }
-    }
-    public void fadeOutSettings () {
-        final View[] views = { colorPickerContainer, boxedVertical, buttons };
 
         AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
         alphaAnimation.setDuration(300);
         alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                setMultipleEnabled(views, false);
+                setMultipleEnabled(allViews, false);
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                setMultipleAlpha(views,0);
+                setMultipleAlpha(allViews,0);
+                if (removeViews != null) {
+                    for (View view : removeViews) {
+                        if (view != null && view.getParent() != null) {
+                            removeView(view);
+                        }
+                    }
+                }
             }
 
             @Override
             public void onAnimationRepeat(Animation animation) {}
         });
-        startMultipleAnimations(views, alphaAnimation);
+        startMultipleAnimations(allViews, alphaAnimation);
     }
 
-    public void fadeInSettings () {
-        final View[] views = { colorPickerContainer, boxedVertical, buttons };
-
+    public void fadeInViews (@Nullable final View[] views, @Nullable final View[] addViews) {
+        final ArrayList<View> allViews = new ArrayList<>();
+        if (views != null) {
+            allViews.addAll(Arrays.asList(views));
+        }
+        if (addViews != null) {
+            allViews.addAll(Arrays.asList(addViews));
+            for (View view : addViews) {
+                if (view != null && view.getParent() == null) {
+                    addView(view);
+                }
+            }
+        }
         AlphaAnimation alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
         alphaAnimation.setDuration(300);
         alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                setMultipleAlpha(views,1);
+                setMultipleAlpha(allViews,1);
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                setMultipleEnabled(views, true);
+                setMultipleEnabled(allViews, true);
             }
 
             @Override
             public void onAnimationRepeat(Animation animation) {}
         });
-        startMultipleAnimations(views, alphaAnimation);
+        startMultipleAnimations(allViews, alphaAnimation);
     }
 }
