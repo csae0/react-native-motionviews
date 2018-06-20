@@ -42,7 +42,6 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
         super(sketchLayer, canvasWidth, canvasHeight, visible);
         this.sketchPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         this.bitmap = null;
-//        updateEntity(false);
     }
 
     public void updateEntity() {
@@ -147,7 +146,7 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
             final SketchViewContainer sketchViewContainer = SketchViewContainer.getInstance(main.getContext());
             sketchViewContainer.setCallback(new SketchViewCallback() {
                 @Override
-                public void closeAndCreateEntity(@Nullable Bitmap bitmap, @Nullable Rect position, @Nullable Integer color, @Nullable Integer sizeInPixel) {
+                public void closeAndCreateEntity (@Nullable Bitmap bitmap, @Nullable Rect position, @Nullable Integer color, @Nullable Integer sizeInPixel) {
                     RelativeLayout main = activity.findViewById(R.id.activity_main);
                     if (main != null && sketchViewContainer != null && main.indexOfChild(sketchViewContainer) >= 0) {
                         main.removeView(sketchViewContainer);

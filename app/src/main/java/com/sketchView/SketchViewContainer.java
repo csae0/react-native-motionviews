@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -42,6 +43,7 @@ import abak.tr.com.boxedverticalseekbar.BoxedVertical;
 import team.uptech.motionviews.R;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.widget.Interfaces.Limits;
+import team.uptech.motionviews.widget.Interfaces.OnMoveGestureListener;
 import team.uptech.motionviews.widget.Interfaces.SketchViewCallback;
 import team.uptech.motionviews.widget.entity.MotionEntity;
 
@@ -57,7 +59,7 @@ public class SketchViewContainer extends RelativeLayout {
 
     private LinearLayout colorPickerContainer;
     private BoxedVertical boxedVertical;
-
+    private LinearLayout buttons;
     /**
      * Constructor (allowing only one instance)
      * @param context
@@ -67,6 +69,7 @@ public class SketchViewContainer extends RelativeLayout {
 
         colorPickerContainer = null;
         boxedVertical = null;
+        buttons = null;
         createLayout(context);
     }
     public static SketchViewContainer getInstance (Context context) {
@@ -79,8 +82,9 @@ public class SketchViewContainer extends RelativeLayout {
      * Create Views
      * @return
      */
-    private void createLayout(Context context) {
 
+    // TODO: Merge redundant logic for edit settings (TextEditorDialogFragment, SketchViewContainer, (ImageEntity edit screen))
+    private void createLayout(Context context) {
         // Container layout
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         setLayoutParams(layoutParams);
@@ -109,7 +113,30 @@ public class SketchViewContainer extends RelativeLayout {
     private void addSketchView (final Context context) {
         sketchView = SketchView.getInstance(context);
         sketchView.setOnTouchListener(new OnTouchListener() {
-            MoveGestureDetector moveDetector = new MoveGestureDetector(context, new MoveListener());
+            MoveGestureDetector moveDetector = new MoveGestureDetector(context, new OnMoveGestureListener() {
+                boolean visible = true;
+                @Override
+                public boolean onMove(MoveGestureDetector detector) {
+                    return false;
+                }
+
+                @Override
+                public boolean onMoveBegin(MoveGestureDetector detector) {
+                    if (visible) {
+                        visible = false;
+                        fadeOutSettings();
+                    }
+                    return true;
+                }
+
+                @Override
+                public void onMoveEnd(MoveGestureDetector detector) {
+                    if (!visible) {
+                        visible = true;
+                        fadeInSettings();
+                    }
+                }
+            });
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 moveDetector.onTouchEvent(event);
@@ -121,19 +148,41 @@ public class SketchViewContainer extends RelativeLayout {
 
     // buttons
     private void addButtons (Context context) {
-        Button show = new Button(context);
-        show.setText("SHOW");
-        show.setOnClickListener(new OnClickListener() {
+        int padding = getResources().getDimensionPixelOffset(R.dimen.padding);
+        int height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
+
+        Button cancel = new Button(context);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, height);
+        layoutParams.topMargin = padding;
+        layoutParams.bottomMargin = padding;
+        layoutParams.leftMargin = padding;
+        layoutParams.rightMargin = padding;
+        cancel.setLayoutParams(layoutParams);
+        cancel.setText("CANCEL");
+        cancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (sketchView != null) {
-                    sketchView.showBounds = !sketchView.showBounds;
-                    sketchView.invalidate();
+                    sketchView.clear();
+                    sketchViewCallback.closeAndCreateEntity(sketchView.getImage(), sketchView.getCroppedImageBounds(), sketchView.getToolColor(), (int) sketchView.getToolThickness());
+                }
+            }
+        });
+
+        Button clear = new Button(context);
+        clear.setLayoutParams(layoutParams);
+        clear.setText("CLEAR");
+        clear.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (sketchView != null) {
+                    sketchView.clear();
                 }
             }
         });
 
         Button save = new Button(context);
+        save.setLayoutParams(layoutParams);
         save.setText("SAVE");
         save.setOnClickListener(new OnClickListener() {
             @Override
@@ -145,8 +194,27 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
 
-        addView(show);
-        addView(save);
+//        Button box = new Button(context);
+//        box.setLayoutParams(layoutParams);
+//        box.setText("BOX");
+//        box.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (sketchView != null) {
+//                    sketchView.showBounds = !sketchView.showBounds;
+//                }
+//            }
+//        });
+
+        buttons = new LinearLayout(context);
+        buttons.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        buttons.setGravity(Gravity.RIGHT);
+        buttons.addView(cancel);
+        buttons.addView(clear);
+        buttons.addView(save);
+//        buttons.addView(box);
+
+        addView(buttons);
     }
     private void addToolThicknessSlider (Context context) {
         // boxed vertical seekbar
@@ -205,6 +273,7 @@ public class SketchViewContainer extends RelativeLayout {
 
         addView(boxedVertical);
     }
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void addColorSelections (Context context) {
         // LinearLayout
@@ -401,7 +470,7 @@ public class SketchViewContainer extends RelativeLayout {
         }
     }
     public void fadeOutSettings () {
-        final View[] views = { colorPickerContainer, boxedVertical };
+        final View[] views = { colorPickerContainer, boxedVertical, buttons };
 
         AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
         alphaAnimation.setDuration(300);
@@ -423,7 +492,7 @@ public class SketchViewContainer extends RelativeLayout {
     }
 
     public void fadeInSettings () {
-        final View[] views = { colorPickerContainer, boxedVertical };
+        final View[] views = { colorPickerContainer, boxedVertical, buttons };
 
         AlphaAnimation alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
         alphaAnimation.setDuration(300);
@@ -442,34 +511,5 @@ public class SketchViewContainer extends RelativeLayout {
             public void onAnimationRepeat(Animation animation) {}
         });
         startMultipleAnimations(views, alphaAnimation);
-    }
-
-    /**
-     * Move gesture detector listener
-     */
-    private class MoveListener extends MoveGestureDetector.SimpleOnMoveGestureListener {
-        boolean visible = true;
-
-        @Override
-        public boolean onMove(MoveGestureDetector detector) {
-            return false;
-        }
-
-        @Override
-        public boolean onMoveBegin(MoveGestureDetector detector) {
-            if (visible) {
-                visible = false;
-                fadeOutSettings();
-            }
-            return true;
-        }
-
-        @Override
-        public void onMoveEnd(MoveGestureDetector detector) {
-            if (!visible) {
-                visible = true;
-                fadeInSettings();
-            }
-        }
     }
 }

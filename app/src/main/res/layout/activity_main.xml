@@ -41,7 +41,7 @@
             android:onClick="addTextSticker">
         </ImageButton>
         <ImageButton
-            android:id="@+id/main_add_sticker"
+            android:id="@+id/main_add_image"
             android:background="@drawable/ic_add"
             android:backgroundTint="@android:color/black"
             android:title="@string/add_sticker"
@@ -51,7 +51,7 @@
             android:onClick="addSticker">
         </ImageButton>
         <ImageButton
-            android:id="@+id/main_add_lines"
+            android:id="@+id/main_add_sketch"
             android:background="@drawable/pokeball"
             android:title="@string/add_sticker"
             android:layout_width="40dp"

@@ -10,9 +10,7 @@ import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.RelativeLayout;
 
-import com.almeros.android.multitouch.MoveGestureDetector;
 import com.sketchView.model.MultiPoint;
 import com.sketchView.tools.EraseSketchTool;
 import com.sketchView.tools.PenSketchTool;
@@ -23,7 +21,6 @@ import com.sketchView.tools.Blueprints.ToolThickness;
 import java.util.ArrayList;
 
 import team.uptech.motionviews.utils.ConversionUtils;
-import team.uptech.motionviews.widget.entity.MotionEntity;
 
 import static com.sketchView.SketchView.DIRECTION.BOTTOM;
 import static com.sketchView.SketchView.DIRECTION.LEFT;
@@ -48,7 +45,7 @@ public class SketchView extends View {
     private boolean blockEditedUpdates;
     private Rect croppedImageBounds;
     // TODO: remove debug variables
-    public boolean showBounds = false;
+//    public boolean showBounds = false;
 
     /**
      *  Constructor (allowing only one instance)
@@ -68,15 +65,13 @@ public class SketchView extends View {
         penTool = new PenSketchTool(this);
         eraseTool = new EraseSketchTool(this);
         setToolType(SketchTool.TYPE_PEN);
-        // setToolThickness(20);
-        // setToolColor(Color.BLUE);
         setBackgroundColor(Color.TRANSPARENT);
-        // setBackgroundColor(Color.RED);
     }
 
     /**
      *  Crop image correctly with good performance
      */
+    // TODO: use paths instead of bitmap
     @Nullable
     private Rect getImageBounds() {
         if (incrementalImage != null) {
@@ -153,17 +148,18 @@ public class SketchView extends View {
             ArrayList<Point> minTops = new ArrayList<>();
             ArrayList<Point> maxRights = new ArrayList<>();
             ArrayList<Point> maxBottoms = new ArrayList<>();
+            int color = Color.MAGENTA;
             for (Point p: minLeftP.getPairs()) {
-                minLefts.add(findExactBounds(LEFT, p, 1));
+                minLefts.add(findExactBounds(LEFT, p, 1, color));
             }
             for (Point p: minTopP.getPairs()) {
-                minTops.add(findExactBounds(TOP, p, 1));
+                minTops.add(findExactBounds(TOP, p, 1, color));
             }
             for (Point p: maxRightP.getPairs()) {
-                maxRights.add(findExactBounds(RIGHT, p, 1));
+                maxRights.add(findExactBounds(RIGHT, p, 1, color));
             }
             for (Point p: maxBottomP.getPairs()) {
-                maxBottoms.add(findExactBounds(BOTTOM, p, 1));
+                maxBottoms.add(findExactBounds(BOTTOM, p, 1, color));
             }
 
             Point minLeft = getMinOrMax(minLefts.toArray(new Point[minLefts.size()]), true, true, -1);
@@ -180,28 +176,30 @@ public class SketchView extends View {
         }
         return null;
     }
-    private Point findExactBounds (DIRECTION direction, Point curr, int step) {
+    private Point findExactBounds (DIRECTION direction, Point curr, int step, int color) {
 
         Point[] newPoints = new Point[4];
 
-        if (isTransparentOrColor(curr.x, curr.y, Color.GREEN, true)) {
+        if (isTransparentOrColor(curr.x, curr.y, color, true)) {
             return null;
         }
 
-//        incrementalImage.setPixel(curr.x, curr.y, Color.CYAN);
-        imageCopy.setPixel(curr.x, curr.y, Color.GREEN);
+//        if (showBounds) {
+//            incrementalImage.setPixel(curr.x, curr.y, Color.GREEN);
+//        }
+        imageCopy.setPixel(curr.x, curr.y, color);
 
         if (direction != RIGHT) {
-            newPoints[0] = findExactBounds(direction, new Point(curr.x - step, curr.y), step); // LEFT
+            newPoints[0] = findExactBounds(direction, new Point(curr.x - step, curr.y), step, color); // LEFT
         }
         if (direction != BOTTOM) {
-            newPoints[1] = findExactBounds(direction, new Point(curr.x ,curr.y - step), step); // TOP
+            newPoints[1] = findExactBounds(direction, new Point(curr.x ,curr.y - step), step, color); // TOP
         }
         if (direction != LEFT) {
-            newPoints[2] = findExactBounds(direction, new Point(curr.x + step ,curr.y), step); // RIGHT
+            newPoints[2] = findExactBounds(direction, new Point(curr.x + step ,curr.y), step, color); // RIGHT
         }
         if (direction != TOP) {
-            newPoints[3] = findExactBounds(direction, new Point(curr.x ,curr.y + step), step); // BOTTOM
+            newPoints[3] = findExactBounds(direction, new Point(curr.x ,curr.y + step), step, color); // BOTTOM
         }
 
         Point p;
@@ -276,8 +274,6 @@ public class SketchView extends View {
             return true;
         }
         int pixel = imageCopy.getPixel(x, y);
-        boolean result = Color.alpha(pixel) == 0 || pixel == color;
-
         return Color.alpha(pixel) == 0 || pixel == color;
     }
 
@@ -296,18 +292,18 @@ public class SketchView extends View {
         }
 
         // TODO: REMOVE
-        if (showBounds) {
-            Rect rect = getImageBounds();
-            if (rect != null) {
-                Paint p = new Paint();
-                p.setColor(Color.RED);
-
-                canvas.drawLine(rect.left, rect.top, rect.left, rect.bottom, p);
-                canvas.drawLine(rect.right, rect.top, rect.right, rect.bottom, p);
-                canvas.drawLine(rect.left, rect.top, rect.right, rect.top, p);
-                canvas.drawLine(rect.left, rect.bottom, rect.right, rect.bottom, p);
-            }
-        }
+//        if (showBounds) {
+//            Rect rect = getImageBounds();
+//            if (rect != null) {
+//                Paint p = new Paint();
+//                p.setColor(Color.RED);
+//
+//                canvas.drawLine(rect.left, rect.top, rect.left, rect.bottom, p);
+//                canvas.drawLine(rect.right, rect.top, rect.right, rect.bottom, p);
+//                canvas.drawLine(rect.left, rect.top, rect.right, rect.top, p);
+//                canvas.drawLine(rect.left, rect.bottom, rect.right, rect.bottom, p);
+//            }
+//        }
     }
 
     Bitmap drawBitmap() {

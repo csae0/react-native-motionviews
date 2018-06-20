@@ -1,8 +1,6 @@
 package team.uptech.motionviews.widget.entity;
 
 import android.app.Activity;
-import android.app.FragmentManager;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -19,7 +17,6 @@ import team.uptech.motionviews.ui.TextEditorDialogFragment;
 import team.uptech.motionviews.utils.FontProvider;
 import team.uptech.motionviews.viewmodel.Font;
 import team.uptech.motionviews.viewmodel.TextLayer;
-import team.uptech.motionviews.widget.Interfaces.Limits;
 import team.uptech.motionviews.widget.Interfaces.TextEntityActions;
 
 public class TextEntity extends MotionEntity implements TextEntityActions {
@@ -27,7 +24,7 @@ public class TextEntity extends MotionEntity implements TextEntityActions {
     private final TextPaint textPaint;
     private final FontProvider fontProvider;
     private int maxWidth;
-
+    private boolean newCreated;
     @Nullable
     private Bitmap bitmap;
 
@@ -47,6 +44,7 @@ public class TextEntity extends MotionEntity implements TextEntityActions {
         this.fontProvider = fontProvider;
         this.textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         this.maxWidth = Integer.MIN_VALUE;
+        newCreated = true;
         updateEntity(false);
     }
     private void updateEntity(boolean moveToPreviousCenter) {
@@ -82,7 +80,7 @@ public class TextEntity extends MotionEntity implements TextEntityActions {
         srcPoints[8] = 0;
         srcPoints[9] = 0;
 
-        if (moveToPreviousCenter) {
+        if (moveToPreviousCenter && newCreated) {
             // move to previous center
             moveCenterTo(oldCenter);
         }
@@ -207,6 +205,7 @@ public class TextEntity extends MotionEntity implements TextEntityActions {
     public void updateState(@Nullable String text, @Nullable Integer color, @Nullable Integer sizeInPixel, @Nullable Integer maxWidth) {
         TextLayer textLayer = getLayer();
         Font font = textLayer.getFont();
+
         // Set text
         if (text != null && text.length() > 0 && !text.equals(textLayer.getText())) {
             textLayer.setText(text);
@@ -225,5 +224,9 @@ public class TextEntity extends MotionEntity implements TextEntityActions {
         }
         setVisible(true);
         updateEntity();
+
+        if (newCreated == true) {
+            newCreated = false;
+        }
     }
 }

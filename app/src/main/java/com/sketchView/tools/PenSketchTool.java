@@ -10,13 +10,15 @@ import com.sketchView.tools.Blueprints.ToolColor;
 import com.sketchView.tools.Blueprints.ToolThickness;
 import com.sketchView.utils.ToolUtils;
 
+import team.uptech.motionviews.widget.Interfaces.Limits;
+
 /**
  * Created by keshav on 08/04/17.
  */
 public class PenSketchTool extends PathTrackingSketchTool implements ToolThickness, ToolColor {
 
     private static final float DEFAULT_THICKNESS = 5;
-    private static final int DEFAULT_COLOR = Color.BLACK;
+    private static final int DEFAULT_COLOR = Limits.INITIAL_FONT_COLOR; // Color.BLACK;
 
     private float toolThickness;
     private int toolColor;

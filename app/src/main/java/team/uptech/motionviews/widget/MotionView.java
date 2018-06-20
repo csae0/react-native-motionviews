@@ -271,7 +271,6 @@ public class MotionView  extends FrameLayout {
     }
 
     private void selectEntity(@Nullable MotionEntity entity, boolean updateCallback) {
-
         if (selectedEntity != entity) {
             if (selectedEntity != null) {
                 selectedEntity.setIsSelected(false);
@@ -306,11 +305,13 @@ public class MotionView  extends FrameLayout {
         return selected;
     }
 
-    private void updateSelectionOnTap(MotionEvent e) {
+    private boolean updateSelectionOnTap(MotionEvent e) {
         MotionEntity entity = findEntityAtPoint(e.getX(), e.getY());
         if (entity != null) {
             selectEntity(entity, true);
+            return true;
         }
+        return false;
     }
 
     private void updateOnLongPress(MotionEvent e) {
@@ -354,6 +355,9 @@ public class MotionView  extends FrameLayout {
     }
 
     public void deleteSelectedEntity() {
+        if (hideAllEntities) {
+            hideAllEntities = false;
+        }
         if (selectedEntity == null) {
             return;
         }
@@ -470,8 +474,7 @@ public class MotionView  extends FrameLayout {
     private class TapsListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            updateSelectionOnTap(e);
-            if (motionViewCallback != null && selectedEntity != null) {
+            if (updateSelectionOnTap(e) && motionViewCallback != null && selectedEntity != null) {
                 motionViewCallback.onEntitySingleTapConfirmed(selectedEntity);
             }
             return true;
@@ -522,7 +525,7 @@ public class MotionView  extends FrameLayout {
         @Override
         public boolean onMoveBegin(MoveGestureDetector detector) {
             MotionEvent motionEvent = detector.getmCurrEvent();
-            MotionEntity entity = findEntityAtPoint(motionEvent.getX(), motionEvent.getY());;
+            MotionEntity entity = findEntityAtPoint(motionEvent.getX(), motionEvent.getY());
 
             if (entity == null && selectedEntity != null) {
                 entity = selectedEntity;
@@ -538,7 +541,12 @@ public class MotionView  extends FrameLayout {
         @Override
         public void onMoveEnd(MoveGestureDetector detector) {
             MotionEvent motionEvent = detector.getmCurrEvent();
-            MotionEntity entity = findEntityAtPoint(motionEvent.getX(), motionEvent.getY());;
+            MotionEntity entity = findEntityAtPoint(motionEvent.getX(), motionEvent.getY());
+
+            if (entity == null && selectedEntity != null) {
+                entity = selectedEntity;
+            }
+
             if (entity != null) {
                 fadeOutTrashButton();
                 handleTrashDelete();

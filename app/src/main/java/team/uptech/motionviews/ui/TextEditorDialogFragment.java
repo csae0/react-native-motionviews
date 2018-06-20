@@ -50,6 +50,8 @@ import team.uptech.motionviews.widget.Interfaces.Limits;
  * <p>
  * If Activity does not implement {@link EditCallback}, exception will be thrown at Runtime
  */
+
+// TODO: create view instead of fragment (like SketchViewContainer) --> create super class (abstract?) because all subclasses will be kind of the same
 public class TextEditorDialogFragment extends DialogFragment {
 
     public static final String ARG_TEXT = "editor_text_arg";
@@ -140,6 +142,7 @@ public class TextEditorDialogFragment extends DialogFragment {
         boxedVertical.setValue(ConversionUtils.pxToDp(size));
 
         createColorSelections(view, color);
+        addButtons(view);
         initListeners(view);
 
         initWithTextEntity(text);
@@ -149,6 +152,64 @@ public class TextEditorDialogFragment extends DialogFragment {
             Typeface typeface = fontProvider.getTypeface(!typefaceName.equals("") || typefaceName != null ? typefaceName : fontProvider.getDefaultFontName());
             editText.setTypeface(typeface);
         }
+    }
+
+    // buttons
+    private void addButtons (View view) {
+        Context context = view.getContext();
+        int padding = getResources().getDimensionPixelOffset(R.dimen.padding);
+        int height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
+
+        Button cancel = new Button(context);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, height);
+        layoutParams.topMargin = padding;
+        layoutParams.bottomMargin = padding;
+        layoutParams.leftMargin = padding;
+        layoutParams.rightMargin = padding;
+        cancel.setLayoutParams(layoutParams);
+        cancel.setText("CANCEL");
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+
+        Button clear = new Button(context);
+        clear.setLayoutParams(layoutParams);
+        clear.setText("CLEAR");
+        clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (editText != null) {
+                    editText.setText("");
+                }
+            }
+        });
+
+        Button save = new Button(context);
+        save.setLayoutParams(layoutParams);
+        save.setText("SAVE");
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (callback != null) {
+                    callback.updateEntity(editText.getText().toString(), editText.getCurrentTextColor(), (int)editText.getTextSize(), editText.getWidth());
+                }
+                dismiss();
+            }
+        });
+
+        LinearLayout buttons = new LinearLayout(context);
+        buttons.setLayoutParams(new LinearLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
+        buttons.setPadding(padding, padding, padding, padding);
+        buttons.setGravity(Gravity.RIGHT);
+        buttons.addView(cancel);
+        buttons.addView(clear);
+        buttons.addView(save);
+
+        RelativeLayout rootContainer = view.findViewById(R.id.text_editor_root);
+        rootContainer.addView(buttons);
     }
 
     private void initListeners (View view) {

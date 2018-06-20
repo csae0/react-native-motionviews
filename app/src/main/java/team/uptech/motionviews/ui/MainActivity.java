@@ -5,12 +5,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import java.util.List;
 
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
         @Override
         public void onEntitySingleTapConfirmed(@NonNull MotionEntity entity) {
             MotionEntity motionEntity = motionView.getSelectedEntity();
+
             if (motionEntity != null) {
                 motionEntity.startEditing(getThis());
             }
@@ -102,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
         SketchEntity sketchEntity = new SketchEntity(sketchLayer, motionView.getWidth(), motionView.getHeight(), visible);
         motionView.addEntityAndPosition(sketchEntity);
 
+        showButtons(false);
         sketchEntity.startEditing(this);
 
     }
@@ -126,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
         TextEntity textEntity = new TextEntity(textLayer, motionView.getWidth(), motionView.getHeight(), fontProvider, visible);
         motionView.addEntityAndPosition(textEntity);
 
+        showButtons(false);
         textEntity.startEditing(this);
     }
 
@@ -142,6 +147,18 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
         return textLayer;
     }
 
+    public void showButtons (boolean show) {
+        ImageButton[] addButtons = { findViewById(R.id.main_add_text), findViewById(R.id.main_add_image), findViewById(R.id.main_add_sketch)};
+
+        for(ImageButton button : addButtons) {
+            if (button != null) {
+                button.setEnabled(show);
+                button.setAlpha(show ? 1.0f : 0.0f);
+            }
+        }
+
+
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -166,20 +183,30 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
     // TODO: verschiebe das Interface in die MotionView (momentan wegen dem Fragment in der Main_Activity)
     @Override
     public void updateEntity(@Nullable String text, @Nullable Integer color, @Nullable Integer sizeInPixel, @Nullable Integer maxWidth) {
+        showButtons(true);
         MotionEntity motionEntity = motionView.getSelectedEntity();
         if (motionEntity != null && motionEntity instanceof TextEntity) {
-            ((TextEntity) motionEntity).updateState(text, color, sizeInPixel, maxWidth);
-            motionView.invalidate();
+            if (text == null || text.length() == 0) {
+                motionView.deleteSelectedEntity(); // includes invalidate
+            } else {
+                ((TextEntity) motionEntity).updateState(text, color, sizeInPixel, maxWidth);
+                motionView.invalidate();
+            }
         }
     }
 
     @Override
     public void updateEntity(@Nullable Bitmap bitmap, @Nullable Rect position, @Nullable Integer color, @Nullable Integer sizeInPixel) {
+        showButtons(true);
         MotionEntity motionEntity = motionView.getSelectedEntity();
 
         if (motionEntity != null && motionEntity instanceof SketchEntity) {
-            ((SketchEntity) motionEntity).updateState(bitmap, position, color, sizeInPixel);
-            motionView.invalidate();
+            if (bitmap == null) {
+                motionView.deleteSelectedEntity(); // includes invalidate
+            } else {
+                ((SketchEntity) motionEntity).updateState(bitmap, position, color, sizeInPixel);
+                motionView.invalidate();
+            }
         }
     }
 }
