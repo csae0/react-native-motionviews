@@ -51,4 +51,14 @@ public class MathUtils {
     private static float crossProduct(float ax, float ay, float bx, float by, float cx, float cy) {
         return (ax - cx) * (by - cy) - (bx - cx) * (ay - cy);
     }
+
+    /**
+     * Pythagorean theorem to calculate circle radius
+     */
+    public static float hypotenuse (PointF a, PointF b) {
+        float dx = b.x - a.x;
+        float dy = b.y - a.y;
+
+        return (float)Math.hypot(dx,dy);
+    }
 }

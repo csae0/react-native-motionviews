@@ -57,6 +57,8 @@ public class SketchViewContainer extends RelativeLayout {
     private LinearLayout colorPickerContainer;
     private BoxedVertical boxedVertical;
     private LinearLayout buttons;
+
+    private boolean colorPickerContainerEnabled;
     /**
      * Constructor (allowing only one instance)
      * @param context
@@ -67,6 +69,8 @@ public class SketchViewContainer extends RelativeLayout {
         colorPickerContainer = null;
         boxedVertical = null;
         buttons = null;
+
+        colorPickerContainerEnabled = true;
         createLayout(context);
     }
     public static SketchViewContainer getInstance (Context context) {
@@ -223,10 +227,7 @@ public class SketchViewContainer extends RelativeLayout {
         pen.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (sketchView != null) {
-                    setColorPickerContainerEnabled(true);
-                    sketchView.setToolType(SketchTool.TYPE_PEN);
-                }
+                setToolType(SketchTool.TYPE_PEN);
             }
         });
 
@@ -236,18 +237,26 @@ public class SketchViewContainer extends RelativeLayout {
         eraser.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (sketchView != null) {
-                    setColorPickerContainerEnabled(false);
-                    sketchView.setToolType(SketchTool.TYPE_ERASE);
-                }
+                setToolType(SketchTool.TYPE_ERASE);
             }
         });
-        
+
+        Button circle = new Button(context);
+        circle.setLayoutParams(layoutParams);
+        circle.setText("CIRCLE");
+        circle.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setToolType(SketchTool.TYPE_CIRCLE);
+            }
+        });
+
         LinearLayout toolButtons = new LinearLayout(context);
         toolButtons.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         toolButtons.setGravity(Gravity.RIGHT);
         toolButtons.addView(pen);
         toolButtons.addView(eraser);
+        toolButtons.addView(circle);
 
         buttons.addView(editButtons);
         buttons.addView(toolButtons);
@@ -414,15 +423,23 @@ public class SketchViewContainer extends RelativeLayout {
         boxedVertical.setValue((int) thickness);
     }
 
+    public void setToolType(int type) {
+        if (sketchView != null) {
+            sketchView.setToolType(type);
+            setColorPickerContainerEnabled(type != SketchTool.TYPE_ERASE);
+        }
+    }
+
     public void setColorPickerContainerEnabled (boolean enabled) {
         View[] views = new View[]{ colorPickerContainer };
-        if (enabled) {
-            fadeInViews(null, views);
-        } else {
-            fadeOutViews(null, views);
+        if (enabled != colorPickerContainerEnabled) {
+            colorPickerContainerEnabled = enabled;
+            if (enabled) {
+                fadeInViews(null, views);
+            } else {
+                fadeOutViews(null, views);
+            }
         }
-
-
     }
 
     private void startMultipleAnimations (ArrayList<View> views, Animation animation) {
@@ -532,7 +549,6 @@ public class SketchViewContainer extends RelativeLayout {
         if (removeViews != null) {
             allViews.addAll(Arrays.asList(removeViews));
         }
-
         AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
         alphaAnimation.setDuration(300);
         alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
@@ -543,7 +559,7 @@ public class SketchViewContainer extends RelativeLayout {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                setMultipleAlpha(allViews,0);
+                setMultipleAlpha(allViews, 0);
                 if (removeViews != null) {
                     for (View view : removeViews) {
                         if (view != null && view.getParent() != null) {
@@ -554,7 +570,8 @@ public class SketchViewContainer extends RelativeLayout {
             }
 
             @Override
-            public void onAnimationRepeat(Animation animation) {}
+            public void onAnimationRepeat(Animation animation) {
+            }
         });
         startMultipleAnimations(allViews, alphaAnimation);
     }
@@ -572,12 +589,13 @@ public class SketchViewContainer extends RelativeLayout {
                 }
             }
         }
+
         AlphaAnimation alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
         alphaAnimation.setDuration(300);
         alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                setMultipleAlpha(allViews,1);
+                setMultipleAlpha(allViews, 1);
             }
 
             @Override
@@ -586,7 +604,8 @@ public class SketchViewContainer extends RelativeLayout {
             }
 
             @Override
-            public void onAnimationRepeat(Animation animation) {}
+            public void onAnimationRepeat(Animation animation) {
+            }
         });
         startMultipleAnimations(allViews, alphaAnimation);
     }

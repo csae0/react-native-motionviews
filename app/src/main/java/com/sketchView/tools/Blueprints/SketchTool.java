@@ -12,6 +12,7 @@ public abstract class SketchTool implements View.OnTouchListener {
 
     public static final int TYPE_PEN = 0;
     public static final int TYPE_ERASE = 1;
+    public static final int TYPE_CIRCLE = 2;
 
     protected View touchView;
     public SketchTool(View touchView) {
@@ -42,12 +43,12 @@ public abstract class SketchTool implements View.OnTouchListener {
         return true;
     }
 
-    abstract void onTouchDown(MotionEvent event);
+    public abstract void onTouchDown(MotionEvent event);
 
-    abstract void onTouchMove(MotionEvent event);
+    public abstract void onTouchMove(MotionEvent event);
 
-    abstract void onTouchUp(MotionEvent event);
+    public abstract void onTouchUp(MotionEvent event);
 
-    abstract void onTouchCancel(MotionEvent event);
+    public abstract void onTouchCancel(MotionEvent event);
 
 }

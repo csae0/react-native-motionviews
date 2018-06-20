@@ -23,24 +23,24 @@ public abstract class PathTrackingSketchTool extends SketchTool {
     }
 
     @Override
-    void onTouchDown(MotionEvent event) {
+    public void onTouchDown(MotionEvent event) {
         path.moveTo(event.getX(), event.getY());
     }
 
     @Override
-    void onTouchMove(MotionEvent event) {
+    public void onTouchMove(MotionEvent event) {
         path.lineTo(event.getX(), event.getY());
         touchView.invalidate();
     }
 
     @Override
-    void onTouchUp(MotionEvent event) {
+    public void onTouchUp(MotionEvent event) {
         path.lineTo(event.getX(), event.getY());
         touchView.invalidate();
     }
 
     @Override
-    void onTouchCancel(MotionEvent event) {
+    public void onTouchCancel(MotionEvent event) {
         onTouchUp(event);
     }
 }

@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.sketchView.model.MultiPoint;
+import com.sketchView.tools.CircleSketchTool;
 import com.sketchView.tools.EraseSketchTool;
 import com.sketchView.tools.PenSketchTool;
 import com.sketchView.tools.Blueprints.SketchTool;
@@ -40,6 +41,7 @@ public class SketchView extends View {
     SketchTool currentTool;
     SketchTool penTool;
     SketchTool eraseTool;
+    SketchTool circleTool;
     Bitmap incrementalImage;
     Bitmap imageCopy;
     private boolean blockEditedUpdates;
@@ -64,6 +66,7 @@ public class SketchView extends View {
 
         penTool = new PenSketchTool(this);
         eraseTool = new EraseSketchTool(this);
+        circleTool = new CircleSketchTool(this);
         setToolType(SketchTool.TYPE_PEN);
         setBackgroundColor(Color.TRANSPARENT);
     }
@@ -362,16 +365,21 @@ public class SketchView extends View {
             case SketchTool.TYPE_ERASE:
                 currentTool = eraseTool;
                 break;
+            case SketchTool.TYPE_CIRCLE:
+                currentTool = circleTool;
+                break;
             default:
                 currentTool = penTool;
         }
     }
     public void setToolColor(int toolColor) {
         ((ToolColor) penTool).setToolColor(toolColor);
+        ((ToolColor) circleTool).setToolColor(toolColor);
     }
     public void setToolThickness(float toolThickness) {
         ((ToolThickness) penTool).setToolThickness(toolThickness);
         ((ToolThickness) eraseTool).setToolThickness(toolThickness);
+        ((ToolThickness) circleTool).setToolThickness(toolThickness);
     }
     public void setViewImage(Bitmap bitmap) {
         incrementalImage = bitmap;

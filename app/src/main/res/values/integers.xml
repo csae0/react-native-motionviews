@@ -5,7 +5,7 @@
     <integer name="initial_font_size">30</integer>
     <integer name="font_size_steps">1</integer>
 
-    <integer name="max_thickness">20</integer>
+    <integer name="max_thickness">40</integer>
     <integer name="min_thickness">2</integer>
     <integer name="initial_thickness">5</integer>
     <integer name="thickness_steps">1</integer>
