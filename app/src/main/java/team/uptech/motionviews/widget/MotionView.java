@@ -294,15 +294,21 @@ public class MotionView  extends FrameLayout {
 
     @Nullable
     private MotionEntity findEntityAtPoint(float x, float y) {
+        MotionEntity potentiallySelected = null;
         MotionEntity selected = null;
         PointF p = new PointF(x, y);
         for (int i = entities.size() - 1; i >= 0; i--) {
-            if (entities.get(i).pointInLayerRect(p)) {
-                selected = entities.get(i);
-                break;
+            MotionEntity tempEntity = entities.get(i);
+            if (tempEntity.pointInLayerRect(p)) {
+                if (tempEntity.pointHasPixelColor(p)) {
+                    selected = entities.get(i);
+                    break;
+                } else if (potentiallySelected == null){
+                    potentiallySelected = entities.get(i);
+                }
             }
         }
-        return selected;
+        return selected != null ? selected : potentiallySelected;
     }
 
     private boolean updateSelectionOnTap(MotionEvent e) {
@@ -355,9 +361,6 @@ public class MotionView  extends FrameLayout {
     }
 
     public void deleteSelectedEntity() {
-        if (hideAllEntities) {
-            hideAllEntities = false;
-        }
         if (selectedEntity == null) {
             return;
         }

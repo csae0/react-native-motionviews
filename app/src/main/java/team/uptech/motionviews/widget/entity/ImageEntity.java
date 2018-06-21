@@ -49,6 +49,11 @@ public class ImageEntity extends MotionEntity {
     }
 
     @Override
+    public Bitmap getEntityBitmap() {
+        return bitmap;
+    }
+
+    @Override
     public void drawContent(@NonNull Canvas canvas, @Nullable Paint drawingPaint) {
         canvas.drawBitmap(bitmap, matrix, drawingPaint);
     }

@@ -47,6 +47,12 @@ public class TextEntity extends MotionEntity implements TextEntityActions {
         newCreated = true;
         updateEntity(false);
     }
+
+    @Override
+    public Bitmap getEntityBitmap() {
+        return bitmap;
+    }
+
     private void updateEntity(boolean moveToPreviousCenter) {
 
         // save previous center

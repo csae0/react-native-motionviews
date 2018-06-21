@@ -44,6 +44,11 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
         this.bitmap = null;
     }
 
+    @Override
+    public Bitmap getEntityBitmap() {
+        return bitmap;
+    }
+
     public void updateEntity() {
         updateEntity(true);
     }

@@ -2,7 +2,9 @@ package team.uptech.motionviews.widget.entity;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
@@ -230,6 +232,31 @@ public abstract class MotionEntity implements EntityActions {
         return MathUtils.pointInTriangle(point, pA, pB, pC) || MathUtils.pointInTriangle(point, pA, pD, pC);
     }
 
+    @Nullable
+    public abstract Bitmap getEntityBitmap();
+
+    public boolean pointHasPixelColor (PointF point) {
+        Bitmap image = getEntityBitmap();
+        if (image != null) {
+            Matrix inverse = new Matrix();
+            matrix.invert(inverse);
+            float[] transformedPoint = new float[2];
+            inverse.mapPoints(transformedPoint, new float[]{point.x, point.y});
+
+            return !isTransparent(transformedPoint, image, true);
+        }
+        return false;
+    }
+
+    private boolean isTransparent(float[] point, Bitmap image, boolean checkCoordinates) {
+        int width = image.getWidth() - 1;
+        int height = image.getHeight() - 1;
+        if (checkCoordinates && !(point[0] >= 0 && point[0] < width && point[1] >= 0 && point[1] < height)) {
+            return true;
+        }
+        int pixel = image.getPixel((int)point[0], (int)point[1]);
+        return Color.alpha(pixel) == 0;
+    }
     /**
      * http://judepereira.com/blog/calculate-the-real-scale-factor-and-the-angle-of-rotation-from-an-android-matrix/
      *
