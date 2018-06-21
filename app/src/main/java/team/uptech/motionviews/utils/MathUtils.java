@@ -3,6 +3,8 @@ package team.uptech.motionviews.utils;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
 
+import java.util.Vector;
+
 public class MathUtils {
 
     /**
@@ -53,12 +55,55 @@ public class MathUtils {
     }
 
     /**
-     * Pythagorean theorem to calculate circle radius
+     * Create 2d vector from 2 points
      */
-    public static float hypotenuse (PointF a, PointF b) {
-        float dx = b.x - a.x;
-        float dy = b.y - a.y;
+    public static PointF getVector(PointF tail, PointF top) {
+        return new PointF(top.x - tail.x, top.y - tail.y);
+    }
 
-        return (float)Math.hypot(dx,dy);
+    /**
+     * Pythagorean theorem to calculate vector length
+     */
+    public static float vectorLength (PointF tail, PointF top) {
+        return vectorLength(getVector(tail, top));
+    }
+    public static float vectorLength (PointF vector) {
+        return (float)Math.hypot(vector.x,vector.y);
+    }
+
+    /**
+     * Normalize vestor to get vetror direction
+     */
+    public static PointF getNormalizedVector (PointF tail, PointF top) {
+        return getNormalizedVector(getVector(tail, top));
+    }
+    public static PointF getNormalizedVector (PointF vector) {
+        float length = vectorLength(vector);
+        return new PointF(vector.x / length, vector.y / length);
+    }
+
+    /**
+     *
+     * @param tail
+     * @param top
+     * @return vector direction (= normalized vector)
+     */
+    public static PointF vectorDirection (PointF tail, PointF top) {
+        return getNormalizedVector(tail, top);
+    }
+
+    /**
+     *
+     * @param tail
+     * @param top
+     * @return Rotated direction of vector
+     */
+    public static PointF rotatedVectorDirection (PointF tail, PointF top, int angle) {
+        PointF direction = vectorDirection(tail,top);
+        float currentAngle = (float)(Math.toDegrees(Math.atan2(direction.y, direction.x)));
+        direction.x = (float)Math.sin(Math.toRadians(angle - currentAngle));
+        direction.y = (float)Math.cos(Math.toRadians(angle - currentAngle));
+
+        return getNormalizedVector(direction);
     }
 }

@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
         motionView.setMotionViewCallback(motionViewCallback);
         motionView.setTrashButton((Button)findViewById(R.id.trash_button));
         addSticker(R.drawable.pikachu_2, true);
-        // addSketch(true);
+        addSketch(false);
     }
 
     private void addSticker(final int stickerResId, final boolean visible) {

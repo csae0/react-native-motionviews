@@ -251,12 +251,23 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
 
+        Button arrow = new Button(context);
+        arrow.setLayoutParams(layoutParams);
+        arrow.setText("ARROW");
+        arrow.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setToolType(SketchTool.TYPE_ARROW);
+            }
+        });
+
         LinearLayout toolButtons = new LinearLayout(context);
         toolButtons.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         toolButtons.setGravity(Gravity.RIGHT);
         toolButtons.addView(pen);
         toolButtons.addView(eraser);
         toolButtons.addView(circle);
+        toolButtons.addView(arrow);
 
         buttons.addView(editButtons);
         buttons.addView(toolButtons);

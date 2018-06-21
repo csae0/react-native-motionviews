@@ -154,3 +154,10 @@ public class RotateGestureDetector extends TwoFingerGestureDetector {
         }
     }
 }
+
+
+
+
+
+
+

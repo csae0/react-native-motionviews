@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
@@ -12,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.sketchView.model.MultiPoint;
+import com.sketchView.tools.ArrowSketchTool;
 import com.sketchView.tools.CircleSketchTool;
 import com.sketchView.tools.EraseSketchTool;
 import com.sketchView.tools.PenSketchTool;
@@ -42,6 +42,8 @@ public class SketchView extends View {
     SketchTool penTool;
     SketchTool eraseTool;
     SketchTool circleTool;
+    SketchTool arrowTool;
+
     Bitmap incrementalImage;
     Bitmap imageCopy;
     private boolean blockEditedUpdates;
@@ -67,7 +69,8 @@ public class SketchView extends View {
         penTool = new PenSketchTool(this);
         eraseTool = new EraseSketchTool(this);
         circleTool = new CircleSketchTool(this);
-        setToolType(SketchTool.TYPE_PEN);
+        arrowTool = new ArrowSketchTool(this);
+        setToolType(SketchTool.TYPE_ARROW); // TYPE_PEN
         setBackgroundColor(Color.TRANSPARENT);
     }
 
@@ -368,6 +371,9 @@ public class SketchView extends View {
             case SketchTool.TYPE_CIRCLE:
                 currentTool = circleTool;
                 break;
+            case SketchTool.TYPE_ARROW:
+                currentTool = arrowTool;
+                break;
             default:
                 currentTool = penTool;
         }
@@ -375,11 +381,13 @@ public class SketchView extends View {
     public void setToolColor(int toolColor) {
         ((ToolColor) penTool).setToolColor(toolColor);
         ((ToolColor) circleTool).setToolColor(toolColor);
+        ((ToolColor) arrowTool).setToolColor(toolColor);
     }
     public void setToolThickness(float toolThickness) {
         ((ToolThickness) penTool).setToolThickness(toolThickness);
         ((ToolThickness) eraseTool).setToolThickness(toolThickness);
         ((ToolThickness) circleTool).setToolThickness(toolThickness);
+        ((ToolThickness) arrowTool).setToolThickness(toolThickness);
     }
     public void setViewImage(Bitmap bitmap) {
         incrementalImage = bitmap;

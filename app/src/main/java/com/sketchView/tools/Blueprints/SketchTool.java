@@ -13,6 +13,7 @@ public abstract class SketchTool implements View.OnTouchListener {
     public static final int TYPE_PEN = 0;
     public static final int TYPE_ERASE = 1;
     public static final int TYPE_CIRCLE = 2;
+    public static final int TYPE_ARROW = 3;
 
     protected View touchView;
     public SketchTool(View touchView) {
@@ -26,6 +27,7 @@ public abstract class SketchTool implements View.OnTouchListener {
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         int action = event.getAction();
+        registerDetector(event);
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 onTouchDown(event);
@@ -41,6 +43,10 @@ public abstract class SketchTool implements View.OnTouchListener {
                 break;
         }
         return true;
+    }
+
+    protected void registerDetector (MotionEvent event) {
+        // Override to use
     }
 
     public abstract void onTouchDown(MotionEvent event);
