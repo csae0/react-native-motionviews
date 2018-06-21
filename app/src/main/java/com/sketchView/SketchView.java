@@ -78,6 +78,7 @@ public class SketchView extends View {
      *  Crop image correctly with good performance
      */
     // TODO: use paths instead of bitmap
+    // TODO: remember min toolThickness which was used on sketchView (to assure that step is small enough)
     @Nullable
     private Rect getImageBounds() {
         if (incrementalImage != null) {
@@ -154,18 +155,18 @@ public class SketchView extends View {
             ArrayList<Point> minTops = new ArrayList<>();
             ArrayList<Point> maxRights = new ArrayList<>();
             ArrayList<Point> maxBottoms = new ArrayList<>();
-            int color = Color.MAGENTA;
+            int fillColor = Color.argb(111, 217, 179, 140); // Color brown with transparency (should be likely not to be chosen) // TODO: remember colors which are drawn on sketchView
             for (Point p: minLeftP.getPairs()) {
-                minLefts.add(findExactBounds(LEFT, p, 1, color));
+                minLefts.add(findExactBounds(LEFT, p, 1, fillColor));
             }
             for (Point p: minTopP.getPairs()) {
-                minTops.add(findExactBounds(TOP, p, 1, color));
+                minTops.add(findExactBounds(TOP, p, 1, fillColor));
             }
             for (Point p: maxRightP.getPairs()) {
-                maxRights.add(findExactBounds(RIGHT, p, 1, color));
+                maxRights.add(findExactBounds(RIGHT, p, 1, fillColor));
             }
             for (Point p: maxBottomP.getPairs()) {
-                maxBottoms.add(findExactBounds(BOTTOM, p, 1, color));
+                maxBottoms.add(findExactBounds(BOTTOM, p, 1, fillColor));
             }
 
             Point minLeft = getMinOrMax(minLefts.toArray(new Point[minLefts.size()]), true, true, -1);
@@ -191,7 +192,7 @@ public class SketchView extends View {
         }
 
 //        if (showBounds) {
-//            incrementalImage.setPixel(curr.x, curr.y, Color.GREEN);
+            incrementalImage.setPixel(curr.x, curr.y, Color.GREEN);
 //        }
         imageCopy.setPixel(curr.x, curr.y, color);
 
