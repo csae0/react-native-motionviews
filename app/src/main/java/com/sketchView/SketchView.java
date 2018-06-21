@@ -70,7 +70,7 @@ public class SketchView extends View {
         eraseTool = new EraseSketchTool(this);
         circleTool = new CircleSketchTool(this);
         arrowTool = new ArrowSketchTool(this);
-        setToolType(SketchTool.TYPE_ARROW); // TYPE_PEN
+        setToolType(SketchTool.TYPE_PEN); // TYPE_PEN
         setBackgroundColor(Color.TRANSPARENT);
     }
 
