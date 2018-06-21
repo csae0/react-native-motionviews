@@ -209,4 +209,20 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
             }
         }
     }
+
+    @Override
+    public void cancelAction() {
+        showButtons(true);
+        MotionEntity motionEntity = motionView.getSelectedEntity();
+        motionEntity.setVisible(true);
+
+        if (motionEntity != null) {
+            if (motionEntity instanceof TextEntity){
+                String text = ((TextEntity)motionEntity).getLayer().getText();
+                if (text == null || text.length() == 0) {
+                    motionView.deleteSelectedEntity(); // includes invalidate
+                }
+            }
+        }
+    }
 }
