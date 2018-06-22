@@ -1,10 +1,9 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 26
     buildToolsVersion '27.0.3'
     defaultConfig {
-        applicationId "team.uptech.motionviews"
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 3
@@ -20,8 +19,10 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
 
+    // react native
+    compile 'com.facebook.react:react-native:+'
     // support
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:recyclerview-v7:26.1.0'
@@ -30,18 +31,11 @@ dependencies {
     implementation 'com.github.QuadFlask:colorpicker:0.0.13'
 
     implementation project(':BoxedVerticalSeekBarLib')
-//    implementation 'com.github.alpbak:BoxedVerticalSeekBar:1b377fd8db'
-
-
-    // discrete slider
-    // implementation project(':library')
-    // implementation 'com.github.pinpong:discreteSeekBar:8c2ec706b9'
-
+//    implementation 'com.github.alpbak:BoxedVerticalSeekBar:1b377fd8db' // older version online with bug
 
     // test
     testImplementation 'junit:junit:4.12'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
 }

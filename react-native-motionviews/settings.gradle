@@ -4,4 +4,4 @@ include ':react-native-motionviews'
 //project(':library').projectDir = new File('../discreteSeekBar/library')
 
 include ':BoxedVerticalSeekBarLib'
-project(':BoxedVerticalSeekBarLib').projectDir = new File('../BoxedVerticalSeekBar/BoxedVerticalSeekBarLib/')
+project(':BoxedVerticalSeekBarLib').projectDir = new File('../../BoxedVerticalSeekBar/BoxedVerticalSeekBarLib/')
