@@ -197,7 +197,7 @@ public class TextEditorDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 if (callback != null) {
-                    callback.updateEntity(editText.getText().toString(), editText.getCurrentTextColor(), (int)editText.getTextSize(), editText.getWidth());
+                    callback.updateTextEntity(editText.getText().toString(), editText.getCurrentTextColor(), (int)editText.getTextSize(), editText.getWidth());
                 }
                 dismiss();
             }
@@ -222,7 +222,7 @@ public class TextEditorDialogFragment extends DialogFragment {
             public void onClick(View view) {
                 // apply editText properties to textView
                 if (callback != null) {
-                    callback.updateEntity(editText.getText().toString(), editText.getCurrentTextColor(), (int)editText.getTextSize(), editText.getWidth());
+                    callback.updateTextEntity(editText.getText().toString(), editText.getCurrentTextColor(), (int)editText.getTextSize(), editText.getWidth());
                 }
                 // exit when clicking on background
                 dismiss();

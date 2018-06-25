@@ -24,6 +24,6 @@ public class RNMotionViewPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-        return Arrays.<ViewManager>asList(new RNMotionViewManager());
+        return Collections.emptyList();
     }
 }

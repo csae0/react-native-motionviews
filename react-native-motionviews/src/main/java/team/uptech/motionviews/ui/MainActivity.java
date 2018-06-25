@@ -3,9 +3,7 @@ package team.uptech.motionviews.ui;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.graphics.Rect;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,9 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 
-import java.util.List;
-
 import at.csae0.reactnative.R;
+
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
 import team.uptech.motionviews.viewmodel.Font;
@@ -39,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
 
     protected MotionView motionView;
 
-    // TODO: verschiebe das Interface in die MotionView (momentan wegen dem Fragment in der Main_Activity)
     private final MotionViewCallback motionViewCallback = new MotionViewCallback() {
         @Override
         public void onEntitySelected(@Nullable MotionEntity entity) {
@@ -182,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
 
     // TODO: verschiebe das Interface in die MotionView (momentan wegen dem Fragment in der Main_Activity)
     @Override
-    public void updateEntity(@Nullable String text, @Nullable Integer color, @Nullable Integer sizeInPixel, @Nullable Integer maxWidth) {
+    public void updateTextEntity(@Nullable String text, @Nullable Integer color, @Nullable Integer sizeInPixel, @Nullable Integer maxWidth) {
         showButtons(true);
         MotionEntity motionEntity = motionView.getSelectedEntity();
         if (motionEntity != null && motionEntity instanceof TextEntity) {
@@ -196,13 +192,14 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
     }
 
     @Override
-    public void updateEntity(@Nullable Bitmap bitmap, @Nullable Rect position, @Nullable Integer color, @Nullable Integer sizeInPixel) {
+    public void updateSketchEntity(@Nullable Bitmap bitmap, @Nullable Rect position, @Nullable Integer color, @Nullable Integer sizeInPixel) {
         showButtons(true);
         MotionEntity motionEntity = motionView.getSelectedEntity();
 
         if (motionEntity != null && motionEntity instanceof SketchEntity) {
             if (bitmap == null) {
                 motionView.deleteSelectedEntity(); // includes invalidate
+                motionView.setHideAllEntities(false);
             } else {
                 ((SketchEntity) motionEntity).updateState(bitmap, position, color, sizeInPixel);
                 motionView.invalidate();
@@ -213,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
     @Override
     public void cancelAction() {
         showButtons(true);
+        motionView.setHideAllEntities(false);
         MotionEntity motionEntity = motionView.getSelectedEntity();
         motionEntity.setVisible(true);
 

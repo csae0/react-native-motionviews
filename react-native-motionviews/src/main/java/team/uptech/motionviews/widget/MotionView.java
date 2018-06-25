@@ -161,6 +161,10 @@ public class MotionView  extends FrameLayout {
         }
     }
 
+    public void setHideAllEntities (boolean hide) {
+        hideAllEntities = hide;
+    }
+
     public void addEntity (@Nullable MotionEntity entity) {
         if (entity != null) {
             setEntityCallback(entity);

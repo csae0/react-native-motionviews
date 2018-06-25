@@ -235,6 +235,7 @@ public abstract class MotionEntity implements EntityActions {
     @Nullable
     public abstract Bitmap getEntityBitmap();
 
+    // TODO: Pixel check --> min stroke thickness (to select small thickness e.g. circles more easily)
     public boolean pointHasPixelColor (PointF point) {
         Bitmap image = getEntityBitmap();
         if (image != null) {

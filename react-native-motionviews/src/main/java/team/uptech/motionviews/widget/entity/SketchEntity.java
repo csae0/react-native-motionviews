@@ -156,7 +156,7 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
                     if (main != null && sketchViewContainer != null && main.indexOfChild(sketchViewContainer) >= 0) {
                         main.removeView(sketchViewContainer);
                     }
-                    ((EditCallback) activity).updateEntity(bitmap, position, color, sizeInPixel);
+                    ((EditCallback) activity).updateSketchEntity(bitmap, position, color, sizeInPixel);
                 }
             });
 
