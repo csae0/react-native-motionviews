@@ -16,7 +16,7 @@ import android.widget.ImageButton;
 
 import java.util.List;
 
-import team.uptech.motionviews.R;
+import at.csae0.reactnative.R;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
 import team.uptech.motionviews.viewmodel.Font;

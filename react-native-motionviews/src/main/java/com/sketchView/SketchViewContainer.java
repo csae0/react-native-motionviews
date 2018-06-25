@@ -37,7 +37,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import abak.tr.com.boxedverticalseekbar.BoxedVertical;
-import team.uptech.motionviews.R;
+import at.csae0.reactnative.R;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.widget.Interfaces.Limits;
 import team.uptech.motionviews.widget.Interfaces.OnMoveGestureListener;

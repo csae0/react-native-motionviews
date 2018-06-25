@@ -34,7 +34,7 @@ import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import abak.tr.com.boxedverticalseekbar.BoxedVertical;
-import team.uptech.motionviews.R;
+import at.csae0.reactnative.R;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
 import team.uptech.motionviews.widget.Interfaces.EditCallback;

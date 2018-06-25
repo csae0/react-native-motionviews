@@ -29,7 +29,7 @@ import com.almeros.android.multitouch.RotateGestureDetector;
 import java.util.ArrayList;
 import java.util.List;
 
-import team.uptech.motionviews.R;
+import at.csae0.reactnative.R;
 import team.uptech.motionviews.widget.Interfaces.EntityCallback;
 import team.uptech.motionviews.widget.Interfaces.MotionViewCallback;
 import team.uptech.motionviews.widget.Interfaces.ShrinkWorkerCallback;

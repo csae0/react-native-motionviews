@@ -9,7 +9,7 @@ import team.uptech.motionviews.ui.adapter.MotionViewContainer;
 
 public class RNMotionViewManager extends SimpleViewManager<MotionViewContainer> {
 
-    public static final String REACT_CLASS = "RNMotionView";
+    public static final String REACT_CLASS = "RNMotionViews";
 
     @Override
     public String getName() {

@@ -18,7 +18,7 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 
-import team.uptech.motionviews.R;
+import at.csae0.reactnative.R;
 
 /**
  * selects sticker

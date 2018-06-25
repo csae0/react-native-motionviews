@@ -19,7 +19,7 @@ import team.uptech.motionviews.viewmodel.SketchLayer;
 import team.uptech.motionviews.viewmodel.Stroke;
 import team.uptech.motionviews.widget.Interfaces.EditCallback;
 import team.uptech.motionviews.widget.Interfaces.SketchEntityActions;
-import team.uptech.motionviews.R;
+import at.csae0.reactnative.R;
 import team.uptech.motionviews.widget.Interfaces.SketchViewCallback;
 
 public class SketchEntity extends MotionEntity implements SketchEntityActions {

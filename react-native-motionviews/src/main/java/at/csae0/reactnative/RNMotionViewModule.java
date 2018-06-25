@@ -17,7 +17,7 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void navigateToExample() {
+    public void navigateToExample () {
         Activity activity = getCurrentActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, MainActivity.class);
@@ -27,6 +27,6 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
 
     @Override
     public String getName() {
-        return "RNMotionView";
+        return "RNMotionViews";
     }
 }
