@@ -155,7 +155,7 @@ public class SketchView extends View {
             ArrayList<Point> minTops = new ArrayList<>();
             ArrayList<Point> maxRights = new ArrayList<>();
             ArrayList<Point> maxBottoms = new ArrayList<>();
-            int fillColor = Color.argb(111, 217, 179, 140); // Color brown with transparency (should be likely not to be chosen) // TODO: remember colors which are drawn on sketchView
+            int fillColor = Color.argb(255, 217, 179, 140); // Color brown with transparency (should be likely not to be chosen) // TODO: remember colors which are drawn on sketchView
             for (Point p: minLeftP.getPairs()) {
                 minLefts.add(findExactBounds(LEFT, p, 1, fillColor));
             }
@@ -192,7 +192,7 @@ public class SketchView extends View {
         }
 
 //        if (showBounds) {
-            incrementalImage.setPixel(curr.x, curr.y, Color.GREEN);
+//            incrementalImage.setPixel(curr.x, curr.y, Color.GREEN);
 //        }
         imageCopy.setPixel(curr.x, curr.y, color);
 
