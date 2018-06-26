@@ -12,10 +12,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import at.csae0.reactnative.R;
 
+import at.csae0.reactnative.RNMotionViewModule;
 import at.csae0.reactnative.model.ButtonConfig;
 import at.csae0.reactnative.model.ColorConfig;
 import at.csae0.reactnative.model.Config;
@@ -40,6 +43,8 @@ import team.uptech.motionviews.widget.entity.ImageEntity;
 import team.uptech.motionviews.widget.entity.MotionEntity;
 import team.uptech.motionviews.widget.entity.SketchEntity;
 import team.uptech.motionviews.widget.entity.TextEntity;
+
+import static at.csae0.reactnative.RNMotionViewModule.OPTIONS_ID;
 
 public class MotionViewsActivity extends AppCompatActivity implements EditCallback {
 
@@ -75,7 +80,11 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ConfigManager.create(this.getIntent().getExtras());
+        Bundle bundle = this.getIntent().getExtras();
+        Bundle options = bundle.getBundle(RNMotionViewModule.OPTIONS_ID);
+        Set<String> keys1 = bundle.keySet();
+        Set<String> keys2 = options.keySet();
+        ConfigManager.create(options);
 
         this.fontProvider = new FontProvider(getResources());
 

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class ColorConfig extends Config {
 
     private Integer initialColor;
-    private ArrayList<Integer> colors;
+    private ArrayList<String> colors;
     private PickerConfig pickerconfig;
 
     public ColorConfig (@Nullable Boolean enabled, @Nullable String initialColor, @Nullable ArrayList<String> colors, @Nullable PickerConfig pickerConfig) {
@@ -21,7 +21,7 @@ public class ColorConfig extends Config {
         if (colors != null) {
             for (String color: colors) {
                 if (color != null) {
-                    this.colors.add(Color.parseColor(color));
+                    this.colors.add(color);
                 }
             }
         }
@@ -47,6 +47,19 @@ public class ColorConfig extends Config {
     public boolean hasInitialColor() {
         return initialColor != null;
     }
+
+    @Nullable
+    public ArrayList<String> getColors() {
+        if (colors == null || colors.size() == 0) {
+            return null;
+        }
+        return colors;
+    }
+
+    public void setColors(ArrayList<String> colors) {
+        this.colors = colors;
+    }
+
     public boolean hasColors() {
         return colors != null;
     }

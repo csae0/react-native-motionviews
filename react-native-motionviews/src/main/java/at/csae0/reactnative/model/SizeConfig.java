@@ -83,7 +83,7 @@ public class SizeConfig extends Config {
     public boolean hasStep() {
         return step != null;
     }
-    public boolean hasinitialValue() {
+    public boolean hasInitialValue() {
         return initialValue != null;
     }
 }

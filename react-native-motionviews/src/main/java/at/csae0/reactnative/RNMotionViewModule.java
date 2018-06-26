@@ -28,7 +28,7 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
 
             Bundle options = BundleConverter.toBundle(params);
 
-            intent.putExtra(OPTIONS_ID, options);
+            intent.putExtra(RNMotionViewModule.OPTIONS_ID, options);
             activity.startActivity(intent);
         }
     }

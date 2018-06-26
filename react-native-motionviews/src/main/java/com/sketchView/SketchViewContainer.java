@@ -41,6 +41,7 @@ import at.csae0.reactnative.interfaces.ConfigActions;
 import at.csae0.reactnative.model.ButtonConfig;
 import at.csae0.reactnative.model.ColorConfig;
 import at.csae0.reactnative.model.GeneralConfig;
+import at.csae0.reactnative.model.PickerConfig;
 import at.csae0.reactnative.model.SizeConfig;
 import at.csae0.reactnative.utils.ConfigManager;
 import team.uptech.motionviews.utils.ConversionUtils;
@@ -53,6 +54,8 @@ import team.uptech.motionviews.widget.Interfaces.SketchViewCallback;
 
 public class SketchViewContainer extends RelativeLayout {
 
+    private static final int COLOR_PICKER_CONTAINER_ID = 11111;
+
     private static SketchViewContainer instance = null;
     public SketchView sketchView;
     private SketchViewCallback sketchViewCallback;
@@ -60,8 +63,9 @@ public class SketchViewContainer extends RelativeLayout {
     private LinearLayout colorPickerContainer;
     private BoxedVertical boxedVertical;
     private LinearLayout buttons;
-    private Button cancel, clear, save, pen, eraser, circle, arrow;
+    private Button cancel, clear, save, pen, eraser, circle, arrow, colorPalette;
 
+    private PickerConfig pickerConfig;
 
     private boolean colorPickerContainerEnabled;
     /**
@@ -74,6 +78,10 @@ public class SketchViewContainer extends RelativeLayout {
         colorPickerContainer = null;
         boxedVertical = null;
         buttons = null;
+        cancel = clear = save = pen = eraser = circle = arrow = colorPalette = null;
+
+
+        pickerConfig = null;
 
         colorPickerContainerEnabled = true;
         createLayout(context);
@@ -104,38 +112,46 @@ public class SketchViewContainer extends RelativeLayout {
 
                @Override
                public void applyColorConfig(ColorConfig config) {
+                    if (config != null) {
+//                        private Integer initialColor;
+//                        private ArrayList<Integer> colors;
+//                        private PickerConfig pickerconfig;
+                        if (config.hasInitialColor()) {
+                            setToolColor(config.getInitialColor());
+                        }
 
+                        if (config.hasPickerConfig()) {
+                            pickerConfig = config.getPickerconfig();
+                        }
+                    }
+
+                   int colorCircleDiameter = getResources().getDimensionPixelSize(R.dimen.color_circle_diameter);
+                   addDynamicColorSelections(colorPickerContainer, colorPalette, colorCircleDiameter, config.getColors());
                }
 
                @Override
                public void applySizeConfig(SizeConfig config) {
-
-                   this.backgroundColor = backgroundColor != null ? Color.parseColor(backgroundColor) : null;
-                   this.progressColor = progressColor != null ? Color.parseColor(progressColor) : null;
-                   this.min = min;
-                   this.max = max;
-                   this.initialValue = initialValue;
-                   this.step = step;
-
-                   if (config.getBackgroundColor() != null) {
-                       boxedVertical.setBackgroundColor(config.getBackgroundColor());
+                   if (config != null) {
+                       if (config.hasBackgroundColor()) {
+                           boxedVertical.setBackgroundColor(config.getBackgroundColor());
+                       }
+                       if (config.hasProgrssColor()) {
+                           boxedVertical.setProgressPaint(config.getProgressColor());
+                       }
+                       if (config.hasMax()) {
+                           boxedVertical.setMax(config.getMax());
+                       }
+                       if (config.hasMin()) {
+                           boxedVertical.setMin(config.getMin());
+                       }
+                       if (config.hasStep()) {
+                           boxedVertical.setStep(config.getStep());
+                       }
+                       if (config.hasInitialValue()) {
+                           setToolThickness(config.getInitialValue());
+//                           boxedVertical.setValue((int) (sketchView != null ? sketchView.getToolThickness() : config.getInitialValue()));
+                       }
                    }
-                   if (config.getProgressColor() != null) {
-                       boxedVertical.setProgressPaint(config.getProgressColor());
-                   }
-                   if (config.get() != null) {
-                       boxedVertical.setMax(maxThickness);
-                   }
-                   if (config.getProgressColor() != null) {
-                       boxedVertical.setMin(minThickness);
-                   }
-                   if (config.getProgressColor() != null) {
-                       boxedVertical.setStep(stepThickness);
-                   }
-                   if (config.getProgressColor() != null) {
-                       boxedVertical.setValue((int) (sketchView != null ? sketchView.getToolThickness() : defaultThickness));
-                   }
-
                }
 
                @Override
@@ -393,16 +409,16 @@ public class SketchViewContainer extends RelativeLayout {
         addView(boxedVertical);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void addColorSelections (Context context) {
         // LinearLayout
         colorPickerContainer = new LinearLayout(context);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        colorPickerContainer.setId(COLOR_PICKER_CONTAINER_ID);
         colorPickerContainer.setLayoutParams(layoutParams);
         colorPickerContainer.setOrientation(LinearLayout.HORIZONTAL);
         int padding = getResources().getDimensionPixelSize(R.dimen.padding);
-        colorPickerContainer.setPadding(padding, padding, padding, padding); // TODO: find solution that works with react native
+        colorPickerContainer.setPadding(padding, padding, padding, padding);
 
         // LinearLayout
         LinearLayout colorPickerSubContainer = new LinearLayout(context);
@@ -411,11 +427,11 @@ public class SketchViewContainer extends RelativeLayout {
         colorPickerSubContainer.setGravity(Gravity.CENTER);
 
         // Button
-        Button colorPalette = new Button(context);
+        colorPalette = new Button(context);
         int colorCircleDiameter = getResources().getDimensionPixelSize(R.dimen.color_circle_diameter);
-        layoutParams = new RelativeLayout.LayoutParams(colorCircleDiameter, colorCircleDiameter); // TODO: find solution that works with react native
+        layoutParams = new RelativeLayout.LayoutParams(colorCircleDiameter, colorCircleDiameter);
         colorPalette.setLayoutParams(layoutParams);
-        // colorPalette.setBackground(); // DRAWABLE ic_format_color_text // TODO: find solution that works with react native
+         colorPalette.setBackground(getResources().getDrawable(R.drawable.ic_format_color_text));
         if (sketchView != null) {
             colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(sketchView.getToolColor()))); // TODO: solution for min API 21 needed
         }
@@ -427,15 +443,16 @@ public class SketchViewContainer extends RelativeLayout {
         });
         colorPickerSubContainer.addView(colorPalette);
         colorPickerContainer.addView(colorPickerSubContainer);
-        addDynamicColorSelections(colorPickerContainer, colorPalette, colorCircleDiameter);
+
+//        addDynamicColorSelections(colorPickerContainer, colorPalette, colorCircleDiameter, null);
 
         addView(colorPickerContainer);
     }
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void addDynamicColorSelections (LinearLayout colorPickerContainer, final Button colorPalette, int colorCircleDiameter) {
-        String[] colors = {"#000000", "#20BBFC", "#2DFD2F", "#FD28F9", "#EA212E", "#FD7E24", "#FFFA38", "#FFFFFF"};
+
+    private void addDynamicColorSelections (LinearLayout colorPickerContainer, final Button colorPalette, int colorCircleDiameter, @Nullable ArrayList<String> colors) {
+        String[] defaultColors = {"#000000", "#20BBFC", "#2DFD2F", "#FD28F9", "#EA212E", "#FD7E24", "#FFFA38", "#FFFFFF"};
         Context context = colorPickerContainer.getContext();
-        for (String color: colors) {
+        for (String color: (colors != null ? colors.toArray(new String[colors.size()]) : defaultColors)) {
             final int parsedColor = Color.parseColor(color);
 
             LinearLayout colorButtonContainer = new LinearLayout(context);
@@ -460,13 +477,14 @@ public class SketchViewContainer extends RelativeLayout {
         }
     }
     private void openColorPalette(final View v) {
+        boolean hasPickerConfig = pickerConfig != null;
         ColorPickerDialogBuilder
                 .with(v.getContext())
-                .setTitle(R.string.select_color)
-                .initialColor(sketchView != null ? sketchView.getToolColor() : Color.WHITE)
+                .setTitle(hasPickerConfig && pickerConfig.hasPickerLabel() ? pickerConfig.getPickerLabel() : getResources().getString(R.string.select_color))
+                .initialColor(sketchView != null ? sketchView.getToolColor() : hasPickerConfig && pickerConfig.hasInitialColor() ? pickerConfig.getInitialColor() : Color.WHITE)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(15) // magic number
-                .setPositiveButton(R.string.ok, new ColorPickerClickListener() {
+                .setPositiveButton(hasPickerConfig && pickerConfig.hasSubmitText() ? pickerConfig.getSubmitText() : getResources().getString(R.string.ok), new ColorPickerClickListener() {
                     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
@@ -476,7 +494,7 @@ public class SketchViewContainer extends RelativeLayout {
                         }
                     }
                 })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                .setNegativeButton(hasPickerConfig && pickerConfig.hasCancelText() ? pickerConfig.getCancelText() : getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                     }
@@ -492,8 +510,21 @@ public class SketchViewContainer extends RelativeLayout {
     }
 
     public void setToolThickness (float thickness) {
-        sketchView.setToolThickness(thickness);
-        boxedVertical.setValue((int) thickness);
+        if (sketchView != null) {
+            sketchView.setToolThickness(thickness);
+        }
+        if (boxedVertical != null) {
+            boxedVertical.setValue((int) thickness);
+        }
+    }
+
+    public void setToolColor (int color) {
+        if (sketchView != null) {
+            sketchView.setToolColor(color);
+        }
+        if (colorPalette != null) {
+            colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(color))); // min API 21 needed TODO: find solution
+        }
     }
 
     public void setToolType(int type) {

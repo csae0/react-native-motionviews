@@ -138,7 +138,7 @@ public class ConfigManager {
                 ButtonConfig buttonConfig;
                 if (tempBundle != null) {
                     buttonConfig = new ButtonConfig(
-                            TYPE.valueOf(key),
+                            TYPE.get(key),
                             tempBundle.getBoolean("enabled", true),
                             tempBundle.getString("icon", null),
                             tempBundle.getString("label", null),
@@ -146,7 +146,7 @@ public class ConfigManager {
                     );
                 } else {
                     buttonConfig = new ButtonConfig(
-                            TYPE.valueOf(key),
+                            TYPE.get(key),
                             false,
                             null,
                             null,
