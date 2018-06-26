@@ -31,18 +31,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 
 import abak.tr.com.boxedverticalseekbar.BoxedVertical;
 import at.csae0.reactnative.R;
+import at.csae0.reactnative.interfaces.ConfigActions;
+import at.csae0.reactnative.model.ButtonConfig;
+import at.csae0.reactnative.model.ColorConfig;
+import at.csae0.reactnative.model.GeneralConfig;
+import at.csae0.reactnative.model.SizeConfig;
+import at.csae0.reactnative.utils.ConfigManager;
 import team.uptech.motionviews.utils.ConversionUtils;
-import team.uptech.motionviews.widget.Interfaces.Limits;
 import team.uptech.motionviews.widget.Interfaces.OnMoveGestureListener;
 import team.uptech.motionviews.widget.Interfaces.SketchViewCallback;
-import team.uptech.motionviews.widget.entity.MotionEntity;
 
 /**
  * Created by keshav on 06/04/17.
@@ -57,6 +60,8 @@ public class SketchViewContainer extends RelativeLayout {
     private LinearLayout colorPickerContainer;
     private BoxedVertical boxedVertical;
     private LinearLayout buttons;
+    private Button cancel, clear, save, pen, eraser, circle, arrow;
+
 
     private boolean colorPickerContainerEnabled;
     /**
@@ -72,7 +77,9 @@ public class SketchViewContainer extends RelativeLayout {
 
         colorPickerContainerEnabled = true;
         createLayout(context);
+        applyConfig();
     }
+
     public static SketchViewContainer getInstance (Context context) {
         if (instance == null) {
             instance = new SketchViewContainer(context);
@@ -83,6 +90,61 @@ public class SketchViewContainer extends RelativeLayout {
      * Create Views
      * @return
      */
+
+    /**
+     * set config paramaters
+     */
+    private void applyConfig() {
+        if (ConfigManager.hasInstance()) {
+           ConfigManager.getInstance().apply(new ConfigActions() {
+               @Override
+               public void applyGeneralConfig(GeneralConfig config) {
+
+               }
+
+               @Override
+               public void applyColorConfig(ColorConfig config) {
+
+               }
+
+               @Override
+               public void applySizeConfig(SizeConfig config) {
+
+                   this.backgroundColor = backgroundColor != null ? Color.parseColor(backgroundColor) : null;
+                   this.progressColor = progressColor != null ? Color.parseColor(progressColor) : null;
+                   this.min = min;
+                   this.max = max;
+                   this.initialValue = initialValue;
+                   this.step = step;
+
+                   if (config.getBackgroundColor() != null) {
+                       boxedVertical.setBackgroundColor(config.getBackgroundColor());
+                   }
+                   if (config.getProgressColor() != null) {
+                       boxedVertical.setProgressPaint(config.getProgressColor());
+                   }
+                   if (config.get() != null) {
+                       boxedVertical.setMax(maxThickness);
+                   }
+                   if (config.getProgressColor() != null) {
+                       boxedVertical.setMin(minThickness);
+                   }
+                   if (config.getProgressColor() != null) {
+                       boxedVertical.setStep(stepThickness);
+                   }
+                   if (config.getProgressColor() != null) {
+                       boxedVertical.setValue((int) (sketchView != null ? sketchView.getToolThickness() : defaultThickness));
+                   }
+
+               }
+
+               @Override
+               public void applyButtonConfigs(ArrayList<ButtonConfig> buttonConfigs) {
+
+               }
+           });
+        }
+    }
 
     // TODO: Merge redundant logic for edit settings (TextEditorDialogFragment, SketchViewContainer, (ImageEntity edit screen))
     private void createLayout(Context context) {
@@ -153,7 +215,7 @@ public class SketchViewContainer extends RelativeLayout {
         int padding = getResources().getDimensionPixelOffset(R.dimen.padding);
         int height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
 
-        Button cancel = new Button(context);
+        cancel = new Button(context);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, height);
         layoutParams.topMargin = padding;
         layoutParams.bottomMargin = padding;
@@ -171,7 +233,7 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
 
-        Button clear = new Button(context);
+        clear = new Button(context);
         clear.setLayoutParams(layoutParams);
         clear.setText("CLEAR");
         clear.setOnClickListener(new OnClickListener() {
@@ -183,7 +245,7 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
 
-        Button save = new Button(context);
+        save = new Button(context);
         save.setLayoutParams(layoutParams);
         save.setText("SAVE");
         save.setOnClickListener(new OnClickListener() {
@@ -221,7 +283,7 @@ public class SketchViewContainer extends RelativeLayout {
 //        buttons.addView(box);
 
 
-        Button pen = new Button(context);
+        pen = new Button(context);
         pen.setLayoutParams(layoutParams);
         pen.setText("PEN");
         pen.setOnClickListener(new OnClickListener() {
@@ -231,7 +293,7 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
 
-        Button eraser = new Button(context);
+        eraser = new Button(context);
         eraser.setLayoutParams(layoutParams);
         eraser.setText("ERASE");
         eraser.setOnClickListener(new OnClickListener() {
@@ -241,7 +303,7 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
 
-        Button circle = new Button(context);
+        circle = new Button(context);
         circle.setLayoutParams(layoutParams);
         circle.setText("CIRCLE");
         circle.setOnClickListener(new OnClickListener() {
@@ -251,7 +313,7 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
 
-        Button arrow = new Button(context);
+        arrow = new Button(context);
         arrow.setLayoutParams(layoutParams);
         arrow.setText("ARROW");
         arrow.setOnClickListener(new OnClickListener() {

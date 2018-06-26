@@ -12,8 +12,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import java.util.HashMap;
+
 import at.csae0.reactnative.R;
 
+import at.csae0.reactnative.model.ButtonConfig;
+import at.csae0.reactnative.model.ColorConfig;
+import at.csae0.reactnative.model.Config;
+import at.csae0.reactnative.model.GeneralConfig;
+import at.csae0.reactnative.model.PickerConfig;
+import at.csae0.reactnative.model.SizeConfig;
+import at.csae0.reactnative.model.TYPE;
+import at.csae0.reactnative.utils.BundleConverter;
+import at.csae0.reactnative.utils.ConfigManager;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
 import team.uptech.motionviews.viewmodel.Font;
@@ -30,10 +41,9 @@ import team.uptech.motionviews.widget.entity.MotionEntity;
 import team.uptech.motionviews.widget.entity.SketchEntity;
 import team.uptech.motionviews.widget.entity.TextEntity;
 
-public class MainActivity extends AppCompatActivity implements EditCallback {
+public class MotionViewsActivity extends AppCompatActivity implements EditCallback {
 
     public static final int SELECT_STICKER_REQUEST_CODE = 123;
-
     protected MotionView motionView;
 
     private final MotionViewCallback motionViewCallback = new MotionViewCallback() {
@@ -54,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
     };
 
     // Workaround to access this inside callback class
-    private MainActivity getThis() {
+    private MotionViewsActivity getThis() {
         return this;
     }
 
@@ -64,12 +74,15 @@ public class MainActivity extends AppCompatActivity implements EditCallback {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ConfigManager.create(this.getIntent().getExtras());
+
         this.fontProvider = new FontProvider(getResources());
 
         motionView = findViewById(R.id.main_motion_view);
         motionView.setMotionViewCallback(motionViewCallback);
         motionView.setTrashButton((Button)findViewById(R.id.trash_button));
-        addSticker(R.drawable.pikachu_2, true);
+        // addSticker(R.drawable.pikachu_2, true);
         // addSketch(false);
     }
 

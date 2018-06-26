@@ -52,7 +52,7 @@ import team.uptech.motionviews.widget.Interfaces.Limits;
  */
 
 // TODO: create view instead of fragment (like SketchViewContainer) --> create super class (abstract?) because all subclasses will be kind of the same
-public class TextEditorDialogFragment extends DialogFragment {
+public class TextEditorDialogFragment extends DialogFragment implements ColorConfigInterface {
 
     public static final String ARG_TEXT = "editor_text_arg";
     public static final String ARG_SIZE = "editor_size_arg";
