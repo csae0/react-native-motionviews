@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 
+import team.uptech.motionviews.utils.CONFIG_TYPE;
+
 public class ColorConfig extends Config {
 
     private Integer initialColor;
@@ -12,7 +14,7 @@ public class ColorConfig extends Config {
     private PickerConfig pickerconfig;
 
     public ColorConfig (@Nullable Boolean enabled, @Nullable String initialColor, @Nullable ArrayList<String> colors, @Nullable PickerConfig pickerConfig) {
-        super(TYPE.COLOR_CONFIG);
+        super(CONFIG_TYPE.COLOR_CONFIG);
         if (enabled != null) {
             setEnabled(enabled);
         }

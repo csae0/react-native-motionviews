@@ -12,21 +12,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Set;
 
 import at.csae0.reactnative.R;
 
 import at.csae0.reactnative.RNMotionViewModule;
-import at.csae0.reactnative.model.ButtonConfig;
-import at.csae0.reactnative.model.ColorConfig;
-import at.csae0.reactnative.model.Config;
-import at.csae0.reactnative.model.GeneralConfig;
-import at.csae0.reactnative.model.PickerConfig;
-import at.csae0.reactnative.model.SizeConfig;
-import at.csae0.reactnative.model.TYPE;
-import at.csae0.reactnative.utils.BundleConverter;
 import at.csae0.reactnative.utils.ConfigManager;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
@@ -43,8 +33,6 @@ import team.uptech.motionviews.widget.entity.ImageEntity;
 import team.uptech.motionviews.widget.entity.MotionEntity;
 import team.uptech.motionviews.widget.entity.SketchEntity;
 import team.uptech.motionviews.widget.entity.TextEntity;
-
-import static at.csae0.reactnative.RNMotionViewModule.OPTIONS_ID;
 
 public class MotionViewsActivity extends AppCompatActivity implements EditCallback {
 

@@ -1,11 +1,11 @@
-package at.csae0.reactnative.model;
+package team.uptech.motionviews.utils;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public enum TYPE {
+public enum CONFIG_TYPE {
     // general
     GENERAL_CONFIG("generalConfig"),
     // settings
@@ -13,7 +13,8 @@ public enum TYPE {
     PICKER_CONFIG("pickerConfig"),
     SIZE_CONFIG("sizeConfig"),
 
-    // BUTTONS
+    // BUTTONS config key
+    BUTTONS_CONFIG("buttonsConfig"),
     // motionView main actions
     CREATE_TEXT_CONFIG("createTextConfig"),
     CREATE_SKETCH_CONFIG("createSketchConfig"),
@@ -31,9 +32,9 @@ public enum TYPE {
 
     private String name;
 
-    private static final Map<String, TYPE> ENUM_MAP;
+    private static final Map<String, CONFIG_TYPE> ENUM_MAP;
 
-    TYPE (String name) {
+    CONFIG_TYPE(String name) {
         this.name = name;
     }
 
@@ -49,14 +50,14 @@ public enum TYPE {
     // Any Map impl can be used.
 
     static {
-        Map<String, TYPE> map = new ConcurrentHashMap<String, TYPE>();
-        for (TYPE instance : TYPE.values()) {
+        Map<String, CONFIG_TYPE> map = new ConcurrentHashMap<String, CONFIG_TYPE>();
+        for (CONFIG_TYPE instance : CONFIG_TYPE.values()) {
             map.put(instance.getName(), instance);
         }
         ENUM_MAP = Collections.unmodifiableMap(map);
     }
 
-    public static TYPE get (String name) {
+    public static CONFIG_TYPE get (String name) {
         return ENUM_MAP.get(name);
     }
 }

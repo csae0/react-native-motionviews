@@ -1,6 +1,7 @@
 package at.csae0.reactnative.utils;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -76,14 +77,32 @@ public class BundleConverter {
         return bundle;
     }
 
-    public static ArrayList<String> bundleToIntegerArray(Bundle bundle) {
-        ArrayList<String> colors = new ArrayList<>();
-        for (String key : bundle.keySet()) {
-            String color = bundle.getString(key);
-            if (color != null) {
-                colors.add(color);
+    @Nullable
+    public static ArrayList<?> bundleToArrayList(Bundle bundle) { // bundle needs to be a converted array (index 0 - n of same type)
+        Object check = bundle.get("0");
+        if (check != null) {
+
+            // check.getClass() == int.class || check.getClass() == Integer.class check for primitive type
+            if (check instanceof String) {
+                ArrayList<String> arrayList = new ArrayList<>();
+                for (String key : bundle.keySet()) {
+                    String value = bundle.getString(key);
+                    if (value != null) {
+                        arrayList.add(value);
+                    }
+                }
+                return arrayList;
+            } else if (check instanceof Bundle) {
+                ArrayList<Bundle> arrayList = new ArrayList<>();
+                for (String key : bundle.keySet()) {
+                    Bundle value = bundle.getBundle(key);
+                    if (value != null) {
+                        arrayList.add(value);
+                    }
+                }
+                return arrayList;
             }
         }
-        return colors;
+        return null;
     }
 }

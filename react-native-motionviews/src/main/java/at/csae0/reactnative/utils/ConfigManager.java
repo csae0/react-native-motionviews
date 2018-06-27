@@ -11,7 +11,7 @@ import at.csae0.reactnative.model.ColorConfig;
 import at.csae0.reactnative.model.GeneralConfig;
 import at.csae0.reactnative.model.PickerConfig;
 import at.csae0.reactnative.model.SizeConfig;
-import at.csae0.reactnative.model.TYPE;
+import team.uptech.motionviews.utils.CONFIG_TYPE;
 
 public class ConfigManager {
 
@@ -57,7 +57,7 @@ public class ConfigManager {
         for (String key : bundle.keySet()) {
             Bundle tempBundle = bundle.getBundle(key);
 
-            if (TYPE.get(key) == TYPE.GENERAL_CONFIG) { // GENERAL CONFIG
+            if (CONFIG_TYPE.get(key) == CONFIG_TYPE.GENERAL_CONFIG) { // GENERAL CONFIG
                 if (tempBundle != null) {
                     generalConfig = new GeneralConfig(
                             tempBundle.getString("backgroundImage", null),
@@ -71,7 +71,7 @@ public class ConfigManager {
                             null
                     );
                 }
-            } else if (TYPE.get(key) == TYPE.SIZE_CONFIG) { //SIZE CONFIG
+            } else if (CONFIG_TYPE.get(key) == CONFIG_TYPE.SIZE_CONFIG) { //SIZE CONFIG
                 if (tempBundle != null) {
                     sizeConfig = new SizeConfig(
                             tempBundle.getBoolean("enabled", true),
@@ -93,7 +93,7 @@ public class ConfigManager {
                             1
                     );
                 }
-            } else if (TYPE.get(key) == TYPE.COLOR_CONFIG) { // COLOR CONFIG
+            } else if (CONFIG_TYPE.get(key) == CONFIG_TYPE.COLOR_CONFIG) { // COLOR CONFIG
                 if (tempBundle != null) {
                     PickerConfig pickerConfig;
                     Bundle pickerConfigBundle = tempBundle.getBundle("pickerConfig");
@@ -117,7 +117,7 @@ public class ConfigManager {
                     colorConfig = new ColorConfig(
                             tempBundle.getBoolean("enabled", true),
                             tempBundle.getString("initialColor", "#FFFFFF"),
-                            BundleConverter.bundleToIntegerArray(tempBundle.getBundle("colors")),
+                            (ArrayList<String>) BundleConverter.bundleToArrayList(tempBundle.getBundle("colors")),
                             pickerConfig
                     );
                 } else {
@@ -134,26 +134,29 @@ public class ConfigManager {
                             )
                     );
                 }
-            } else if (TYPE.get(key) != TYPE.PICKER_CONFIG) { // BUTTON CONFIGS
-                ButtonConfig buttonConfig;
-                if (tempBundle != null) {
-                    buttonConfig = new ButtonConfig(
-                            TYPE.get(key),
-                            tempBundle.getBoolean("enabled", true),
-                            tempBundle.getString("icon", null),
-                            tempBundle.getString("label", null),
-                            tempBundle.getString("tint", null)
-                    );
-                } else {
-                    buttonConfig = new ButtonConfig(
-                            TYPE.get(key),
-                            false,
-                            null,
-                            null,
-                            null
-                    );
+            } else if (CONFIG_TYPE.get(key) == CONFIG_TYPE.BUTTONS_CONFIG) { // BUTTON CONFIGS
+                ArrayList<Bundle> buttonBundlesArray = (ArrayList<Bundle>) BundleConverter.bundleToArrayList(tempBundle);
+                for (Bundle buttonBundle : buttonBundlesArray) {
+                    ButtonConfig buttonConfig;
+                    if (buttonBundle != null) {
+                        buttonConfig = new ButtonConfig(
+                                CONFIG_TYPE.get(buttonBundle.getString("id")),
+                                buttonBundle.getBoolean("enabled", true),
+                                buttonBundle.getString("icon", null),
+                                buttonBundle.getString("label", null),
+                                buttonBundle.getString("tint", null)
+                        );
+                    } else {
+                        buttonConfig = new ButtonConfig(
+                                CONFIG_TYPE.get(key),
+                                false,
+                                null,
+                                null,
+                                null
+                        );
+                    }
+                    buttonConfigs.add(buttonConfig);
                 }
-                buttonConfigs.add(buttonConfig);
             }
         }
     }

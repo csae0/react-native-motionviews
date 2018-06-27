@@ -2,13 +2,15 @@ package at.csae0.reactnative.model;
 
 import android.support.annotation.Nullable;
 
+import team.uptech.motionviews.utils.CONFIG_TYPE;
+
 public class PickerConfig extends Config {
 
     private Integer initialColor;
     private String icon, pickerLabel, cancelText, submitText;
 
     public PickerConfig (@Nullable Boolean enabled, @Nullable String icon, @Nullable String pickerLabel, @Nullable String cancelText, @Nullable String submitText) {
-        super(TYPE.PICKER_CONFIG);
+        super(CONFIG_TYPE.PICKER_CONFIG);
         if (enabled != null) {
             setEnabled(enabled);
         }

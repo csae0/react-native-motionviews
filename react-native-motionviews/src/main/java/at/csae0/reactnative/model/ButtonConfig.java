@@ -1,6 +1,10 @@
 package at.csae0.reactnative.model;
 
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
+
+import team.uptech.motionviews.utils.RessourceUtils;
+import team.uptech.motionviews.utils.CONFIG_TYPE;
 
 public class ButtonConfig extends Config {
 
@@ -8,7 +12,7 @@ public class ButtonConfig extends Config {
     private String label;
     private String tint;
 
-    public ButtonConfig (TYPE id, @Nullable Boolean enabled, @Nullable String icon, @Nullable String label, @Nullable String tint) {
+    public ButtonConfig (CONFIG_TYPE id, @Nullable Boolean enabled, @Nullable String icon, @Nullable String label, @Nullable String tint) {
         super(id);
         if (enabled != null) {
             setEnabled(enabled);
@@ -18,12 +22,18 @@ public class ButtonConfig extends Config {
         this.tint = tint;
     }
 
-    public String getIcon() {
+    public String getIconName() {
         return icon;
     }
 
-    public void setIcon(String icon) {
+    public void setIconName(String icon) {
         this.icon = icon;
+    }
+
+    @Nullable
+    public Drawable getIcon() {
+        Drawable drawable = RessourceUtils.getImageRessource(this.icon);
+        return drawable;
     }
 
     public String getLabel() {

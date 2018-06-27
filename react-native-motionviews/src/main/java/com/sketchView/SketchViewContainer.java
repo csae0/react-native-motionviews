@@ -44,6 +44,7 @@ import at.csae0.reactnative.model.GeneralConfig;
 import at.csae0.reactnative.model.PickerConfig;
 import at.csae0.reactnative.model.SizeConfig;
 import at.csae0.reactnative.utils.ConfigManager;
+import team.uptech.motionviews.utils.CONFIG_TYPE;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.widget.Interfaces.OnMoveGestureListener;
 import team.uptech.motionviews.widget.Interfaces.SketchViewCallback;
@@ -156,7 +157,54 @@ public class SketchViewContainer extends RelativeLayout {
 
                @Override
                public void applyButtonConfigs(ArrayList<ButtonConfig> buttonConfigs) {
+                   if (buttonConfigs != null) {
+                       for (ButtonConfig config : buttonConfigs) {
+                           if (config != null) {
+                               switch (config.getId()) {
+                                   case CANCEL_BUTTON_CONFIG:
+                                       if (cancel != null) {
+                                           if (config.hasLabel()) {
+                                               cancel.setText(config.getLabel());
+                                           }
+                                           if (config.hasIcon()) {
+                                               cancel.setBackground(config.getIcon());
+                                           }
+                                       }
+                                       break;
+                                   case CLEAR_BUTTON_CONFIG:
+                                       if (clear != null) {
 
+                                       }
+                                       break;
+                                   case SAVE_BUTTON_CONFIG:
+                                       if (save != null) {
+
+                                       }
+                                       break;
+                                   case PEN_TOOL_CONFIG:
+                                       if (pen != null) {
+
+                                       }
+                                       break;
+                                   case ERASE_TOOL_CONFIG:
+                                       if (eraser != null) {
+
+                                       }
+                                       break;
+                                   case CIRCLE_TOOL_CONFIG:
+                                       if (circle != null) {
+
+                                       }
+                                       break;
+                                   case ARROW_TOOL_CONFIG:
+                                       if (arrow != null) {
+
+                                       }
+                                       break;
+                               }
+                           }
+                       }
+                   }
                }
            });
         }

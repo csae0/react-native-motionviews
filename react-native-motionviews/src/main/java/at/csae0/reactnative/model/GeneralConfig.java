@@ -2,14 +2,14 @@ package at.csae0.reactnative.model;
 
 import android.support.annotation.Nullable;
 
-import java.util.ArrayList;
+import team.uptech.motionviews.utils.CONFIG_TYPE;
 
 public class GeneralConfig extends Config {
 
     private String backgroundImage, imageSaveName, fontFamily;
 
     public GeneralConfig (@Nullable String backgroundImage, @Nullable String imageSaveName, @Nullable String fontFamily) {
-        super(TYPE.GENERAL_CONFIG, true);
+        super(CONFIG_TYPE.GENERAL_CONFIG, true);
         this.backgroundImage = backgroundImage;
         this.imageSaveName = imageSaveName;
         this.fontFamily = fontFamily;

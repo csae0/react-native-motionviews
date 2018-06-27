@@ -3,12 +3,14 @@ package at.csae0.reactnative.model;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
 
+import team.uptech.motionviews.utils.CONFIG_TYPE;
+
 public class SizeConfig extends Config {
 
     private Integer backgroundColor, progressColor, min, max, initialValue, step;
 
     public SizeConfig (@Nullable Boolean enabled, @Nullable String backgroundColor, @Nullable String progressColor, @Nullable Integer min, @Nullable Integer max, @Nullable Integer initialValue, @Nullable Integer step) {
-        super(TYPE.SIZE_CONFIG);
+        super(CONFIG_TYPE.SIZE_CONFIG);
         if (enabled != null) {
             setEnabled(enabled);
         }

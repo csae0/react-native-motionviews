@@ -76,8 +76,8 @@ public class ArrowSketchTool extends GestureDetectorSketchTool implements ToolCo
 
         private void createArrowPath (MotionEvent event) {
             PointF top = getNewTop(event);
-            PointF leftArrowStrokeTop = getArrowStrokeTop(tail, top, 0 - (ARROW_TOP_ANGEL_FROM_BODY + 90));
-            PointF rightArrowStrokeTop = getArrowStrokeTop(tail, top, 0 + (ARROW_TOP_ANGEL_FROM_BODY - 90));
+            PointF leftArrowStrokeTop = getArrowStrokeTop(tail, top, -(ARROW_TOP_ANGEL_FROM_BODY + 90));
+            PointF rightArrowStrokeTop = getArrowStrokeTop(tail, top, ARROW_TOP_ANGEL_FROM_BODY - 90);
             path.moveTo(tail.x, tail.y);
             path.lineTo(top.x, top.y);
             path.lineTo(leftArrowStrokeTop.x, leftArrowStrokeTop.y);

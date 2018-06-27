@@ -1,25 +1,21 @@
 package at.csae0.reactnative.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import team.uptech.motionviews.utils.CONFIG_TYPE;
 
 public abstract class Config {
 
-    private TYPE id;
+    private CONFIG_TYPE id;
     private boolean enabled;
 
-    public Config (TYPE id) {
+    public Config (CONFIG_TYPE id) {
         this(id, true);
     }
-    public Config (TYPE id, boolean enabled) {
+    public Config (CONFIG_TYPE id, boolean enabled) {
         this.id = id;
         this.enabled = enabled;
     }
 
-    public TYPE getId() {
+    public CONFIG_TYPE getId() {
         return id;
     }
 

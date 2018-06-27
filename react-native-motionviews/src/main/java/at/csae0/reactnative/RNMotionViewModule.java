@@ -14,10 +14,15 @@ import team.uptech.motionviews.ui.MotionViewsActivity;
 
 public class RNMotionViewModule extends ReactContextBaseJavaModule {
     public static final String OPTIONS_ID = "OPTIONS";
+    private static ReactApplicationContext reactApplicationContext = null;
+
+    public static ReactApplicationContext getReactContext () {
+        return reactApplicationContext;
+    }
 
     public RNMotionViewModule(ReactApplicationContext reactContext) {
         super(reactContext);
-
+        reactApplicationContext = reactContext;
     }
 
     @ReactMethod
