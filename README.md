@@ -1,3 +1,27 @@
+# react-native-motionviews
+
+## Code Guide : 
+
+Use MotionViews-Android in react native
+
+## Settings: 
+
+check out config object structure in index.js
+
+## Installation: 
+
+To use button icons use font linking syntax (since react-native link only links fonts i used https://github.com/unimonkiez/react-native-asset to perform asset linking):
+
+  "rnpm": {
+    "assets": [
+      "./fonts",
+      "./App/Images/Icons"
+    ]
+  }
+
+
+
+
 # MotionViews-Android
 
 ![alt tag](http://i.giphy.com/3o7TKJhBZiimAe6JDG.gif)
