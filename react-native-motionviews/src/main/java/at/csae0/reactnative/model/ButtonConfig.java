@@ -1,5 +1,6 @@
 package at.csae0.reactnative.model;
 
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 
@@ -32,8 +33,13 @@ public class ButtonConfig extends Config {
 
     @Nullable
     public Drawable getIcon() {
-        Drawable drawable = RessourceUtils.getImageRessource(this.icon);
-        return drawable;
+        if (this.icon != null) {
+            String[] icon = this.icon.split("\\.");
+            if (icon.length == 2) {
+                return RessourceUtils.getImageAsset(icon[0], icon[1]);
+            }
+        }
+        return null;
     }
 
     public String getLabel() {
@@ -42,6 +48,14 @@ public class ButtonConfig extends Config {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    @Nullable
+    public Integer getTintColor() {
+        if (tint != null) {
+            return Color.parseColor(tint);
+        }
+        return null;
     }
 
     public String getTint() {
@@ -53,8 +67,15 @@ public class ButtonConfig extends Config {
     }
 
     public boolean hasIcon() {
-        return icon != null;
+        if (this.icon != null) {
+            String[] icon = this.icon.split("\\.");
+            if (icon.length == 2) {
+                return RessourceUtils.getImageAsset(icon[0], icon[1]) != null;
+            }
+        }
+        return false;
     }
+
     public boolean hasLabel() {
         return label != null;
     }

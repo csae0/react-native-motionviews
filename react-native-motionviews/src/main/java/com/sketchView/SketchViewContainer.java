@@ -18,6 +18,8 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -160,47 +162,53 @@ public class SketchViewContainer extends RelativeLayout {
                    if (buttonConfigs != null) {
                        for (ButtonConfig config : buttonConfigs) {
                            if (config != null) {
+                               Button tempButton = null;
+
                                switch (config.getId()) {
                                    case CANCEL_BUTTON_CONFIG:
-                                       if (cancel != null) {
-                                           if (config.hasLabel()) {
-                                               cancel.setText(config.getLabel());
-                                           }
-                                           if (config.hasIcon()) {
-                                               cancel.setBackground(config.getIcon());
-                                           }
-                                       }
+                                       tempButton = cancel;
                                        break;
                                    case CLEAR_BUTTON_CONFIG:
-                                       if (clear != null) {
-
-                                       }
+                                       tempButton = clear;
                                        break;
                                    case SAVE_BUTTON_CONFIG:
-                                       if (save != null) {
-
-                                       }
+                                       tempButton = save;
                                        break;
                                    case PEN_TOOL_CONFIG:
-                                       if (pen != null) {
-
-                                       }
+                                       tempButton = pen;
                                        break;
                                    case ERASE_TOOL_CONFIG:
-                                       if (eraser != null) {
-
-                                       }
+                                       tempButton = eraser;
                                        break;
                                    case CIRCLE_TOOL_CONFIG:
-                                       if (circle != null) {
-
-                                       }
+                                       tempButton = circle;
                                        break;
                                    case ARROW_TOOL_CONFIG:
-                                       if (arrow != null) {
-
-                                       }
+                                       tempButton = arrow;
                                        break;
+                               }
+
+                               if (tempButton != null) {
+                                   if (config.hasEnabled() && config.isEnabled()) {
+                                       if (config.hasLabel() && !config.hasIcon()) {
+                                           cancel.setText(config.getLabel());
+                                       }
+                                       if (config.hasIcon()) {
+                                           cancel.setText("");
+                                           cancel.setBackground(config.getIcon());
+                                           ViewGroup.LayoutParams layoutParams = cancel.getLayoutParams();
+                                           layoutParams.width = layoutParams.height;
+                                           cancel.setLayoutParams(layoutParams);
+                                           cancel.setPadding(0,0,0,0);
+                                       }
+
+                                       if (config.hasTint()) {
+                                           cancel.setBackgroundTintList(ColorStateList.valueOf(config.getTintColor()));
+                                       }
+                                   } else {
+                                       cancel.setAlpha(0);
+                                       cancel.setEnabled(false);
+                                   }
                                }
                            }
                        }

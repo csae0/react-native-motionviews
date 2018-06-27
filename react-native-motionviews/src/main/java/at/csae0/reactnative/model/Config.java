@@ -5,7 +5,7 @@ import team.uptech.motionviews.utils.CONFIG_TYPE;
 public abstract class Config {
 
     private CONFIG_TYPE id;
-    private boolean enabled;
+    private Boolean enabled;
 
     public Config (CONFIG_TYPE id) {
         this(id, true);
@@ -25,5 +25,9 @@ public abstract class Config {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean hasEnabled() {
+        return enabled != null;
     }
 }

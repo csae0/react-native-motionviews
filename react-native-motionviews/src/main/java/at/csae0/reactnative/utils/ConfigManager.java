@@ -139,10 +139,22 @@ public class ConfigManager {
                 for (Bundle buttonBundle : buttonBundlesArray) {
                     ButtonConfig buttonConfig;
                     if (buttonBundle != null) {
+
+                        Bundle icon = buttonBundle.getBundle("icon");
+                        String iconString = null;
+                        if (icon != null) {
+                            String iconName = icon.getString("name", null);
+                            String iconExtension = icon.getString("extension", null);
+
+                            if (iconName != null && iconExtension != null) {
+                                iconString = iconName + "." + iconExtension;
+                            }
+                        }
+
                         buttonConfig = new ButtonConfig(
                                 CONFIG_TYPE.get(buttonBundle.getString("id")),
                                 buttonBundle.getBoolean("enabled", true),
-                                buttonBundle.getString("icon", null),
+                                iconString,
                                 buttonBundle.getString("label", null),
                                 buttonBundle.getString("tint", null)
                         );
