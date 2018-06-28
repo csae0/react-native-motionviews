@@ -3,10 +3,12 @@ package com.sketchView;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -42,12 +44,14 @@ import at.csae0.reactnative.R;
 import at.csae0.reactnative.interfaces.ConfigActions;
 import at.csae0.reactnative.model.ButtonConfig;
 import at.csae0.reactnative.model.ColorConfig;
+import at.csae0.reactnative.model.Config;
 import at.csae0.reactnative.model.GeneralConfig;
 import at.csae0.reactnative.model.PickerConfig;
 import at.csae0.reactnative.model.SizeConfig;
 import at.csae0.reactnative.utils.ConfigManager;
 import team.uptech.motionviews.utils.CONFIG_TYPE;
 import team.uptech.motionviews.utils.ConversionUtils;
+import team.uptech.motionviews.utils.RessourceUtils;
 import team.uptech.motionviews.widget.Interfaces.OnMoveGestureListener;
 import team.uptech.motionviews.widget.Interfaces.SketchViewCallback;
 
@@ -163,51 +167,60 @@ public class SketchViewContainer extends RelativeLayout {
                        for (ButtonConfig config : buttonConfigs) {
                            if (config != null) {
                                Button tempButton = null;
+                               Drawable defaultDrawable = null;
+                               if (config.getId() != null) {
+                                   switch (config.getId()) {
+                                       case CANCEL_BUTTON_CONFIG:
+                                           tempButton = cancel;
+                                           defaultDrawable = RessourceUtils.getImageRessource("ic_close");
+                                           break;
+                                       case CLEAR_BUTTON_CONFIG:
+                                           tempButton = clear;
+                                           defaultDrawable = RessourceUtils.getImageRessource("ic_clear");
+                                           break;
+                                       case SAVE_BUTTON_CONFIG:
+                                           tempButton = save;
+                                           defaultDrawable = RessourceUtils.getImageRessource("ic_check");
+                                           break;
+                                       case PEN_TOOL_CONFIG:
+                                           tempButton = pen;
+                                           defaultDrawable = RessourceUtils.getImageRessource("ic_pen_tool");
+                                           break;
+                                       case ERASE_TOOL_CONFIG:
+                                           tempButton = eraser;
+                                           defaultDrawable = RessourceUtils.getImageRessource("ic_erase_tool");
+                                           break;
+                                       case CIRCLE_TOOL_CONFIG:
+                                           tempButton = circle;
+                                           defaultDrawable = RessourceUtils.getImageRessource("ic_circle_tool");
+                                           break;
+                                       case ARROW_TOOL_CONFIG:
+                                           tempButton = arrow;
+                                           defaultDrawable = RessourceUtils.getImageRessource("ic_arrow_tool");
+                                           break;
+                                       default:
+                                   }
 
-                               switch (config.getId()) {
-                                   case CANCEL_BUTTON_CONFIG:
-                                       tempButton = cancel;
-                                       break;
-                                   case CLEAR_BUTTON_CONFIG:
-                                       tempButton = clear;
-                                       break;
-                                   case SAVE_BUTTON_CONFIG:
-                                       tempButton = save;
-                                       break;
-                                   case PEN_TOOL_CONFIG:
-                                       tempButton = pen;
-                                       break;
-                                   case ERASE_TOOL_CONFIG:
-                                       tempButton = eraser;
-                                       break;
-                                   case CIRCLE_TOOL_CONFIG:
-                                       tempButton = circle;
-                                       break;
-                                   case ARROW_TOOL_CONFIG:
-                                       tempButton = arrow;
-                                       break;
-                               }
+                                   if (tempButton != null) {
+                                       if (config.hasEnabled() && config.isEnabled()) {
+                                           if (config.hasLabel() && !config.hasIcon()) {
+                                               tempButton.setText(config.getLabel());
+                                           }
+                                           if (config.hasIcon() || defaultDrawable != null) {
+                                               tempButton.setText("");
+                                               tempButton.setBackground(config.hasIcon() ? config.getIcon() : defaultDrawable);
+                                               ViewGroup.LayoutParams layoutParams = tempButton.getLayoutParams();
+                                               layoutParams.width = layoutParams.height;
+                                               tempButton.setLayoutParams(layoutParams);
+                                               tempButton.setPadding(0, 0, 0, 0);
+                                           }
 
-                               if (tempButton != null) {
-                                   if (config.hasEnabled() && config.isEnabled()) {
-                                       if (config.hasLabel() && !config.hasIcon()) {
-                                           cancel.setText(config.getLabel());
+                                           if (config.hasTint()) {
+                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(config.getTintColor()));
+                                           }
+                                       } else if (tempButton.getParent() != null) {
+                                           ((LinearLayout) tempButton.getParent()).removeView(tempButton);
                                        }
-                                       if (config.hasIcon()) {
-                                           cancel.setText("");
-                                           cancel.setBackground(config.getIcon());
-                                           ViewGroup.LayoutParams layoutParams = cancel.getLayoutParams();
-                                           layoutParams.width = layoutParams.height;
-                                           cancel.setLayoutParams(layoutParams);
-                                           cancel.setPadding(0,0,0,0);
-                                       }
-
-                                       if (config.hasTint()) {
-                                           cancel.setBackgroundTintList(ColorStateList.valueOf(config.getTintColor()));
-                                       }
-                                   } else {
-                                       cancel.setAlpha(0);
-                                       cancel.setEnabled(false);
                                    }
                                }
                            }

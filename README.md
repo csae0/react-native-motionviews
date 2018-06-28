@@ -10,7 +10,7 @@ check out config object structure in index.js
 
 ## Installation: 
 
-To use button icons use font linking syntax (since react-native link only links fonts i used https://github.com/unimonkiez/react-native-asset to perform asset linking):
+To use button icons use font linking syntax (since react-native link only links fonts i used https://github.com/csae0/react-native-asset#filterAndRename to perform asset linking):
 
   "rnpm": {
     "assets": [

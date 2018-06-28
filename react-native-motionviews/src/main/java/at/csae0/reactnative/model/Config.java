@@ -1,9 +1,10 @@
 package at.csae0.reactnative.model;
 
+import android.support.annotation.Nullable;
+
 import team.uptech.motionviews.utils.CONFIG_TYPE;
 
 public abstract class Config {
-
     private CONFIG_TYPE id;
     private Boolean enabled;
 
@@ -15,6 +16,7 @@ public abstract class Config {
         this.enabled = enabled;
     }
 
+    @Nullable
     public CONFIG_TYPE getId() {
         return id;
     }

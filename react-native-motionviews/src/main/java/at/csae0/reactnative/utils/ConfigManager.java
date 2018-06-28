@@ -12,9 +12,9 @@ import at.csae0.reactnative.model.GeneralConfig;
 import at.csae0.reactnative.model.PickerConfig;
 import at.csae0.reactnative.model.SizeConfig;
 import team.uptech.motionviews.utils.CONFIG_TYPE;
+import team.uptech.motionviews.utils.RessourceUtils;
 
 public class ConfigManager {
-
     private static ConfigManager instance = null;
 
     private GeneralConfig generalConfig = null;
@@ -100,7 +100,7 @@ public class ConfigManager {
                     if (pickerConfigBundle != null) {
                         pickerConfig = new PickerConfig(
                                 pickerConfigBundle.getBoolean("enabled", true),
-                                pickerConfigBundle.getString("icon", null),
+                                buildIconNameFromBundle(pickerConfigBundle.getBundle("icon")),
                                 pickerConfigBundle.getString("pickerLabel", null),
                                 pickerConfigBundle.getString("submitText", null),
                                 pickerConfigBundle.getString("cancelText", null)
@@ -139,22 +139,10 @@ public class ConfigManager {
                 for (Bundle buttonBundle : buttonBundlesArray) {
                     ButtonConfig buttonConfig;
                     if (buttonBundle != null) {
-
-                        Bundle icon = buttonBundle.getBundle("icon");
-                        String iconString = null;
-                        if (icon != null) {
-                            String iconName = icon.getString("name", null);
-                            String iconExtension = icon.getString("extension", null);
-
-                            if (iconName != null && iconExtension != null) {
-                                iconString = iconName + "." + iconExtension;
-                            }
-                        }
-
                         buttonConfig = new ButtonConfig(
                                 CONFIG_TYPE.get(buttonBundle.getString("id")),
                                 buttonBundle.getBoolean("enabled", true),
-                                iconString,
+                                buildIconNameFromBundle(buttonBundle.getBundle("icon")),
                                 buttonBundle.getString("label", null),
                                 buttonBundle.getString("tint", null)
                         );
@@ -171,5 +159,23 @@ public class ConfigManager {
                 }
             }
         }
+    }
+
+    @Nullable
+    private String buildIconNameFromBundle(Bundle icon) {
+        String iconString = null;
+        if (icon != null) {
+
+            String iconName = icon.getString("name", null);
+            if (iconName != null) {
+                iconString = RessourceUtils.rename(iconName);
+            }
+
+            String iconExtension = icon.getString("extension", null);
+            if (iconName != null && iconExtension != null) {
+                iconString += "." + iconExtension;
+            }
+        }
+        return iconString;
     }
 }

@@ -1,5 +1,7 @@
 package team.uptech.motionviews.utils;
 
+import android.support.annotation.Nullable;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -57,7 +59,9 @@ public enum CONFIG_TYPE {
         ENUM_MAP = Collections.unmodifiableMap(map);
     }
 
+    @Nullable
     public static CONFIG_TYPE get (String name) {
-        return ENUM_MAP.get(name);
+        CONFIG_TYPE type = ENUM_MAP.get(name);
+        return type;
     }
 }

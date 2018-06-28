@@ -55,4 +55,13 @@ public class RessourceUtils {
         }
         return null;
     }
+
+    // replace file name characters and react-native image name conventions that do not match android naming conventions
+    @Nullable
+    public static String rename (@Nullable String name) {
+        if (name != null) {
+            return name.replace("-","_").replaceAll("@[0-9]x|@[0-9],5x","");
+        }
+        return null;
+    }
 }
