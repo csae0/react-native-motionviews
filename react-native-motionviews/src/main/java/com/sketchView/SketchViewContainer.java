@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -69,7 +70,8 @@ public class SketchViewContainer extends RelativeLayout {
 
     private LinearLayout colorPickerContainer;
     private BoxedVertical boxedVertical;
-    private LinearLayout buttons;
+    private RelativeLayout buttons;
+    private LinearLayout toolButtons;
     private Button cancel, clear, save, pen, eraser, circle, arrow, colorPalette;
 
     private PickerConfig pickerConfig;
@@ -210,7 +212,7 @@ public class SketchViewContainer extends RelativeLayout {
                                                tempButton.setText("");
                                                tempButton.setBackground(config.hasIcon() ? config.getIcon() : defaultDrawable);
                                                ViewGroup.LayoutParams layoutParams = tempButton.getLayoutParams();
-                                               layoutParams.width = layoutParams.height;
+                                               layoutParams.width = layoutParams.height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
                                                tempButton.setLayoutParams(layoutParams);
                                                tempButton.setPadding(0, 0, 0, 0);
                                            }
@@ -263,7 +265,7 @@ public class SketchViewContainer extends RelativeLayout {
         sketchView.setOnTouchListener(new OnTouchListener() {
             MoveGestureDetector moveDetector = new MoveGestureDetector(context, new OnMoveGestureListener() {
                 boolean visible = true;
-                View[] views = new View[]{ colorPickerContainer, boxedVertical, buttons };
+                View[] views = new View[]{ colorPickerContainer, boxedVertical, buttons, toolButtons };
                 @Override
                 public boolean onMove(MoveGestureDetector detector) {
                     return false;
@@ -355,18 +357,21 @@ public class SketchViewContainer extends RelativeLayout {
 //            }
 //        });
 
-        buttons = new LinearLayout(context);
+        buttons = new RelativeLayout(context);
         buttons.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        buttons.setOrientation(LinearLayout.VERTICAL);
-        
-        LinearLayout editButtons = new LinearLayout(context);
-        editButtons.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        editButtons.setGravity(Gravity.RIGHT);
-        editButtons.addView(cancel);
-        editButtons.addView(clear);
-        editButtons.addView(save);
-//        buttons.addView(box);
 
+        LinearLayout editButtonsRight = new LinearLayout(context);
+        RelativeLayout.LayoutParams containerLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        containerLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        editButtonsRight.setLayoutParams(containerLayoutParams);
+        editButtonsRight.addView(clear);
+        editButtonsRight.addView(save);
+
+        LinearLayout editButtonsLeft = new LinearLayout(context);
+        containerLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        containerLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        editButtonsLeft.setLayoutParams(containerLayoutParams);
+        editButtonsLeft.addView(cancel);
 
         pen = new Button(context);
         pen.setLayoutParams(layoutParams);
@@ -408,30 +413,35 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
 
-        LinearLayout toolButtons = new LinearLayout(context);
-        toolButtons.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        toolButtons.setGravity(Gravity.RIGHT);
+        toolButtons = new LinearLayout(context);
+        layoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        layoutParams.topMargin = height * 2;
+        toolButtons.setLayoutParams(layoutParams);
+        toolButtons.setOrientation(LinearLayout.VERTICAL);
         toolButtons.addView(pen);
         toolButtons.addView(eraser);
         toolButtons.addView(circle);
         toolButtons.addView(arrow);
 
-        buttons.addView(editButtons);
-        buttons.addView(toolButtons);
+        buttons.addView(editButtonsRight);
+        buttons.addView(editButtonsLeft);
+
         addView(buttons);
+        addView(toolButtons);
     }
     private void addToolThicknessSlider (Context context) {
         // boxed vertical seekbar
         boxedVertical = new BoxedVertical(context);
 
         int width = getResources().getDimensionPixelOffset(R.dimen.slider_width);
-        int paddingHorizontal = getResources().getDimensionPixelOffset(R.dimen.padding);
-        int paddingVertical = getResources().getDimensionPixelOffset(R.dimen.color_picker_height_and_padding);
+        int marginHorizontal = getResources().getDimensionPixelOffset(R.dimen.padding);
+        int marginVertical = getResources().getDimensionPixelOffset(R.dimen.color_picker_height_and_padding);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(width, RelativeLayout.LayoutParams.MATCH_PARENT);
-        layoutParams.leftMargin = paddingHorizontal;
-        layoutParams.rightMargin = paddingHorizontal;
-        layoutParams.topMargin = paddingVertical * 2;
-        layoutParams.bottomMargin = paddingVertical;
+        layoutParams.leftMargin = marginHorizontal;
+        layoutParams.rightMargin = marginHorizontal;
+        layoutParams.topMargin = marginVertical * 2;
+        layoutParams.bottomMargin = marginVertical;
         layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
         boxedVertical.setLayoutParams(layoutParams);
 
