@@ -13,6 +13,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.graphics.ColorUtils;
 import android.util.Base64;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -73,7 +74,7 @@ public class SketchViewContainer extends RelativeLayout {
     private RelativeLayout buttons;
     private LinearLayout toolButtons;
     private Button cancel, clear, save, pen, eraser, circle, arrow, colorPalette;
-
+    private Integer penTint, eraserTint, circleTint, arrowTint;
     private PickerConfig pickerConfig;
 
     private boolean colorPickerContainerEnabled;
@@ -89,6 +90,7 @@ public class SketchViewContainer extends RelativeLayout {
         buttons = null;
         cancel = clear = save = pen = eraser = circle = arrow = colorPalette = null;
 
+        penTint = eraserTint = circleTint = arrowTint = null;
 
         pickerConfig = null;
 
@@ -187,18 +189,34 @@ public class SketchViewContainer extends RelativeLayout {
                                        case PEN_TOOL_CONFIG:
                                            tempButton = pen;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_pen_tool");
+                                           if (config.hasTint()) {
+                                               penTint = config.getTintColor();
+                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(penTint));
+                                           }
                                            break;
                                        case ERASE_TOOL_CONFIG:
                                            tempButton = eraser;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_erase_tool");
+                                           if (config.hasTint()) {
+                                               eraserTint = config.getTintColor();
+                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(eraserTint));
+                                           }
                                            break;
                                        case CIRCLE_TOOL_CONFIG:
                                            tempButton = circle;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_circle_tool");
+                                           if (config.hasTint()) {
+                                               circleTint = config.getTintColor();
+                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(circleTint));
+                                           }
                                            break;
                                        case ARROW_TOOL_CONFIG:
                                            tempButton = arrow;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_arrow_tool");
+                                           if (config.hasTint()) {
+                                               arrowTint = config.getTintColor();
+                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(arrowTint));
+                                           }
                                            break;
                                        default:
                                    }
@@ -215,10 +233,6 @@ public class SketchViewContainer extends RelativeLayout {
                                                layoutParams.width = layoutParams.height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
                                                tempButton.setLayoutParams(layoutParams);
                                                tempButton.setPadding(0, 0, 0, 0);
-                                           }
-
-                                           if (config.hasTint()) {
-                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(config.getTintColor()));
                                            }
                                        } else if (tempButton.getParent() != null) {
                                            ((LinearLayout) tempButton.getParent()).removeView(tempButton);
@@ -564,7 +578,6 @@ public class SketchViewContainer extends RelativeLayout {
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(15) // magic number
                 .setPositiveButton(hasPickerConfig && pickerConfig.hasSubmitText() ? pickerConfig.getSubmitText() : getResources().getString(R.string.ok), new ColorPickerClickListener() {
-                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
                         if (sketchView != null) {
@@ -604,15 +617,59 @@ public class SketchViewContainer extends RelativeLayout {
         if (colorPalette != null) {
             colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(color))); // min API 21 needed TODO: find solution
         }
+        setToolSelectionIndicator(sketchView.getSelectedTool());
     }
 
     public void setToolType(int type) {
         if (sketchView != null) {
             sketchView.setToolType(type);
+            setToolSelectionIndicator(type);
             setColorPickerContainerEnabled(type != SketchTool.TYPE_ERASE);
         }
     }
 
+    private void setToolSelectionIndicator (int type) {
+        Button[] toolButtons = new Button[]{pen, eraser, circle, arrow};
+        Integer[] toolButtonTints = new Integer[]{penTint, eraserTint, circleTint, arrowTint};
+        for (int i = 0; i < toolButtons.length; i++) {
+            if (toolButtons[i] != null) {
+                if (toolButtonTints[i] != null) {
+                    toolButtons[i].setBackgroundTintList(ColorStateList.valueOf(toolButtonTints[i]));
+                } else {
+                    toolButtons[i].setBackgroundTintList(null);
+                }
+            }
+        }
+
+        switch (type) {
+            case SketchTool.TYPE_PEN:
+//                int selectionTint = ConversionUtils.mixColors
+                pen.setBackgroundTintList(createColorStateList(sketchView.getToolColor(), penTint));
+                break;
+            case SketchTool.TYPE_ERASE:
+                eraser.setBackgroundTintList(createColorStateList(sketchView.getToolColor(), eraserTint));
+                break;
+            case SketchTool.TYPE_CIRCLE:
+                circle.setBackgroundTintList(createColorStateList(sketchView.getToolColor(), circleTint));
+                break;
+            case SketchTool.TYPE_ARROW:
+                arrow.setBackgroundTintList(createColorStateList(sketchView.getToolColor(), arrowTint));
+                break;
+        }
+    }
+
+    @Nullable
+    private ColorStateList createColorStateList(@Nullable Integer toolColor, @Nullable Integer baseTint) {
+        Integer resultColor = null;
+        if (toolColor != null && baseTint != null) {
+            resultColor = ConversionUtils.getToolSelectionIndicatorColor(ConversionUtils.transformAlphaUpperTwoThirds(toolColor), baseTint);
+        }
+
+        if (resultColor != null) {
+            return ColorStateList.valueOf(resultColor);
+        }
+        return null;
+    }
     public void setColorPickerContainerEnabled (boolean enabled) {
         View[] views = new View[]{ colorPickerContainer };
         if (enabled != colorPickerContainerEnabled) {

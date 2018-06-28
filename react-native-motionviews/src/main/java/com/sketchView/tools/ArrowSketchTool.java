@@ -74,7 +74,12 @@ public class ArrowSketchTool extends GestureDetectorSketchTool implements ToolCo
             touchView.invalidate();
         }
 
-        private void createArrowPath (MotionEvent event) {
+    @Override
+    public int getTypeId() {
+        return TYPE_ARROW;
+    }
+
+    private void createArrowPath (MotionEvent event) {
             PointF top = getNewTop(event);
             PointF leftArrowStrokeTop = getArrowStrokeTop(tail, top, -(ARROW_TOP_ANGEL_FROM_BODY + 90));
             PointF rightArrowStrokeTop = getArrowStrokeTop(tail, top, ARROW_TOP_ANGEL_FROM_BODY - 90);

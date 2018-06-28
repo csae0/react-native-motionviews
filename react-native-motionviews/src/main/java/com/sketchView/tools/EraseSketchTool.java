@@ -38,6 +38,11 @@ public class EraseSketchTool extends PathTrackingSketchTool implements ToolThick
     }
 
     @Override
+    public int getTypeId() {
+        return TYPE_ERASE;
+    }
+
+    @Override
     public void setToolThickness(float thickness) {
         toolThickness = thickness;
         paint.setStrokeWidth(ToolUtils.ConvertDPToPixels(touchView.getContext(), toolThickness));

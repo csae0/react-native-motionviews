@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.view.View;
 
 import com.sketchView.tools.Blueprints.PathTrackingSketchTool;
+import com.sketchView.tools.Blueprints.SketchTool;
 import com.sketchView.tools.Blueprints.ToolColor;
 import com.sketchView.tools.Blueprints.ToolThickness;
 import com.sketchView.utils.ToolUtils;
@@ -43,6 +44,11 @@ public class PenSketchTool extends PathTrackingSketchTool implements ToolThickne
     }
 
     @Override
+    public int getTypeId() {
+        return TYPE_PEN;
+    }
+
+    @Override
     public void setToolThickness(float toolThickness) {
         this.toolThickness = toolThickness;
         paint.setStrokeWidth(ToolUtils.ConvertDPToPixels(touchView.getContext(), toolThickness));
@@ -63,4 +69,6 @@ public class PenSketchTool extends PathTrackingSketchTool implements ToolThickne
     public int getToolColor() {
         return toolColor;
     }
+
+
 }

@@ -9,7 +9,7 @@ public class PickerConfig extends Config {
     private Integer initialColor;
     private String icon, pickerLabel, cancelText, submitText;
 
-    public PickerConfig (@Nullable Boolean enabled, @Nullable String icon, @Nullable String pickerLabel, @Nullable String cancelText, @Nullable String submitText) {
+    public PickerConfig (@Nullable Boolean enabled, @Nullable String icon, @Nullable String pickerLabel, @Nullable String submitText, @Nullable String cancelText) {
         super(CONFIG_TYPE.PICKER_CONFIG);
         if (enabled != null) {
             setEnabled(enabled);

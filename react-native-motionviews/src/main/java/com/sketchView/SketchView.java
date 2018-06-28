@@ -395,6 +395,9 @@ public class SketchView extends View {
         invalidate();
     }
 
+    public int getSelectedTool() {
+        return currentTool.getTypeId();
+    }
     public int getToolColor() {
         return ((ToolColor) penTool).getToolColor();
     }

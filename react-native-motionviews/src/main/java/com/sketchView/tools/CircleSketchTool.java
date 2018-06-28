@@ -116,6 +116,11 @@ public class CircleSketchTool extends GestureDetectorSketchTool implements ToolC
         touchView.invalidate();
     }
 
+    @Override
+    public int getTypeId() {
+        return TYPE_CIRCLE;
+    }
+
     private float getNewRadius(MotionEvent event) {
         float newRadius = MathUtils.vectorLength(center, new PointF(event.getX(), event.getY()));
         return newRadius > minRadius ? newRadius : minRadius;

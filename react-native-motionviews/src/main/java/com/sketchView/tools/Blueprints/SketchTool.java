@@ -57,4 +57,5 @@ public abstract class SketchTool implements View.OnTouchListener {
 
     public abstract void onTouchCancel(MotionEvent event);
 
+    public abstract int getTypeId();
 }
