@@ -99,10 +99,6 @@ public class SketchViewContainer extends RelativeLayout {
         }
         return instance;
     }
-    /**
-     * Create Views
-     * @return
-     */
 
     /**
      * set config paramaters
@@ -112,7 +108,6 @@ public class SketchViewContainer extends RelativeLayout {
            ConfigManager.getInstance().apply(new ConfigActions() {
                @Override
                public void applyGeneralConfig(GeneralConfig config) {
-
                }
 
                @Override
@@ -120,21 +115,16 @@ public class SketchViewContainer extends RelativeLayout {
                    ColorConfig config = (ColorConfig) manager.getScreenConfig(SCREEN_TYPE, COLOR);
                    
                    if (config != null) {
-//                        private Integer initialColor;
-//                        private ArrayList<Integer> colors;
-//                        private PickerConfig pickerconfig;
                        if (config.hasInitialColor()) {
                            setToolColor(config.getInitialColor());
                        }
-
                        if (config.hasPickerConfig()) {
                            pickerConfig = config.getPickerconfig();
                        }
                    }
 
                    int colorCircleDiameter = getResources().getDimensionPixelSize(R.dimen.color_circle_diameter);
-                   addDynamicColorSelections(colorPickerContainer, colorPalette, colorCircleDiameter, config.getColors());
-
+                   addDynamicColorSelections(colorPickerContainer, colorCircleDiameter, config.getColors());
                }
 
                @Override
@@ -159,7 +149,6 @@ public class SketchViewContainer extends RelativeLayout {
                        }
                        if (config.hasInitialValue()) {
                            setToolThickness(config.getInitialValue());
-//                           boxedVertical.setValue((int) (sketchView != null ? sketchView.getToolThickness() : config.getInitialValue()));
                        }
                    }
                }
@@ -245,6 +234,7 @@ public class SketchViewContainer extends RelativeLayout {
            });
         }
     }
+
 
     // TODO: Merge redundant logic for edit settings (TextEditorDialogFragment, SketchViewContainer, (ImageEntity edit screen))
     private void createLayout(Context context) {
@@ -541,7 +531,7 @@ public class SketchViewContainer extends RelativeLayout {
         addView(colorPickerContainer);
     }
 
-    private void addDynamicColorSelections (LinearLayout colorPickerContainer, final Button colorPalette, int colorCircleDiameter, @Nullable ArrayList<String> colors) {
+    private void addDynamicColorSelections (LinearLayout colorPickerContainer, int colorCircleDiameter, @Nullable ArrayList<String> colors) {
         String[] defaultColors = {"#000000", "#20BBFC", "#2DFD2F", "#FD28F9", "#EA212E", "#FD7E24", "#FFFA38", "#FFFFFF"};
         Context context = colorPickerContainer.getContext();
         for (String color: (colors != null ? colors.toArray(new String[colors.size()]) : defaultColors)) {

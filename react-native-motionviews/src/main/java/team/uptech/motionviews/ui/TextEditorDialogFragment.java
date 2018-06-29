@@ -10,9 +10,11 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.text.Selection;
 import android.util.DisplayMetrics;
@@ -33,10 +35,22 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
+import java.util.ArrayList;
+
 import abak.tr.com.boxedverticalseekbar.BoxedVertical;
 import at.csae0.reactnative.R;
+import at.csae0.reactnative.interfaces.ConfigActions;
+import at.csae0.reactnative.interfaces.ConfigManagerActions;
+import at.csae0.reactnative.model.ButtonConfig;
+import at.csae0.reactnative.model.ColorConfig;
+import at.csae0.reactnative.model.GeneralConfig;
+import at.csae0.reactnative.model.PickerConfig;
+import at.csae0.reactnative.model.SizeConfig;
+import at.csae0.reactnative.utils.CONFIG_TYPE;
+import at.csae0.reactnative.utils.ConfigManager;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
+import team.uptech.motionviews.utils.RessourceUtils;
 import team.uptech.motionviews.widget.Interfaces.EditCallback;
 import team.uptech.motionviews.widget.Interfaces.Limits;
 
@@ -54,6 +68,8 @@ import team.uptech.motionviews.widget.Interfaces.Limits;
 // TODO: create view instead of fragment (like SketchViewContainer) --> create super class (abstract?) because all subclasses will be kind of the same
 public class TextEditorDialogFragment extends DialogFragment {
 
+    private static final CONFIG_TYPE SCREEN_TYPE = CONFIG_TYPE.TEXT_ENTITY_SCREEN;
+
     public static final String ARG_TEXT = "editor_text_arg";
     public static final String ARG_SIZE = "editor_size_arg";
     public static final String ARG_COLOR = "editor_color_arg";
@@ -61,6 +77,10 @@ public class TextEditorDialogFragment extends DialogFragment {
 
     protected EditText editText;
     protected FontProvider fontProvider;
+
+    private BoxedVertical boxedVertical;
+    private Button colorPalette, cancel, clear, save;
+    private PickerConfig pickerConfig;
 
     private EditCallback callback;
 
@@ -103,7 +123,6 @@ public class TextEditorDialogFragment extends DialogFragment {
         return inflater.inflate(R.layout.text_editor_layout, container, false);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -138,19 +157,123 @@ public class TextEditorDialogFragment extends DialogFragment {
         editText.setLayoutParams(layoutParams);
 
         // Slider values
-        BoxedVertical boxedVertical = view.findViewById(R.id.boxed_vertical);
+        boxedVertical = view.findViewById(R.id.boxed_vertical);
         boxedVertical.setValue(ConversionUtils.pxToDp(size));
 
-        createColorSelections(view, color);
+//        createColorSelections(view, color);
         addButtons(view);
         initListeners(view);
 
         initWithTextEntity(text);
 
-        editText.setTextColor(color);
+        setTextColor(color);
+
         if (fontProvider != null) {
             Typeface typeface = fontProvider.getTypeface(!typefaceName.equals("") || typefaceName != null ? typefaceName : fontProvider.getDefaultFontName());
             editText.setTypeface(typeface);
+        }
+
+        applyConfig(view);
+    }
+
+    private void applyConfig(final View view) {
+        if (ConfigManager.hasInstance()) {
+            ConfigManager.getInstance().apply(new ConfigActions() {
+                @Override
+                public void applyGeneralConfig(GeneralConfig config) {
+                    // TODO: do something with it
+                }
+
+                @Override
+                public void applyColorConfig(ConfigManagerActions manager) {
+                    ColorConfig config = (ColorConfig) manager.getScreenConfig(SCREEN_TYPE, COLOR);
+
+                    if (config != null) {
+                        if (config.hasInitialColor()) {
+                            setTextColor(config.getInitialColor());
+                        }
+                        if (config.hasPickerConfig()) {
+                            pickerConfig = config.getPickerconfig();
+                        }
+                    }
+
+                    int colorCircleDiameter = getResources().getDimensionPixelSize(R.dimen.color_circle_diameter);
+                    createColorSelections(view, colorCircleDiameter, config.getColors());
+                }
+
+                @Override
+                public void applySizeConfig(ConfigManagerActions manager) {
+                    SizeConfig config = (SizeConfig) manager.getScreenConfig(SCREEN_TYPE, SIZE);
+
+                    if (config != null) {
+                        if (config.hasBackgroundColor()) {
+                            boxedVertical.setBackgroundColor(config.getBackgroundColor());
+                        }
+                        if (config.hasProgrssColor()) {
+                            boxedVertical.setProgressPaint(config.getProgressColor());
+                        }
+                        if (config.hasMax()) {
+                            boxedVertical.setMax(config.getMax());
+                        }
+                        if (config.hasMin()) {
+                            boxedVertical.setMin(config.getMin());
+                        }
+                        if (config.hasStep()) {
+                            boxedVertical.setStep(config.getStep());
+                        }
+                        if (config.hasInitialValue()) {
+                            setTextSize(config.getInitialValue());
+                        }
+                    }
+                }
+
+                @Override
+                public void applyButtonConfigs(ArrayList<ButtonConfig> configs) {
+                    if (configs != null) {
+                        for (ButtonConfig config : configs) {
+                            if (config != null) {
+                                Button tempButton = null;
+                                Drawable defaultDrawable = null;
+                                if (config.getId() != null) {
+                                    switch (config.getId()) {
+                                        case CANCEL_BUTTON_CONFIG:
+                                            tempButton = cancel;
+                                            defaultDrawable = RessourceUtils.getImageRessource("ic_close");
+                                            break;
+                                        case CLEAR_BUTTON_CONFIG:
+                                            tempButton = clear;
+                                            defaultDrawable = RessourceUtils.getImageRessource("ic_clear");
+                                            break;
+                                        case SAVE_BUTTON_CONFIG:
+                                            tempButton = save;
+                                            defaultDrawable = RessourceUtils.getImageRessource("ic_check");
+                                            break;
+                                        default:
+                                    }
+
+                                    if (tempButton != null) {
+                                        if (config.hasEnabled() && config.isEnabled()) {
+                                            if (config.hasLabel() && !config.hasIcon()) {
+                                                tempButton.setText(config.getLabel());
+                                            }
+                                            if (config.hasIcon() || defaultDrawable != null) {
+                                                tempButton.setText("");
+                                                tempButton.setBackground(config.hasIcon() ? config.getIcon() : defaultDrawable);
+                                                ViewGroup.LayoutParams layoutParams = tempButton.getLayoutParams();
+                                                layoutParams.width = layoutParams.height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
+                                                tempButton.setLayoutParams(layoutParams);
+                                                tempButton.setPadding(0, 0, 0, 0);
+                                            }
+                                        } else if (tempButton.getParent() != null) {
+                                            ((LinearLayout) tempButton.getParent()).removeView(tempButton);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -160,7 +283,7 @@ public class TextEditorDialogFragment extends DialogFragment {
         int padding = getResources().getDimensionPixelOffset(R.dimen.padding);
         int height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
 
-        Button cancel = new Button(context);
+        cancel = new Button(context);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, height);
         layoutParams.topMargin = padding;
         layoutParams.bottomMargin = padding;
@@ -178,7 +301,7 @@ public class TextEditorDialogFragment extends DialogFragment {
             }
         });
 
-        Button clear = new Button(context);
+        clear = new Button(context);
         clear.setLayoutParams(layoutParams);
         clear.setText("CLEAR");
         clear.setOnClickListener(new View.OnClickListener() {
@@ -190,7 +313,7 @@ public class TextEditorDialogFragment extends DialogFragment {
             }
         });
 
-        Button save = new Button(context);
+        save = new Button(context);
         save.setLayoutParams(layoutParams);
         save.setText("SAVE");
         save.setOnClickListener(new View.OnClickListener() {
@@ -236,7 +359,7 @@ public class TextEditorDialogFragment extends DialogFragment {
                 int textSizePixel = (int)editText.getTextSize();
                 int valuePixel = ConversionUtils.dpToPx(value);
                 if (textSizePixel != valuePixel) {
-                    editText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, value);
+                    setTextSize(value);
                 }
             }
             @Override
@@ -246,34 +369,35 @@ public class TextEditorDialogFragment extends DialogFragment {
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void createColorSelections (View context, int currentColor) {
-        String[] colors = {"#000000", "#20BBFC", "#2DFD2F", "#FD28F9", "#EA212E", "#FD7E24", "#FFFA38", "#FFFFFF"};
+    private void createColorSelections (View context, int colorCircleDiameter, @Nullable ArrayList<String> colors) {
+        String[] defaultColors = {"#000000", "#20BBFC", "#2DFD2F", "#FD28F9", "#EA212E", "#FD7E24", "#FFFA38", "#FFFFFF"};
 
         LinearLayout colorPicker = context.findViewById(R.id.color_picker);
-        final Button colorPalette = context.findViewById(R.id.color_pallette);
-        colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(currentColor))); // min API 21 needed
+        colorPalette = context.findViewById(R.id.color_pallette);
+        if (editText != null) {
+            colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(editText.getCurrentTextColor()))); // min API 21 needed
+        }
         colorPalette.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openColorPalette(v);
             }
         });
-        for (String color: colors) {
+
+        for (String color: (colors != null ? colors.toArray(new String[colors.size()]) : defaultColors)) {
             final int parsedColor = Color.parseColor(color);
             LinearLayout colorButtonContainer = new LinearLayout(context.getContext());
             colorButtonContainer.setLayoutParams(new LinearLayout.LayoutParams(0,  ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
             colorButtonContainer.setGravity(Gravity.CENTER);
-            int diameter = context.getResources().getDimensionPixelSize(R.dimen.color_circle_diameter);
+
             Button colorButton = new Button(context.getContext());
-            colorButton.setLayoutParams(new LinearLayout.LayoutParams(diameter, diameter));
+            colorButton.setLayoutParams(new LinearLayout.LayoutParams(colorCircleDiameter, colorCircleDiameter));
             colorButton.setBackgroundResource(R.drawable.circle);
             colorButton.getBackground().mutate().setTint(parsedColor); // min API 21 needed
             colorButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    editText.setTextColor(parsedColor);
-                    colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(editText.getCurrentTextColor()))); // min API 21 needed
+                    setTextColor(parsedColor);
                 }
             });
             colorButtonContainer.addView(colorButton);
@@ -282,23 +406,21 @@ public class TextEditorDialogFragment extends DialogFragment {
         colorPicker.invalidate();
     }
 
-
     private void openColorPalette(final View v) {
+        boolean hasPickerConfig = pickerConfig != null;
         ColorPickerDialogBuilder
                 .with(v.getContext())
-                .setTitle(R.string.select_color)
-                .initialColor(editText.getCurrentTextColor())
+                .setTitle(hasPickerConfig && pickerConfig.hasPickerLabel() ? pickerConfig.getPickerLabel() : getResources().getString(R.string.select_color))
+                .initialColor(editText != null ? editText.getCurrentTextColor() : hasPickerConfig && pickerConfig.hasInitialColor() ? pickerConfig.getInitialColor() : Color.WHITE)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(15) // magic number
-                .setPositiveButton(R.string.ok, new ColorPickerClickListener() {
-                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                .setPositiveButton(hasPickerConfig && pickerConfig.hasSubmitText() ? pickerConfig.getSubmitText() : getResources().getString(R.string.ok), new ColorPickerClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                        editText.setTextColor(selectedColor);
-                        v.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(selectedColor))); // min API 21 needed
+                        setTextColor(selectedColor);
                     }
                 })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                .setNegativeButton(hasPickerConfig && pickerConfig.hasCancelText() ? pickerConfig.getCancelText() : getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                     }
@@ -319,6 +441,33 @@ public class TextEditorDialogFragment extends DialogFragment {
         });
     }
 
+    private void setTextSize (int size) {
+        if (editText != null) {
+            editText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size);
+        }
+        if (boxedVertical != null) {
+            boxedVertical.setValue(size);
+        }
+    }
+
+    private void setTextColor (int color) {
+        if (editText != null) {
+            editText.setTextColor(color);
+            if (colorPalette != null) {
+                colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(editText.getCurrentTextColor()))); // min API 21 needed
+            }
+        }
+    }
+
+    private void setEditText(boolean gainFocus) {
+        if (!gainFocus) {
+            editText.clearFocus();
+            editText.clearComposingText();
+        }
+        editText.setFocusableInTouchMode(gainFocus);
+        editText.setFocusable(gainFocus);
+    }
+
     @Override
     public void dismiss() {
         super.dismiss();
@@ -331,9 +480,12 @@ public class TextEditorDialogFragment extends DialogFragment {
     @Override
     public void onDetach() {
         // release links
-        this.callback = null;
-        this.editText = null;
-        this.fontProvider = null;
+        callback = null;
+        editText = null;
+        fontProvider = null;
+        boxedVertical = null;
+        colorPalette = cancel = clear = save = null;
+        pickerConfig = null;
 
         super.onDetach();
     }
@@ -377,14 +529,5 @@ public class TextEditorDialogFragment extends DialogFragment {
                 ims.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
             }
         });
-    }
-
-    private void setEditText(boolean gainFocus) {
-        if (!gainFocus) {
-            editText.clearFocus();
-            editText.clearComposingText();
-        }
-        editText.setFocusableInTouchMode(gainFocus);
-        editText.setFocusable(gainFocus);
     }
 }
