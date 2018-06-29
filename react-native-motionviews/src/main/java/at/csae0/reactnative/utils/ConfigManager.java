@@ -121,7 +121,7 @@ public class ConfigManager implements ConfigManagerActions {
 
                         if (colorConfigBundle != null) {
                             PickerConfig pickerConfig = null;
-                            Bundle pickerConfigBundle = tempBundle.getBundle("pickerConfig");
+                            Bundle pickerConfigBundle = colorConfigBundle.getBundle("pickerConfig");
                             if (pickerConfigBundle != null) {
                                 pickerConfig = new PickerConfig(
                                         pickerConfigBundle.getBoolean("enabled", true),
@@ -129,7 +129,7 @@ public class ConfigManager implements ConfigManagerActions {
                                         pickerConfigBundle.getString("pickerLabel", null),
                                         pickerConfigBundle.getString("submitText", null),
                                         pickerConfigBundle.getString("cancelText", null),
-                                        tempBundle.getString("initialColor", "#FFFFFF")
+                                        colorConfigBundle.getString("initialColor", "#FFFFFF")
 
                                 );
                             } else {
@@ -143,10 +143,10 @@ public class ConfigManager implements ConfigManagerActions {
                                 );
                             }
                             colorConfig = new ColorConfig(
-                                    tempBundle.getBoolean("enabled", true),
-                                    tempBundle.getString("screen", null),
-                                    tempBundle.getString("initialColor", "#FFFFFF"),
-                                    (ArrayList<String>) BundleConverter.bundleToArrayList(tempBundle.getBundle("colors")),
+                                    colorConfigBundle.getBoolean("enabled", true),
+                                    colorConfigBundle.getString("screen", null),
+                                    colorConfigBundle.getString("initialColor", "#FFFFFF"),
+                                    (ArrayList<String>) BundleConverter.bundleToArrayList(colorConfigBundle.getBundle("colors")),
                                     pickerConfig
                             );
                         } else {

@@ -30,7 +30,7 @@ public abstract class ScreenConfig extends Config {
     public void setScreenType(@Nullable String screenType) {
         this.screenType = null;
         if (screenType != null) {
-            this.screenType = CONFIG_TYPE.valueOf(screenType);
+            this.screenType = CONFIG_TYPE.get(screenType);
         }
         if (this.screenType == null) {
             this.screenType = CONFIG_TYPE.ALL_SCREENS;
