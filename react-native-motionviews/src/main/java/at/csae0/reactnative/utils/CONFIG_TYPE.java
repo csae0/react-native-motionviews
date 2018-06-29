@@ -1,4 +1,4 @@
-package team.uptech.motionviews.utils;
+package at.csae0.reactnative.utils;
 
 import android.support.annotation.Nullable;
 
@@ -17,6 +17,7 @@ public enum CONFIG_TYPE {
 
     // BUTTONS config key
     BUTTONS_CONFIG("buttonsConfig"),
+
     // motionView main actions
     CREATE_TEXT_CONFIG("createTextConfig"),
     CREATE_SKETCH_CONFIG("createSketchConfig"),
@@ -30,7 +31,13 @@ public enum CONFIG_TYPE {
     PEN_TOOL_CONFIG("penToolConfig"),
     ERASE_TOOL_CONFIG("eraseToolConfig"),
     CIRCLE_TOOL_CONFIG("circleToolConfig"),
-    ARROW_TOOL_CONFIG("arrowToolConfig");
+    ARROW_TOOL_CONFIG("arrowToolConfig"),
+
+    // screen types
+    ALL_SCREENS("allScreens"),
+    TEXT_ENTITY_SCREEN("textEntityScreen"),
+    IMAGE_ENTITY_SCREEN("imageEntityScreen"),
+    SKETCH_ENTITY_SCREEN("sketchEntityScreen");
 
     private String name;
 

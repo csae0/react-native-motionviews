@@ -1,9 +1,11 @@
-package team.uptech.motionviews.utils;
+package at.csae0.reactnative.utils;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import at.csae0.reactnative.utils.CONFIG_TYPE;
 
 public enum RESSOURCE_TYPE {
     DRAWABLE("drawable"),

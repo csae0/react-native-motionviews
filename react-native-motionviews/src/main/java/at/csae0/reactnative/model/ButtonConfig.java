@@ -5,36 +5,31 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 
 import team.uptech.motionviews.utils.RessourceUtils;
-import team.uptech.motionviews.utils.CONFIG_TYPE;
+import at.csae0.reactnative.utils.CONFIG_TYPE;
 
 public class ButtonConfig extends Config {
 
-    private String icon;
+    private String iconName;
     private String label;
     private String tint;
 
     public ButtonConfig (CONFIG_TYPE id, @Nullable Boolean enabled, @Nullable String icon, @Nullable String label, @Nullable String tint) {
-        super(id);
-        if (enabled != null) {
-            setEnabled(enabled);
-        }
-        this.icon = icon;
-        this.label = label;
-        this.tint = tint;
+        super(id, enabled);
+
+        setIconName(icon);
+        setLabel(label);
+        setTint(tint);
     }
 
+    @Nullable
     public String getIconName() {
-        return icon;
-    }
-
-    public void setIconName(String icon) {
-        this.icon = icon;
+        return iconName;
     }
 
     @Nullable
     public Drawable getIcon() {
-        if (this.icon != null) {
-            String[] icon = this.icon.split("\\.");
+        if (this.iconName != null) {
+            String[] icon = this.iconName.split("\\.");
             if (icon.length == 2) {
                 return RessourceUtils.getImageAsset(icon[0], icon[1]);
             }
@@ -42,12 +37,9 @@ public class ButtonConfig extends Config {
         return null;
     }
 
+    @Nullable
     public String getLabel() {
         return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     @Nullable
@@ -58,17 +50,26 @@ public class ButtonConfig extends Config {
         return null;
     }
 
+    @Nullable
     public String getTint() {
         return tint;
     }
 
-    public void setTint(String tint) {
+    public void setIconName(@Nullable String icon) {
+        this.iconName = icon;
+    }
+
+    public void setLabel(@Nullable String label) {
+        this.label = label;
+    }
+
+    public void setTint(@Nullable String tint) {
         this.tint = tint;
     }
 
     public boolean hasIcon() {
-        if (this.icon != null) {
-            String[] icon = this.icon.split("\\.");
+        if (this.iconName != null) {
+            String[] icon = this.iconName.split("\\.");
             if (icon.length == 2) {
                 return RessourceUtils.getImageAsset(icon[0], icon[1]) != null;
             }

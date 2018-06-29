@@ -2,42 +2,62 @@ package at.csae0.reactnative.model;
 
 import android.support.annotation.Nullable;
 
-import team.uptech.motionviews.utils.CONFIG_TYPE;
+import at.csae0.reactnative.utils.CONFIG_TYPE;
 
 public class GeneralConfig extends Config {
 
-    private String backgroundImage, imageSaveName, fontFamily;
+    private String backgroundImage, imageSaveName, fontFamily, initialToolSelection, initialText;
 
-    public GeneralConfig (@Nullable String backgroundImage, @Nullable String imageSaveName, @Nullable String fontFamily) {
+    public GeneralConfig (@Nullable String backgroundImage, @Nullable String imageSaveName, @Nullable String fontFamily, @Nullable String initialToolSelection, @Nullable String initialText) {
         super(CONFIG_TYPE.GENERAL_CONFIG, true);
-        this.backgroundImage = backgroundImage;
-        this.imageSaveName = imageSaveName;
-        this.fontFamily = fontFamily;
+
+        setBackgroundImage(backgroundImage);
+        setImageSaveName(imageSaveName);
+        setFontFamily(fontFamily);
+        setInitialToolSelection(initialToolSelection);
+        setInitialText(initialText);
     }
 
+    @Nullable
     public String getBackgroundImage() {
         return backgroundImage;
     }
-
-    public void setBackgroundImage(String backgroundImage) {
-        this.backgroundImage = backgroundImage;
-    }
-
+    @Nullable
     public String getImageSaveName() {
         return imageSaveName;
     }
-
-    public void setImageSaveName(String imageSaveName) {
-        this.imageSaveName = imageSaveName;
-    }
-
+    @Nullable
     public String getFontFamily() {
         return fontFamily;
     }
+    @Nullable
+    public String getInitialToolSelection() {
+        return initialToolSelection;
+    }
+    @Nullable
+    public String getInitialText() {
+            return initialText;
+    }
 
-    public void setFontFamily(String fontFamily) {
+    public void setBackgroundImage(@Nullable String backgroundImage) {
+        this.backgroundImage = backgroundImage;
+    }
+
+    public void setImageSaveName(@Nullable String imageSaveName) {
+        this.imageSaveName = imageSaveName;
+    }
+
+    public void setFontFamily(@Nullable String fontFamily) {
         this.fontFamily = fontFamily;
     }
+
+    public void setInitialToolSelection(@Nullable String initialToolSelection) {
+        this.initialToolSelection = initialToolSelection;
+    }
+    public void setInitialText(@Nullable String initialText) {
+        this.initialText = initialText;
+    }
+
 
     public boolean hasbackgroundImage() {
         return backgroundImage != null;
@@ -47,5 +67,11 @@ public class GeneralConfig extends Config {
     }
     public boolean hasfontFamily() {
         return fontFamily != null;
+    }
+    public boolean hasInitialToolSelection() {
+        return initialToolSelection != null;
+    }
+    public boolean hasInitialText() {
+        return initialText != null;
     }
 }

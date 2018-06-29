@@ -5,63 +5,67 @@ import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 
-import team.uptech.motionviews.utils.CONFIG_TYPE;
+import at.csae0.reactnative.utils.CONFIG_TYPE;
 
-public class ColorConfig extends Config {
+public class ColorConfig extends ScreenConfig {
 
     private Integer initialColor;
     private ArrayList<String> colors;
     private PickerConfig pickerconfig;
 
-    public ColorConfig (@Nullable Boolean enabled, @Nullable String initialColor, @Nullable ArrayList<String> colors, @Nullable PickerConfig pickerConfig) {
-        super(CONFIG_TYPE.COLOR_CONFIG);
-        if (enabled != null) {
-            setEnabled(enabled);
-        }
-        this.initialColor = initialColor != null ? Color.parseColor(initialColor) : null;
-        this.colors = new ArrayList<>();
-        if (colors != null) {
-            for (String color: colors) {
-                if (color != null) {
-                    this.colors.add(color);
-                }
-            }
-        }
-        this.pickerconfig = pickerConfig;
+    public ColorConfig (@Nullable Boolean enabled, @Nullable String screenType, @Nullable String initialColor, @Nullable ArrayList<String> colors, @Nullable PickerConfig pickerConfig) {
+        super(CONFIG_TYPE.COLOR_CONFIG, enabled, screenType);
+
+        String s = initialColor;
+        setInitialColor(s);
+
+        setColors(colors);
+
+        setPickerconfig(pickerConfig);
     }
 
+    @Nullable
     public Integer getInitialColor() {
         return initialColor;
     }
 
-    public void setInitialColor(Integer initialColor) {
-        this.initialColor = initialColor;
+    public void setInitialColor(@Nullable Integer initialColor) {
+        this.initialColor = initialColor != null ? initialColor : null;
     }
 
+    public void setInitialColor(@Nullable String initialColor) {
+        this.initialColor = initialColor != null ? Color.parseColor(initialColor) : null;
+    }
+
+    @Nullable
     public PickerConfig getPickerconfig() {
         return pickerconfig;
     }
 
-    public void setPickerconfig(PickerConfig pickerconfig) {
+    public void setPickerconfig(@Nullable PickerConfig pickerconfig) {
         this.pickerconfig = pickerconfig;
+    }
+
+    @Nullable
+    public ArrayList<String> getColors() {
+        return colors;
+    }
+
+    public void setColors(@Nullable ArrayList<String> colors) {
+        if (colors != null) {
+            ArrayList<String> newColors = new ArrayList<>();
+            for (String color: colors) {
+                if (color != null) {
+                    newColors.add(color);
+                }
+            }
+            this.colors = newColors;
+        }
     }
 
     public boolean hasInitialColor() {
         return initialColor != null;
     }
-
-    @Nullable
-    public ArrayList<String> getColors() {
-        if (colors == null || colors.size() == 0) {
-            return null;
-        }
-        return colors;
-    }
-
-    public void setColors(ArrayList<String> colors) {
-        this.colors = colors;
-    }
-
     public boolean hasColors() {
         return colors != null;
     }

@@ -1,16 +1,13 @@
 package team.uptech.motionviews.utils;
 
-import at.csae0.reactnative.R;
 import at.csae0.reactnative.RNMotionViewModule;
+import at.csae0.reactnative.utils.RESSOURCE_TYPE;
 
-import android.app.Activity;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.ReactApplicationContext;
-
-import java.io.InputStream;
 
 public class RessourceUtils {
 
