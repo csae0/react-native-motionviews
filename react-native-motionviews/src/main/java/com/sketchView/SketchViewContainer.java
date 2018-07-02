@@ -39,9 +39,11 @@ import at.csae0.reactnative.R;
 import at.csae0.reactnative.interfaces.ConfigActions;
 import at.csae0.reactnative.interfaces.ConfigManagerActions;
 import at.csae0.reactnative.model.ButtonConfig;
+import at.csae0.reactnative.model.ButtonConfigs;
 import at.csae0.reactnative.model.ColorConfig;
 import at.csae0.reactnative.model.GeneralConfig;
 import at.csae0.reactnative.model.PickerConfig;
+import at.csae0.reactnative.model.ScreenConfig;
 import at.csae0.reactnative.model.SizeConfig;
 import at.csae0.reactnative.utils.CONFIG_TYPE;
 import at.csae0.reactnative.utils.ConfigManager;
@@ -113,7 +115,8 @@ public class SketchViewContainer extends RelativeLayout {
                @Override
                public void applyColorConfig(ConfigManagerActions manager) {
                    ColorConfig config = (ColorConfig) manager.getScreenConfig(SCREEN_TYPE, COLOR);
-                   
+                   int colorCircleDiameter = getResources().getDimensionPixelSize(R.dimen.color_circle_diameter);
+
                    if (config != null) {
                        if (config.hasInitialColor()) {
                            setToolColor(config.getInitialColor());
@@ -121,10 +124,11 @@ public class SketchViewContainer extends RelativeLayout {
                        if (config.hasPickerConfig()) {
                            pickerConfig = config.getPickerconfig();
                        }
+                       addDynamicColorSelections(colorPickerContainer, colorCircleDiameter, config.getColors());
+                       return;
                    }
 
-                   int colorCircleDiameter = getResources().getDimensionPixelSize(R.dimen.color_circle_diameter);
-                   addDynamicColorSelections(colorPickerContainer, colorCircleDiameter, config.getColors());
+                   addDynamicColorSelections(colorPickerContainer, colorCircleDiameter, null);
                }
 
                @Override
@@ -154,9 +158,11 @@ public class SketchViewContainer extends RelativeLayout {
                }
 
                @Override
-               public void applyButtonConfigs(ArrayList<ButtonConfig> configs) {
-                   if (configs != null) {
-                       for (ButtonConfig config : configs) {
+               public void applyButtonConfigs(ConfigManagerActions manager) {
+                   ButtonConfigs configs = (ButtonConfigs) manager.getScreenConfig(SCREEN_TYPE, BUTTON);
+
+                   if (configs != null && configs.hasButtonsConfig()) {
+                       for (ButtonConfig config : configs.getButtonsConfig()) {
                            if (config != null) {
                                Button tempButton = null;
                                Drawable defaultDrawable = null;
@@ -165,14 +171,23 @@ public class SketchViewContainer extends RelativeLayout {
                                        case CANCEL_BUTTON_CONFIG:
                                            tempButton = cancel;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_close");
+                                           if (config.hasTint()) {
+                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(config.getTintColor()));
+                                           }
                                            break;
                                        case CLEAR_BUTTON_CONFIG:
                                            tempButton = clear;
-                                           defaultDrawable = RessourceUtils.getImageRessource("ic_clear");
+                                           defaultDrawable = RessourceUtils.getImageRessource("ic_trash");
+                                           if (config.hasTint()) {
+                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(config.getTintColor()));
+                                           }
                                            break;
                                        case SAVE_BUTTON_CONFIG:
                                            tempButton = save;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_check");
+                                           if (config.hasTint()) {
+                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(config.getTintColor()));
+                                           }
                                            break;
                                        case PEN_TOOL_CONFIG:
                                            tempButton = pen;
@@ -214,7 +229,7 @@ public class SketchViewContainer extends RelativeLayout {
                                            if (config.hasLabel() && !config.hasIcon()) {
                                                tempButton.setText(config.getLabel());
                                            }
-                                           if (config.hasIcon() || defaultDrawable != null) {
+                                           if (config.hasIcon() || (!config.hasLabel() && defaultDrawable != null)) {
                                                tempButton.setText("");
                                                tempButton.setBackground(config.hasIcon() ? config.getIcon() : defaultDrawable);
                                                ViewGroup.LayoutParams layoutParams = tempButton.getLayoutParams();
@@ -304,7 +319,7 @@ public class SketchViewContainer extends RelativeLayout {
     private void addButtons (Context context) {
         int padding = getResources().getDimensionPixelOffset(R.dimen.padding);
         int height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
-
+        int marginVertical = getResources().getDimensionPixelOffset(R.dimen.slider_margin_vertical);
         cancel = new Button(context);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, height);
         layoutParams.topMargin = padding;
@@ -362,6 +377,7 @@ public class SketchViewContainer extends RelativeLayout {
 
         buttons = new RelativeLayout(context);
         buttons.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        buttons.setPadding(padding, padding, padding, padding);
 
         LinearLayout editButtonsRight = new LinearLayout(context);
         RelativeLayout.LayoutParams containerLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -419,8 +435,9 @@ public class SketchViewContainer extends RelativeLayout {
         toolButtons = new LinearLayout(context);
         layoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        layoutParams.topMargin = height * 2;
+        layoutParams.topMargin = marginVertical;
         toolButtons.setLayoutParams(layoutParams);
+        toolButtons.setPadding(padding, padding, padding, padding);
         toolButtons.setOrientation(LinearLayout.VERTICAL);
         toolButtons.addView(pen);
         toolButtons.addView(eraser);
@@ -439,11 +456,11 @@ public class SketchViewContainer extends RelativeLayout {
 
         int width = getResources().getDimensionPixelOffset(R.dimen.slider_width);
         int marginHorizontal = getResources().getDimensionPixelOffset(R.dimen.padding);
-        int marginVertical = getResources().getDimensionPixelOffset(R.dimen.color_picker_height_and_padding);
+        int marginVertical = getResources().getDimensionPixelOffset(R.dimen.slider_margin_vertical);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(width, RelativeLayout.LayoutParams.MATCH_PARENT);
         layoutParams.leftMargin = marginHorizontal;
         layoutParams.rightMargin = marginHorizontal;
-        layoutParams.topMargin = marginVertical * 2;
+        layoutParams.topMargin = marginVertical;
         layoutParams.bottomMargin = marginVertical;
         layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
         boxedVertical.setLayoutParams(layoutParams);

@@ -42,6 +42,7 @@ import at.csae0.reactnative.R;
 import at.csae0.reactnative.interfaces.ConfigActions;
 import at.csae0.reactnative.interfaces.ConfigManagerActions;
 import at.csae0.reactnative.model.ButtonConfig;
+import at.csae0.reactnative.model.ButtonConfigs;
 import at.csae0.reactnative.model.ColorConfig;
 import at.csae0.reactnative.model.GeneralConfig;
 import at.csae0.reactnative.model.PickerConfig;
@@ -182,11 +183,15 @@ public class TextEditorDialogFragment extends DialogFragment {
                 @Override
                 public void applyGeneralConfig(GeneralConfig config) {
                     // TODO: do something with it
+
+
+//                    editText.setTypeface(typeface);
                 }
 
                 @Override
                 public void applyColorConfig(ConfigManagerActions manager) {
                     ColorConfig config = (ColorConfig) manager.getScreenConfig(SCREEN_TYPE, COLOR);
+                    int colorCircleDiameter = getResources().getDimensionPixelSize(R.dimen.color_circle_diameter);
 
                     if (config != null) {
                         if (config.hasInitialColor()) {
@@ -195,10 +200,12 @@ public class TextEditorDialogFragment extends DialogFragment {
                         if (config.hasPickerConfig()) {
                             pickerConfig = config.getPickerconfig();
                         }
+
+                        createColorSelections(view, colorCircleDiameter, config.getColors());
+                        return;
                     }
 
-                    int colorCircleDiameter = getResources().getDimensionPixelSize(R.dimen.color_circle_diameter);
-                    createColorSelections(view, colorCircleDiameter, config.getColors());
+                    createColorSelections(view, colorCircleDiameter, null);
                 }
 
                 @Override
@@ -228,9 +235,11 @@ public class TextEditorDialogFragment extends DialogFragment {
                 }
 
                 @Override
-                public void applyButtonConfigs(ArrayList<ButtonConfig> configs) {
-                    if (configs != null) {
-                        for (ButtonConfig config : configs) {
+                public void applyButtonConfigs(ConfigManagerActions manager) {
+                    ButtonConfigs configs = (ButtonConfigs) manager.getScreenConfig(SCREEN_TYPE, BUTTON);
+
+                    if (configs != null && configs.hasButtonsConfig()) {
+                        for (ButtonConfig config : configs.getButtonsConfig()) {
                             if (config != null) {
                                 Button tempButton = null;
                                 Drawable defaultDrawable = null;
@@ -242,13 +251,12 @@ public class TextEditorDialogFragment extends DialogFragment {
                                             break;
                                         case CLEAR_BUTTON_CONFIG:
                                             tempButton = clear;
-                                            defaultDrawable = RessourceUtils.getImageRessource("ic_clear");
+                                            defaultDrawable = RessourceUtils.getImageRessource("ic_trash");
                                             break;
                                         case SAVE_BUTTON_CONFIG:
                                             tempButton = save;
                                             defaultDrawable = RessourceUtils.getImageRessource("ic_check");
                                             break;
-                                        default:
                                     }
 
                                     if (tempButton != null) {
@@ -263,6 +271,9 @@ public class TextEditorDialogFragment extends DialogFragment {
                                                 layoutParams.width = layoutParams.height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
                                                 tempButton.setLayoutParams(layoutParams);
                                                 tempButton.setPadding(0, 0, 0, 0);
+                                            }
+                                            if (config.hasTint()) {
+                                                tempButton.setBackgroundTintList(ColorStateList.valueOf(config.getTintColor()));
                                             }
                                         } else if (tempButton.getParent() != null) {
                                             ((LinearLayout) tempButton.getParent()).removeView(tempButton);
@@ -294,6 +305,7 @@ public class TextEditorDialogFragment extends DialogFragment {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // TODO: new text entity with cancel
                 if (callback != null) {
                     callback.cancelAction();
                 }
@@ -326,13 +338,25 @@ public class TextEditorDialogFragment extends DialogFragment {
             }
         });
 
-        LinearLayout buttons = new LinearLayout(context);
+        RelativeLayout buttons = new RelativeLayout(context);
         buttons.setLayoutParams(new LinearLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
         buttons.setPadding(padding, padding, padding, padding);
-        buttons.setGravity(Gravity.RIGHT);
-        buttons.addView(cancel);
-        buttons.addView(clear);
-        buttons.addView(save);
+
+        LinearLayout editButtonsRight = new LinearLayout(context);
+        RelativeLayout.LayoutParams containerLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        containerLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        editButtonsRight.setLayoutParams(containerLayoutParams);
+        editButtonsRight.addView(clear);
+        editButtonsRight.addView(save);
+
+        LinearLayout editButtonsLeft = new LinearLayout(context);
+        containerLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        containerLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        editButtonsLeft.setLayoutParams(containerLayoutParams);
+        editButtonsLeft.addView(cancel);
+
+        buttons.addView(editButtonsLeft);
+        buttons.addView(editButtonsRight);
 
         RelativeLayout rootContainer = view.findViewById(R.id.text_editor_root);
         rootContainer.addView(buttons);

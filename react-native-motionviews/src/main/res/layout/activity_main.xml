@@ -40,16 +40,16 @@
             android:layout_marginTop="@dimen/padding"
             android:onClick="addTextSticker">
         </ImageButton>
-        <ImageButton
-            android:id="@+id/main_add_image"
-            android:background="@drawable/ic_add"
-            android:backgroundTint="@android:color/black"
-            android:title="@string/add_sticker"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="@dimen/padding"
-            android:onClick="addSticker">
-        </ImageButton>
+        <!--<ImageButton-->
+            <!--android:id="@+id/main_add_image"-->
+            <!--android:background="@drawable/ic_add"-->
+            <!--android:backgroundTint="@android:color/black"-->
+            <!--android:title="@string/add_sticker"-->
+            <!--android:layout_width="40dp"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:layout_marginTop="@dimen/padding"-->
+            <!--android:onClick="addSticker">-->
+        <!--</ImageButton>-->
         <ImageButton
             android:id="@+id/main_add_sketch"
             android:background="@drawable/pokeball"

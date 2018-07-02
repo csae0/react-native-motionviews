@@ -9,7 +9,6 @@
         <activity android:name="team.uptech.motionviews.ui.MotionViewsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -18,7 +17,6 @@
             android:name="team.uptech.motionviews.ui.StickerSelectActivity"
             android:label="@string/add_sticker"
             />
-
     </application>
 
 

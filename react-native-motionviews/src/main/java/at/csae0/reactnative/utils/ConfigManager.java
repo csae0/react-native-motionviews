@@ -8,8 +8,11 @@ import java.util.HashMap;
 
 import at.csae0.reactnative.interfaces.ConfigActions;
 import at.csae0.reactnative.interfaces.ConfigManagerActions;
+import at.csae0.reactnative.interfaces.MergeConfig;
 import at.csae0.reactnative.model.ButtonConfig;
+import at.csae0.reactnative.model.ButtonConfigs;
 import at.csae0.reactnative.model.ColorConfig;
+import at.csae0.reactnative.model.Config;
 import at.csae0.reactnative.model.GeneralConfig;
 import at.csae0.reactnative.model.PickerConfig;
 import at.csae0.reactnative.model.ScreenConfig;
@@ -20,7 +23,7 @@ public class ConfigManager implements ConfigManagerActions {
     private static ConfigManager instance = null;
 
     private GeneralConfig generalConfig;
-    private ArrayList<ButtonConfig> buttonConfigs;
+    private ArrayList<ButtonConfigs> buttonConfigs;
     private ArrayList<ColorConfig> colorConfigs;
     private ArrayList<SizeConfig> sizeConfigs;
 
@@ -52,7 +55,7 @@ public class ConfigManager implements ConfigManagerActions {
     }
 
     public void apply (ConfigActions configActions) {
-        configActions.applyButtonConfigs(buttonConfigs); // needs to be called before colorConfig
+        configActions.applyButtonConfigs(this); // needs to be called before colorConfig
         configActions.applyColorConfig(this);
         configActions.applySizeConfig(this);
         configActions.applyGeneralConfig(generalConfig);
@@ -149,7 +152,7 @@ public class ConfigManager implements ConfigManagerActions {
                                     (ArrayList<String>) BundleConverter.bundleToArrayList(colorConfigBundle.getBundle("colors")),
                                     pickerConfig
                             );
-                        } else {
+                        } else { //TODO: do not create config if null/ not existing pass null instead of "empty" PickerConfig
                             colorConfig = new ColorConfig(
                                     false,
                                     null,
@@ -171,27 +174,48 @@ public class ConfigManager implements ConfigManagerActions {
                         }
                     }
                 }
-            } else if (CONFIG_TYPE.get(key) == CONFIG_TYPE.BUTTONS_CONFIG) { // BUTTON CONFIGS
+            } else if (CONFIG_TYPE.get(key) == CONFIG_TYPE.BUTTON_CONFIGS) { // BUTTON CONFIGS
                 if (tempBundle != null) {
                     ArrayList<Bundle> buttonBundlesArray = (ArrayList<Bundle>) BundleConverter.bundleToArrayList(tempBundle);
-                    for (Bundle buttonBundle : buttonBundlesArray) {
-                        ButtonConfig buttonConfig = null;
-                        if (buttonBundle != null) {
-                            buttonConfig = new ButtonConfig(
-                                    CONFIG_TYPE.get(buttonBundle.getString("id")),
-                                    buttonBundle.getBoolean("enabled", true),
-                                    buildIconNameFromBundle(buttonBundle.getBundle("icon")),
-                                    buttonBundle.getString("label", null),
-                                    buttonBundle.getString("tint", null)
-                            );
-                        } else {
-                            buttonConfig = new ButtonConfig(
-                                    CONFIG_TYPE.get(key),
-                                    false,
-                                    null,
-                                    null,
-                                    null
-                            );
+                    for (Bundle buttonBundles : buttonBundlesArray) {
+                        ButtonConfigs buttonConfig = null;
+                        if (buttonBundles != null) {
+                            Bundle buttonsConfigBundle = buttonBundles.getBundle("configs");
+                            if (buttonsConfigBundle != null) {
+                                ArrayList<Bundle> buttonsBundleArray = (ArrayList<Bundle>) BundleConverter.bundleToArrayList(buttonsConfigBundle);
+                                if (buttonsBundleArray != null) {
+                                    ArrayList<ButtonConfig> buttonsConfigArray = new ArrayList<>();
+                                    for (Bundle buttonsBundle : buttonsBundleArray) {
+                                        ButtonConfig buttonsConfig = null;
+                                        if (buttonsBundle != null) {
+                                            buttonsConfig = new ButtonConfig(
+                                                    CONFIG_TYPE.get(buttonsBundle.getString("id")),
+                                                    buttonsBundle.getBoolean("enabled", true),
+                                                    buildIconNameFromBundle(buttonsBundle.getBundle("icon")),
+                                                    buttonsBundle.getString("label", null),
+                                                    buttonsBundle.getString("tint", null)
+                                            );
+                                        } else {
+                                            buttonsConfig = new ButtonConfig(
+                                                    CONFIG_TYPE.get(key),
+                                                    false,
+                                                    null,
+                                                    null,
+                                                    null
+                                            );
+                                        }
+                                        if (buttonsConfig != null) {
+                                            buttonsConfigArray.add(buttonsConfig);
+                                        }
+                                    }
+                                    if (buttonsConfigArray != null && buttonsConfigArray.size() > 0) {
+                                        buttonConfig = new ButtonConfigs(
+                                                buttonBundles.getString("screen", null),
+                                                buttonsConfigArray
+                                        );
+                                    }
+                                }
+                            }
                         }
                         if (buttonConfig != null) {
                             buttonConfigs.add(buttonConfig);
@@ -233,12 +257,23 @@ public class ConfigManager implements ConfigManagerActions {
             case SIZE_CONFIG:
                 configs = sizeConfigs;
                 break;
+            case BUTTON_CONFIGS:
+                configs = buttonConfigs;
+                break;
         }
 
         if (configs != null) {
             for (ScreenConfig tempConfig : configs) {
                 if (tempConfig.isScreenType(screenType)) {
-                    config = tempConfig;
+                    if (config == null) {
+                        config = tempConfig;
+                    } else {
+                        if (config instanceof MergeConfig) {
+                            config = (ScreenConfig) ((MergeConfig) config).mergeConfig(tempConfig);
+                        } else {
+                            config = tempConfig;
+                        }
+                    }
                 }
             }
         }

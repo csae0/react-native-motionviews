@@ -17,6 +17,7 @@ public enum CONFIG_TYPE {
 
     // BUTTONS config key
     BUTTONS_CONFIG("buttonsConfig"),
+    BUTTON_CONFIGS("buttonConfigs"),
 
     // motionView main actions
     CREATE_TEXT_CONFIG("createTextConfig"),

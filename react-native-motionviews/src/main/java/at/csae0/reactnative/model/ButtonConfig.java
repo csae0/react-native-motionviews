@@ -60,7 +60,11 @@ public class ButtonConfig extends Config {
     }
 
     public void setLabel(@Nullable String label) {
-        this.label = label;
+        if (label != null && label.length() > 0) {
+            this.label = label;
+        } else {
+            this.label = null;
+        }
     }
 
     public void setTint(@Nullable String tint) {

@@ -98,7 +98,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
     }
 
     public void addSticker(View v) {
-        Intent intent = new Intent(this, StickerSelectActivity.class);
+        Intent intent = new Intent(v.getContext(), StickerSelectActivity.class);
         startActivityForResult(intent, SELECT_STICKER_REQUEST_CODE);
     }
 
@@ -154,7 +154,8 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
     }
 
     public void showButtons (boolean show) {
-        ImageButton[] addButtons = { findViewById(R.id.main_add_text), findViewById(R.id.main_add_image), findViewById(R.id.main_add_sketch)};
+//        ImageButton[] addButtons = { findViewById(R.id.main_add_text), findViewById(R.id.main_add_image), findViewById(R.id.main_add_sketch)};
+        ImageButton[] addButtons = { findViewById(R.id.main_add_text), findViewById(R.id.main_add_sketch)};
 
         for(ImageButton button : addButtons) {
             if (button != null) {
