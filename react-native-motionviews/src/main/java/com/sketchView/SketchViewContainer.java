@@ -193,69 +193,55 @@ public class SketchViewContainer extends RelativeLayout {
                        for (ButtonConfig config : configs.getButtonsConfig()) {
                            if (config != null) {
                                Button tempButton = null;
+                               Integer tempTint = null;
                                Drawable defaultDrawable = null;
                                if (config.getId() != null) {
                                    switch (config.getId()) {
                                        case CANCEL_BUTTON_CONFIG:
                                            tempButton = cancel;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_close");
-                                           if (config.hasTint()) {
-                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(config.getTintColor()));
-                                           }
+                                           tempTint = config.getTintColor();
                                            break;
                                        case CLEAR_BUTTON_CONFIG:
                                            tempButton = clear;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_trash");
-                                           if (config.hasTint()) {
-                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(config.getTintColor()));
-                                           }
+                                           tempTint = config.getTintColor();
                                            break;
                                        case SAVE_BUTTON_CONFIG:
                                            tempButton = save;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_check");
-                                           if (config.hasTint()) {
-                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(config.getTintColor()));
-                                           }
+                                           tempTint = config.getTintColor();
                                            break;
                                        case PEN_TOOL_CONFIG:
                                            tempButton = pen;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_pen_tool");
-                                           if (config.hasTint()) {
-                                               penTint = config.getTintColor();
-                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(penTint));
-                                           }
+                                           tempTint = config.getTintColor();
+                                           penTint = config.getTintColor();
                                            break;
                                        case ERASE_TOOL_CONFIG:
                                            tempButton = eraser;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_erase_tool");
-                                           if (config.hasTint()) {
-                                               eraserTint = config.getTintColor();
-                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(eraserTint));
-                                           }
+                                           tempTint = config.getTintColor();
+                                           eraserTint = config.getTintColor();
                                            break;
                                        case CIRCLE_TOOL_CONFIG:
                                            tempButton = circle;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_circle_tool");
-                                           if (config.hasTint()) {
-                                               circleTint = config.getTintColor();
-                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(circleTint));
-                                           }
+                                           tempTint = config.getTintColor();
+                                           circleTint = config.getTintColor();
                                            break;
                                        case ARROW_TOOL_CONFIG:
                                            tempButton = arrow;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_arrow_tool");
-                                           if (config.hasTint()) {
-                                               arrowTint = config.getTintColor();
-                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(arrowTint));
-                                           }
+                                           tempTint = config.getTintColor();
+                                           arrowTint = config.getTintColor();
                                            break;
-                                       default:
                                    }
-
                                    if (tempButton != null) {
                                        if (config.hasEnabled() && config.isEnabled()) {
                                            if (config.hasLabel() && !config.hasIcon()) {
                                                tempButton.setText(config.getLabel());
+                                               tempButton.setBackground(null);
                                            }
                                            if (config.hasIcon() || (!config.hasLabel() && defaultDrawable != null)) {
                                                tempButton.setText("");
@@ -264,6 +250,10 @@ public class SketchViewContainer extends RelativeLayout {
                                                layoutParams.width = layoutParams.height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
                                                tempButton.setLayoutParams(layoutParams);
                                                tempButton.setPadding(0, 0, 0, 0);
+                                           }
+                                           if (tempTint != null) {
+                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(tempTint));
+                                               // tempButton.setTextColor(tempTint);
                                            }
                                        } else if (tempButton.getParent() != null) {
                                            ((LinearLayout) tempButton.getParent()).removeView(tempButton);
@@ -664,25 +654,42 @@ public class SketchViewContainer extends RelativeLayout {
             if (toolButtons[i] != null) {
                 if (toolButtonTints[i] != null) {
                     toolButtons[i].setBackgroundTintList(ColorStateList.valueOf(toolButtonTints[i]));
+                    toolButtons[i].setTextColor(toolButtonTints[i]);
                 } else {
                     toolButtons[i].setBackgroundTintList(null);
                 }
             }
         }
 
+        ColorStateList colorStateList;
         switch (type) {
             case SketchTool.TYPE_PEN:
-//                int selectionTint = ConversionUtils.mixColors
-                pen.setBackgroundTintList(createColorStateList(sketchView.getToolColor(), penTint));
+                colorStateList = createColorStateList(sketchView.getToolColor(), penTint);
+                pen.setBackgroundTintList(colorStateList);
+                if (colorStateList != null) {
+                    pen.setTextColor(colorStateList);
+                }
                 break;
             case SketchTool.TYPE_ERASE:
-                eraser.setBackgroundTintList(createColorStateList(sketchView.getToolColor(), eraserTint));
+                colorStateList = createColorStateList(sketchView.getToolColor(), eraserTint);
+                eraser.setBackgroundTintList(colorStateList);
+                if (colorStateList != null) {
+                    eraser.setTextColor(colorStateList);
+                }
                 break;
             case SketchTool.TYPE_CIRCLE:
-                circle.setBackgroundTintList(createColorStateList(sketchView.getToolColor(), circleTint));
+                colorStateList = createColorStateList(sketchView.getToolColor(), circleTint);
+                circle.setBackgroundTintList(colorStateList);
+                if (colorStateList != null) {
+                    circle.setTextColor(colorStateList);
+                }
                 break;
             case SketchTool.TYPE_ARROW:
-                arrow.setBackgroundTintList(createColorStateList(sketchView.getToolColor(), arrowTint));
+                colorStateList = createColorStateList(sketchView.getToolColor(), arrowTint);
+                arrow.setBackgroundTintList(colorStateList);
+                if (colorStateList != null) {
+                    arrow.setTextColor(colorStateList);
+                }
                 break;
         }
     }
