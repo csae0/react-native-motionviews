@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.Base64;
@@ -43,11 +44,11 @@ import at.csae0.reactnative.model.ButtonConfigs;
 import at.csae0.reactnative.model.ColorConfig;
 import at.csae0.reactnative.model.GeneralConfig;
 import at.csae0.reactnative.model.PickerConfig;
-import at.csae0.reactnative.model.ScreenConfig;
 import at.csae0.reactnative.model.SizeConfig;
 import at.csae0.reactnative.utils.CONFIG_TYPE;
 import at.csae0.reactnative.utils.ConfigManager;
 import team.uptech.motionviews.utils.ConversionUtils;
+import team.uptech.motionviews.utils.FontProvider;
 import team.uptech.motionviews.utils.RessourceUtils;
 import team.uptech.motionviews.widget.Interfaces.OnMoveGestureListener;
 import team.uptech.motionviews.widget.Interfaces.SketchViewCallback;
@@ -74,6 +75,8 @@ public class SketchViewContainer extends RelativeLayout {
     private PickerConfig pickerConfig;
 
     private boolean colorPickerContainerEnabled;
+
+    private static FontProvider fontProvider;
     /**
      * Constructor (allowing only one instance)
      * @param context
@@ -110,6 +113,31 @@ public class SketchViewContainer extends RelativeLayout {
            ConfigManager.getInstance().apply(new ConfigActions() {
                @Override
                public void applyGeneralConfig(GeneralConfig config) {
+                   if (config.hasFontFamily() && fontProvider != null) {
+                       Typeface typeface = fontProvider.getTypeface(config.getFontFamily());
+
+                       if (cancel != null) {
+                           cancel.setTypeface(typeface);
+                       }
+                       if (clear != null) {
+                           clear.setTypeface(typeface);
+                       }
+                       if (save != null) {
+                           save.setTypeface(typeface);
+                       }
+                       if (pen != null) {
+                           pen.setTypeface(typeface);
+                       }
+                       if (eraser != null) {
+                           eraser.setTypeface(typeface);
+                       }
+                       if (circle != null) {
+                           circle.setTypeface(typeface);
+                       }
+                       if (arrow != null) {
+                           arrow.setTypeface(typeface);
+                       }
+                   }
                }
 
                @Override
@@ -437,6 +465,7 @@ public class SketchViewContainer extends RelativeLayout {
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         layoutParams.topMargin = marginVertical;
         toolButtons.setLayoutParams(layoutParams);
+        toolButtons.setGravity(Gravity.RIGHT);
         toolButtons.setPadding(padding, padding, padding, padding);
         toolButtons.setOrientation(LinearLayout.VERTICAL);
         toolButtons.addView(pen);
@@ -530,7 +559,7 @@ public class SketchViewContainer extends RelativeLayout {
         int colorCircleDiameter = getResources().getDimensionPixelSize(R.dimen.color_circle_diameter);
         layoutParams = new RelativeLayout.LayoutParams(colorCircleDiameter, colorCircleDiameter);
         colorPalette.setLayoutParams(layoutParams);
-         colorPalette.setBackground(getResources().getDrawable(R.drawable.ic_format_color_text));
+         colorPalette.setBackground(getResources().getDrawable(R.drawable.ic_border_color));
         if (sketchView != null) {
             colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(sketchView.getToolColor()))); // TODO: solution for min API 21 needed
         }
@@ -848,5 +877,9 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
         startMultipleAnimations(allViews, alphaAnimation);
+    }
+
+    public static void setFontProvider(@Nullable FontProvider fontProvider) {
+        SketchViewContainer.fontProvider = fontProvider;
     }
 }

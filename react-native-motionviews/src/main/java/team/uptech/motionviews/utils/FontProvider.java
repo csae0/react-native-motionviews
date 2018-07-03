@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * extracting Typeface from Assets is a heavy operation,
@@ -16,7 +17,7 @@ import java.util.Map;
  */
 public class FontProvider {
 
-    private static final String DEFAULT_FONT_NAME = "Helvetica";
+    private static String DEFAULT_FONT_NAME = "Helvetica";
 
     private final Map<String, Typeface> typefaces;
     private final Map<String, String> fontNameToTypefaceFile;
@@ -42,8 +43,15 @@ public class FontProvider {
         fontNameToTypefaceFile.put("The Godfather v2", "TheGodfather_v2.ttf");
         fontNameToTypefaceFile.put("Aka Dora", "akaDora.ttf");
         fontNameToTypefaceFile.put("Waltograph", "waltograph42.ttf");
-
         fontNames = new ArrayList<>(fontNameToTypefaceFile.keySet());
+    }
+
+    public void addTypeface(String key, String value) {
+        fontNameToTypefaceFile.put(key, value);
+    }
+
+    public Set<String> getKeys() {
+        return fontNameToTypefaceFile.keySet();
     }
 
     /**
@@ -77,5 +85,8 @@ public class FontProvider {
      */
     public String getDefaultFontName() {
         return DEFAULT_FONT_NAME;
+    }
+    public void setDefaultFontName(String fontName) {
+        DEFAULT_FONT_NAME = fontName;
     }
 }

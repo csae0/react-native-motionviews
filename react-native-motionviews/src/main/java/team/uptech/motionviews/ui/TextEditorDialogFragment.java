@@ -11,11 +11,9 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.text.Selection;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -182,10 +180,22 @@ public class TextEditorDialogFragment extends DialogFragment {
             ConfigManager.getInstance().apply(new ConfigActions() {
                 @Override
                 public void applyGeneralConfig(GeneralConfig config) {
-                    // TODO: do something with it
+                    if (config.hasFontFamily() && fontProvider != null) {
+                        Typeface typeface = fontProvider.getTypeface(config.getFontFamily());
+                        if (editText != null && typeface != null) {
+                            editText.setTypeface(typeface);
+                        }
 
-
-//                    editText.setTypeface(typeface);
+                        if (cancel != null) {
+                            cancel.setTypeface(typeface);
+                        }
+                        if (clear != null) {
+                            clear.setTypeface(typeface);
+                        }
+                        if (save != null) {
+                            save.setTypeface(typeface);
+                        }
+                    }
                 }
 
                 @Override

@@ -148,6 +148,7 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
                 return;
             }
 
+            SketchViewContainer.setFontProvider(((EditCallback)activity).getFontProvider());
             final SketchViewContainer sketchViewContainer = SketchViewContainer.getInstance(main.getContext());
             sketchViewContainer.setCallback(new SketchViewCallback() {
                 @Override

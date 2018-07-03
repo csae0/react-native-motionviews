@@ -65,7 +65,7 @@ public class GeneralConfig extends Config {
     public boolean hasImageSaveName() {
         return imageSaveName != null;
     }
-    public boolean hasfontFamily() {
+    public boolean hasFontFamily() {
         return fontFamily != null;
     }
     public boolean hasInitialToolSelection() {

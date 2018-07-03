@@ -1,5 +1,6 @@
 package team.uptech.motionviews.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,11 +13,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 
-import java.util.Set;
-
 import at.csae0.reactnative.R;
 
 import at.csae0.reactnative.RNMotionViewModule;
+import at.csae0.reactnative.interfaces.ConfigActions;
+import at.csae0.reactnative.interfaces.ConfigManagerActions;
+import at.csae0.reactnative.model.GeneralConfig;
 import at.csae0.reactnative.utils.ConfigManager;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
@@ -70,9 +72,6 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 
         Bundle bundle = this.getIntent().getExtras();
         Bundle options = bundle.getBundle(RNMotionViewModule.OPTIONS_ID);
-        Set<String> keys1 = bundle.keySet();
-        Set<String> keys2 = options.keySet();
-        ConfigManager.create(options);
 
         this.fontProvider = new FontProvider(getResources());
 
@@ -81,8 +80,35 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         motionView.setTrashButton((Button)findViewById(R.id.trash_button));
         // addSticker(R.drawable.pikachu_2, true);
 //        addSketch(false);
+        ConfigManager.create(options);
+        applyConfig(this.getApplicationContext());
     }
 
+    private void applyConfig(final Context context) {
+        if (ConfigManager.hasInstance()) {
+            ConfigManager.getInstance().apply(new ConfigActions() {
+                @Override
+                public void applyGeneralConfig(GeneralConfig config) {
+                    if (config.hasFontFamily()) {
+                        fontProvider.addTypeface(config.getFontFamily(), config.getFontFamily());
+                        fontProvider.setDefaultFontName(config.getFontFamily());
+                    }
+                }
+
+                @Override
+                public void applyColorConfig(ConfigManagerActions manager) {
+                }
+
+                @Override
+                public void applySizeConfig(ConfigManagerActions manager) {
+                }
+
+                @Override
+                public void applyButtonConfigs(ConfigManagerActions manager) {
+                }
+            });
+        }
+    }
     private void addSticker(final int stickerResId, final boolean visible) {
         motionView.post(new Runnable() {
             @Override
@@ -163,8 +189,6 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                 button.setAlpha(show ? 1.0f : 0.0f);
             }
         }
-
-
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
