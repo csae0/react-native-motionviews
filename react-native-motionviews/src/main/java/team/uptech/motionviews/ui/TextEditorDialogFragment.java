@@ -39,6 +39,7 @@ import abak.tr.com.boxedverticalseekbar.BoxedVertical;
 import at.csae0.reactnative.R;
 import at.csae0.reactnative.interfaces.ConfigActions;
 import at.csae0.reactnative.interfaces.ConfigManagerActions;
+import at.csae0.reactnative.interfaces.SetSizeAction;
 import at.csae0.reactnative.model.ButtonConfig;
 import at.csae0.reactnative.model.ButtonConfigs;
 import at.csae0.reactnative.model.ColorConfig;
@@ -222,26 +223,14 @@ public class TextEditorDialogFragment extends DialogFragment {
                 public void applySizeConfig(ConfigManagerActions manager) {
                     SizeConfig config = (SizeConfig) manager.getScreenConfig(SCREEN_TYPE, SIZE);
 
-                    if (config != null) {
-                        if (config.hasBackgroundColor()) {
-                            boxedVertical.setBackgroundColor(config.getBackgroundColor());
+                    manager.configureSize(boxedVertical, config, new SetSizeAction() {
+                        @Override
+                        public void setSize(@Nullable Integer size) {
+                            if (size != null) {
+                                setTextSize(size);
+                            }
                         }
-                        if (config.hasProgrssColor()) {
-                            boxedVertical.setProgressPaint(config.getProgressColor());
-                        }
-                        if (config.hasMax()) {
-                            boxedVertical.setMax(config.getMax());
-                        }
-                        if (config.hasMin()) {
-                            boxedVertical.setMin(config.getMin());
-                        }
-                        if (config.hasStep()) {
-                            boxedVertical.setStep(config.getStep());
-                        }
-                        if (config.hasInitialValue()) {
-                            setTextSize(config.getInitialValue());
-                        }
-                    }
+                    });
                 }
 
                 @Override
@@ -268,28 +257,7 @@ public class TextEditorDialogFragment extends DialogFragment {
                                             defaultDrawable = RessourceUtils.getImageRessource("ic_check");
                                             break;
                                     }
-
-                                    if (tempButton != null) {
-                                        if (config.hasEnabled() && config.isEnabled()) {
-                                            if (config.hasLabel() && !config.hasIcon()) {
-                                                tempButton.setText(config.getLabel());
-                                            }
-                                            if (config.hasIcon() || (!config.hasLabel() && defaultDrawable != null)) {
-                                                tempButton.setText("");
-                                                tempButton.setBackground(config.hasIcon() ? config.getIcon() : defaultDrawable);
-                                                ViewGroup.LayoutParams layoutParams = tempButton.getLayoutParams();
-                                                layoutParams.width = layoutParams.height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
-                                                tempButton.setLayoutParams(layoutParams);
-                                                tempButton.setPadding(0, 0, 0, 0);
-                                            }
-                                            if (config.hasTint()) {
-                                                tempButton.setBackgroundTintList(ColorStateList.valueOf(config.getTintColor()));
-                                                tempButton.setTextColor(config.getTintColor());
-                                            }
-                                        } else if (tempButton.getParent() != null) {
-                                            ((ViewGroup) tempButton.getParent()).removeView(tempButton);
-                                        }
-                                    }
+                                    manager.configureButton(tempButton, config, defaultDrawable);
                                 }
                             }
                         }

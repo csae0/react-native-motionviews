@@ -1,30 +1,36 @@
 package team.uptech.motionviews.ui;
 
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import at.csae0.reactnative.R;
-
 import at.csae0.reactnative.RNMotionViewModule;
 import at.csae0.reactnative.interfaces.ConfigActions;
 import at.csae0.reactnative.interfaces.ConfigManagerActions;
+import at.csae0.reactnative.model.ButtonConfig;
+import at.csae0.reactnative.model.ButtonConfigs;
 import at.csae0.reactnative.model.GeneralConfig;
 import at.csae0.reactnative.utils.CONFIG_TYPE;
 import at.csae0.reactnative.utils.ConfigManager;
+
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
+import team.uptech.motionviews.utils.RessourceUtils;
 import team.uptech.motionviews.viewmodel.Font;
 import team.uptech.motionviews.viewmodel.Layer;
 import team.uptech.motionviews.viewmodel.SketchLayer;
@@ -79,16 +85,21 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 
         Bundle bundle = this.getIntent().getExtras();
         Bundle options = bundle.getBundle(RNMotionViewModule.OPTIONS_ID);
+        // Inject additional config
+        Bundle injectedOptions = new Bundle();
+        injectedOptions.putInt("sideLength", getResources().getDimensionPixelOffset(R.dimen.color_picker_height));
 
         this.fontProvider = new FontProvider(getResources());
         this.defaultText = "";
+
+        addButtons(this.getApplicationContext());
 
         motionView = findViewById(R.id.main_motion_view);
         motionView.setMotionViewCallback(motionViewCallback);
         motionView.setTrashButton((Button)findViewById(R.id.trash_button));
         // addSticker(R.drawable.pikachu_2, true);
 //        addSketch(false);
-        ConfigManager.create(options);
+        ConfigManager.create(options, injectedOptions);
         applyConfig(this.getApplicationContext());
     }
 
@@ -117,10 +128,157 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 
                 @Override
                 public void applyButtonConfigs(ConfigManagerActions manager) {
+                    ButtonConfigs configs = (ButtonConfigs) manager.getScreenConfig(SCREEN_TYPE, BUTTON);
+
+                    if (configs != null && configs.hasButtonsConfig()) {
+                        for (ButtonConfig config : configs.getButtonsConfig()) {
+                            if (config != null) {
+                                Button tempButton = null;
+                                Drawable defaultDrawable = null;
+                                if (config.getId() != null) {
+                                    switch (config.getId()) {
+                                        case CANCEL_BUTTON_CONFIG:
+                                            tempButton = cancel;
+                                            defaultDrawable = RessourceUtils.getImageRessource("ic_close");
+                                            break;
+                                        case SAVE_BUTTON_CONFIG:
+                                            tempButton = submit;
+                                            defaultDrawable = RessourceUtils.getImageRessource("ic_save");
+                                            break;
+                                        case CREATE_SKETCH_CONFIG:
+                                            tempButton = addSketch;
+                                            defaultDrawable = RessourceUtils.getImageRessource("ic_touch");
+                                            break;
+                                        case CREATE_TEXT_CONFIG:
+                                            tempButton = addText;
+                                            defaultDrawable = RessourceUtils.getImageRessource("ic_text_field");
+                                            break;
+                                        case CREATE_STICKER_CONFIG:
+                                            tempButton = addImage;
+                                            defaultDrawable = RessourceUtils.getImageRessource("ic_add");
+                                            break;
+                                    }
+                                    manager.configureButton(tempButton, config, defaultDrawable);
+                                }
+                            }
+                        }
+                    }
                 }
             });
         }
     }
+
+    // buttons
+    private void addButtons(Context context) {
+        buttons = null;
+        addButtons = null;
+        addText = addImage = addSketch = cancel = submit = null;
+
+        int padding = getResources().getDimensionPixelOffset(R.dimen.padding);
+        int height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
+        int marginVertical = getResources().getDimensionPixelOffset(R.dimen.slider_margin_vertical);
+
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, height);
+        layoutParams.topMargin = padding;
+        layoutParams.bottomMargin = padding;
+        layoutParams.leftMargin = padding;
+        layoutParams.rightMargin = padding;
+
+        cancel = new Button(context);
+        cancel.setLayoutParams(layoutParams);
+        cancel.setText("CANCEL");
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancel(v);
+            }
+        });
+        submit = new Button(context);
+        submit.setLayoutParams(layoutParams);
+        submit.setText("SUBMIT");
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                submit(v);
+            }
+        });
+
+        buttons = new RelativeLayout(context);
+        buttons.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        buttons.setPadding(padding, padding, padding, padding);
+
+        LinearLayout editButtonsRight = new LinearLayout(context);
+        RelativeLayout.LayoutParams containerLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        containerLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        editButtonsRight.setLayoutParams(containerLayoutParams);
+        editButtonsRight.addView(submit);
+
+        LinearLayout editButtonsLeft = new LinearLayout(context);
+        containerLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        containerLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        editButtonsLeft.setLayoutParams(containerLayoutParams);
+        editButtonsLeft.addView(cancel);
+
+        addSketch = new Button(context);
+        addSketch.setLayoutParams(layoutParams);
+        addSketch.setText("SKETCH");
+        addSketch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addSketch(v);
+            }
+        });
+
+        addText = new Button(context);
+        addText.setLayoutParams(layoutParams);
+        addText.setText("TEXT");
+        addText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addTextSticker(v);
+            }
+        });
+        addImage = new Button(context);
+        addImage.setLayoutParams(layoutParams);
+        addImage.setText("IMAGE");
+        addImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addSticker(v);
+            }
+        });
+
+        addButtons = new LinearLayout(context);
+        layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        layoutParams.topMargin = marginVertical;
+        addButtons.setLayoutParams(layoutParams);
+        addButtons.setGravity(Gravity.RIGHT);
+        addButtons.setPadding(padding, padding, padding, padding);
+        addButtons.setOrientation(LinearLayout.VERTICAL);
+        addButtons.addView(addSketch);
+        addButtons.addView(addText);
+        addButtons.addView(addImage);
+
+        buttons.addView(editButtonsRight);
+        buttons.addView(editButtonsLeft);
+
+        RelativeLayout rootView = findViewById(R.id.activity_main);
+        rootView.addView(buttons);
+        rootView.addView(addButtons);
+    }
+
+    public void cancel(View v) {
+        // TODO: go back to react
+        //        Intent intent = new Intent(v.getContext(), StickerSelectActivity.class);
+        //        startActivityForResult(intent, SELECT_STICKER_REQUEST_CODE);
+    }
+    public void submit(View v) {
+        // TODO: go back to react and save image if exists
+        //        Intent intent = new Intent(v.getContext(), StickerSelectActivity.class);
+        //        startActivityForResult(intent, SELECT_STICKER_REQUEST_CODE);
+    }
+
     private void addSticker(final int stickerResId, final boolean visible) {
         motionView.post(new Runnable() {
             @Override
@@ -192,13 +350,11 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
     }
 
     public void showButtons (boolean show) {
-//        ImageButton[] addButtons = { findViewById(R.id.main_add_text), findViewById(R.id.main_add_image), findViewById(R.id.main_add_sketch)};
-        ImageButton[] addButtons = { findViewById(R.id.main_add_text), findViewById(R.id.main_add_sketch)};
-
-        for(ImageButton button : addButtons) {
-            if (button != null) {
-                button.setEnabled(show);
-                button.setAlpha(show ? 1.0f : 0.0f);
+        ViewGroup[] viewGroups = new ViewGroup[]{ buttons, addButtons };
+        for(ViewGroup viewGroup: viewGroups) {
+            if (viewGroup != null) {
+                viewGroup.setEnabled(show);
+                viewGroup.setAlpha(show ? 1.0f : 0.0f);
             }
         }
     }

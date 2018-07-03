@@ -1,14 +1,21 @@
 package at.csae0.reactnative.utils;
 
+import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.ViewGroup;
+import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import abak.tr.com.boxedverticalseekbar.BoxedVertical;
+import at.csae0.reactnative.R;
 import at.csae0.reactnative.interfaces.ConfigActions;
 import at.csae0.reactnative.interfaces.ConfigManagerActions;
 import at.csae0.reactnative.interfaces.MergeConfig;
+import at.csae0.reactnative.interfaces.SetSizeAction;
 import at.csae0.reactnative.model.ButtonConfig;
 import at.csae0.reactnative.model.ButtonConfigs;
 import at.csae0.reactnative.model.ColorConfig;
@@ -149,12 +156,12 @@ public class ConfigManager implements ConfigManagerActions {
     private ArrayList<ColorConfig> colorConfigs;
     private ArrayList<SizeConfig> sizeConfigs;
 
-    public ConfigManager (Bundle bundle) {
+    public ConfigManager (Bundle bundle, @Nullable Bundle injectedBundle) {
         generalConfig = null;
         buttonConfigs = new ArrayList<>();
         colorConfigs = new ArrayList<>();
         sizeConfigs = new ArrayList<>();
-        init(bundle);
+        init(bundle, injectedBundle);
     }
 
     @Nullable
@@ -162,9 +169,9 @@ public class ConfigManager implements ConfigManagerActions {
         return instance;
     }
 
-    public static void create (@Nullable Bundle bundle) {
+    public static void create (@Nullable Bundle bundle, @Nullable Bundle injectedBundle) {
         if (bundle != null) {
-            instance = new ConfigManager(bundle);
+            instance = new ConfigManager(bundle, injectedBundle);
         }
     }
 
@@ -183,7 +190,12 @@ public class ConfigManager implements ConfigManagerActions {
         configActions.applyGeneralConfig(generalConfig);
     }
 
-    private void init (Bundle bundle) {
+    private void init (Bundle bundle, @Nullable Bundle injectedBundle) {
+        Integer buttonDefaultSideLength = null;
+        if (injectedBundle != null) {
+            buttonDefaultSideLength = injectedBundle.getInt("sideLength");
+        }
+
         for (String key : bundle.keySet()) {
             Bundle tempBundle = bundle.getBundle(key);
 
@@ -274,7 +286,7 @@ public class ConfigManager implements ConfigManagerActions {
                                     (ArrayList<String>) BundleConverter.bundleToArrayList(colorConfigBundle.getBundle("colors")),
                                     pickerConfig
                             );
-                        } else { //TODO: do not create config if null/ not existing pass null instead of "empty" PickerConfig
+                        } else {
                             colorConfig = new ColorConfig(
                                     false,
                                     null,
@@ -315,12 +327,14 @@ public class ConfigManager implements ConfigManagerActions {
                                                     buttonsBundle.getBoolean("enabled", true),
                                                     buildIconNameFromBundle(buttonsBundle.getBundle("icon")),
                                                     buttonsBundle.getString("label", null),
-                                                    buttonsBundle.getString("tint", null)
+                                                    buttonsBundle.getString("tint", null),
+                                                    buttonDefaultSideLength
                                             );
                                         } else {
                                             buttonsConfig = new ButtonConfig(
                                                     CONFIG_TYPE.get(key),
                                                     false,
+                                                    null,
                                                     null,
                                                     null,
                                                     null
@@ -401,5 +415,60 @@ public class ConfigManager implements ConfigManagerActions {
         }
 
         return config;
+    }
+
+    @Override
+    public void configureButton(@Nullable Button tempButton, @Nullable ButtonConfig config, @Nullable Drawable defaultDrawable) {
+        if (tempButton != null && config != null) {
+            if (config.hasEnabled() && config.isEnabled()) {
+                if (config.hasLabel() && !config.hasIcon()) {
+                    tempButton.setText(config.getLabel());
+                    tempButton.setBackground(null);
+                }
+                if (config.hasIcon() || (!config.hasLabel() && defaultDrawable != null)) {
+                    tempButton.setText("");
+                    tempButton.setBackground(config.hasIcon() ? config.getIcon() : defaultDrawable);
+                    ViewGroup.LayoutParams layoutParams = tempButton.getLayoutParams();
+                    if (config.hasSideLength()) {
+                        layoutParams.width = layoutParams.height = config.getSideLength();
+                    }
+                    tempButton.setLayoutParams(layoutParams);
+                    tempButton.setPadding(0, 0, 0, 0);
+                }
+                if (config.hasTint()) {
+                    Integer tintColor = config.getTintColor();
+                    tempButton.setBackgroundTintList(ColorStateList.valueOf(tintColor));
+                    tempButton.setTextColor(tintColor);
+                }
+            } else if (tempButton.getParent() != null) {
+                ((ViewGroup) tempButton.getParent()).removeView(tempButton);
+            }
+        }
+    }
+
+    @Override
+    public void configureSize(@Nullable BoxedVertical boxedVertical, @Nullable SizeConfig config, SetSizeAction setSizeAction) {
+        if (config != null) {
+            if (boxedVertical != null) {
+                if (config.hasBackgroundColor()) {
+                    boxedVertical.setBackgroundColor(config.getBackgroundColor());
+                }
+                if (config.hasProgrssColor()) {
+                    boxedVertical.setProgressPaint(config.getProgressColor());
+                }
+                if (config.hasMax()) {
+                    boxedVertical.setMax(config.getMax());
+                }
+                if (config.hasMin()) {
+                    boxedVertical.setMin(config.getMin());
+                }
+                if (config.hasStep()) {
+                    boxedVertical.setStep(config.getStep());
+                }
+            }
+            if (config.hasInitialValue() && setSizeAction != null) {
+                setSizeAction.setSize(config.getInitialValue());
+            }
+        }
     }
 }

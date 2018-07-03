@@ -39,6 +39,7 @@ import abak.tr.com.boxedverticalseekbar.BoxedVertical;
 import at.csae0.reactnative.R;
 import at.csae0.reactnative.interfaces.ConfigActions;
 import at.csae0.reactnative.interfaces.ConfigManagerActions;
+import at.csae0.reactnative.interfaces.SetSizeAction;
 import at.csae0.reactnative.model.ButtonConfig;
 import at.csae0.reactnative.model.ButtonConfigs;
 import at.csae0.reactnative.model.ColorConfig;
@@ -166,27 +167,14 @@ public class SketchViewContainer extends RelativeLayout {
                @Override
                public void applySizeConfig(ConfigManagerActions manager) {
                    SizeConfig config = (SizeConfig) manager.getScreenConfig(SCREEN_TYPE, SIZE);
-
-                   if (config != null) {
-                       if (config.hasBackgroundColor()) {
-                           boxedVertical.setBackgroundColor(config.getBackgroundColor());
+                   manager.configureSize(boxedVertical, config, new SetSizeAction() {
+                       @Override
+                       public void setSize(@Nullable Integer size) {
+                           if (size != null) {
+                               setToolThickness(size);
+                           }
                        }
-                       if (config.hasProgrssColor()) {
-                           boxedVertical.setProgressPaint(config.getProgressColor());
-                       }
-                       if (config.hasMax()) {
-                           boxedVertical.setMax(config.getMax());
-                       }
-                       if (config.hasMin()) {
-                           boxedVertical.setMin(config.getMin());
-                       }
-                       if (config.hasStep()) {
-                           boxedVertical.setStep(config.getStep());
-                       }
-                       if (config.hasInitialValue()) {
-                           setToolThickness(config.getInitialValue());
-                       }
-                   }
+                   });
                }
 
                @Override
@@ -197,72 +185,43 @@ public class SketchViewContainer extends RelativeLayout {
                        for (ButtonConfig config : configs.getButtonsConfig()) {
                            if (config != null) {
                                Button tempButton = null;
-                               Integer tempTint = null;
                                Drawable defaultDrawable = null;
                                if (config.getId() != null) {
                                    switch (config.getId()) {
                                        case CANCEL_BUTTON_CONFIG:
                                            tempButton = cancel;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_close");
-                                           tempTint = config.getTintColor();
                                            break;
                                        case CLEAR_BUTTON_CONFIG:
                                            tempButton = clear;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_trash");
-                                           tempTint = config.getTintColor();
                                            break;
                                        case SAVE_BUTTON_CONFIG:
                                            tempButton = save;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_check");
-                                           tempTint = config.getTintColor();
                                            break;
                                        case PEN_TOOL_CONFIG:
                                            tempButton = pen;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_pen_tool");
-                                           tempTint = config.getTintColor();
                                            penTint = config.getTintColor();
                                            break;
                                        case ERASE_TOOL_CONFIG:
                                            tempButton = eraser;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_erase_tool");
-                                           tempTint = config.getTintColor();
                                            eraserTint = config.getTintColor();
                                            break;
                                        case CIRCLE_TOOL_CONFIG:
                                            tempButton = circle;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_circle_tool");
-                                           tempTint = config.getTintColor();
                                            circleTint = config.getTintColor();
                                            break;
                                        case ARROW_TOOL_CONFIG:
                                            tempButton = arrow;
                                            defaultDrawable = RessourceUtils.getImageRessource("ic_arrow_tool");
-                                           tempTint = config.getTintColor();
                                            arrowTint = config.getTintColor();
                                            break;
                                    }
-                                   if (tempButton != null) {
-                                       if (config.hasEnabled() && config.isEnabled()) {
-                                           if (config.hasLabel() && !config.hasIcon()) {
-                                               tempButton.setText(config.getLabel());
-                                               tempButton.setBackground(null);
-                                           }
-                                           if (config.hasIcon() || (!config.hasLabel() && defaultDrawable != null)) {
-                                               tempButton.setText("");
-                                               tempButton.setBackground(config.hasIcon() ? config.getIcon() : defaultDrawable);
-                                               ViewGroup.LayoutParams layoutParams = tempButton.getLayoutParams();
-                                               layoutParams.width = layoutParams.height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
-                                               tempButton.setLayoutParams(layoutParams);
-                                               tempButton.setPadding(0, 0, 0, 0);
-                                           }
-                                           if (tempTint != null) {
-                                               tempButton.setBackgroundTintList(ColorStateList.valueOf(tempTint));
-                                               tempButton.setTextColor(tempTint);
-                                           }
-                                       } else if (tempButton.getParent() != null) {
-                                           ((ViewGroup) tempButton.getParent()).removeView(tempButton);
-                                       }
-                                   }
+                                   manager.configureButton(tempButton, config, defaultDrawable);
                                }
                            }
                        }

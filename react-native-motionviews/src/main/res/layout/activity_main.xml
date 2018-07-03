@@ -26,38 +26,4 @@
             android:clickable="false">
         </Button>
     </RelativeLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true">
-        <ImageButton
-            android:id="@+id/main_add_text"
-            android:background="@drawable/ic_add_text"
-            android:backgroundTint="@android:color/black"
-            android:title="@string/add_text"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="@dimen/padding"
-            android:onClick="addTextSticker">
-        </ImageButton>
-        <!--<ImageButton-->
-            <!--android:id="@+id/main_add_image"-->
-            <!--android:background="@drawable/ic_add"-->
-            <!--android:backgroundTint="@android:color/black"-->
-            <!--android:title="@string/add_sticker"-->
-            <!--android:layout_width="40dp"-->
-            <!--android:layout_height="40dp"-->
-            <!--android:layout_marginTop="@dimen/padding"-->
-            <!--android:onClick="addSticker">-->
-        <!--</ImageButton>-->
-        <ImageButton
-            android:id="@+id/main_add_sketch"
-            android:background="@drawable/pokeball"
-            android:title="@string/add_sticker"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="@dimen/padding"
-            android:onClick="addSketch">
-        </ImageButton>
-    </LinearLayout>
 </RelativeLayout>

@@ -12,18 +12,25 @@ public class ButtonConfig extends Config {
     private String iconName;
     private String label;
     private String tint;
+    private Integer imageButtonSideLength;
 
-    public ButtonConfig (CONFIG_TYPE id, @Nullable Boolean enabled, @Nullable String icon, @Nullable String label, @Nullable String tint) {
+    public ButtonConfig (CONFIG_TYPE id, @Nullable Boolean enabled, @Nullable String icon, @Nullable String label, @Nullable String tint, @Nullable Integer sideLength) {
         super(id, enabled);
 
         setIconName(icon);
         setLabel(label);
         setTint(tint);
+        setSideLength(sideLength);
     }
 
     @Nullable
     public String getIconName() {
         return iconName;
+    }
+
+    @Nullable
+    public Integer getSideLength() {
+        return imageButtonSideLength;
     }
 
     @Nullable
@@ -71,6 +78,14 @@ public class ButtonConfig extends Config {
         this.tint = tint;
     }
 
+    public void setSideLength(@Nullable Integer sideLength) {
+        if (sideLength != null && sideLength > 0) {
+            imageButtonSideLength = sideLength;
+        } else {
+            imageButtonSideLength = null;
+        }
+    }
+
     public boolean hasIcon() {
         if (this.iconName != null) {
             String[] icon = this.iconName.split("\\.");
@@ -81,6 +96,9 @@ public class ButtonConfig extends Config {
         return false;
     }
 
+    public boolean hasSideLength() {
+        return imageButtonSideLength != null;
+    }
     public boolean hasLabel() {
         return label != null;
     }
