@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import at.csae0.reactnative.R;
 
@@ -19,6 +21,7 @@ import at.csae0.reactnative.RNMotionViewModule;
 import at.csae0.reactnative.interfaces.ConfigActions;
 import at.csae0.reactnative.interfaces.ConfigManagerActions;
 import at.csae0.reactnative.model.GeneralConfig;
+import at.csae0.reactnative.utils.CONFIG_TYPE;
 import at.csae0.reactnative.utils.ConfigManager;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
