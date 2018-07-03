@@ -137,19 +137,14 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
         if (bitmap == null) {
             setVisible(false);
             callEntityCallback(true);
-            SketchLayer sketchLayer = getLayer();
 
-            Stroke stroke = sketchLayer.getStroke();
-            int size = (int) (stroke.getSize() + 0.5f);
-            int color = stroke.getColor();
-            // TODO: set size and color for sketchView!
             RelativeLayout main = activity.findViewById(R.id.activity_main);
             if (main == null) {
                 return;
             }
 
-            SketchViewContainer.setFontProvider(((EditCallback)activity).getFontProvider());
-            final SketchViewContainer sketchViewContainer = SketchViewContainer.getInstance(main.getContext());
+            SketchViewContainer.setFontProvider(((EditCallback)activity).getFontProvider()); // for button labels if existing
+            final SketchViewContainer sketchViewContainer = SketchViewContainer.getInstance(main.getContext()); // applies config
             sketchViewContainer.setCallback(new SketchViewCallback() {
                 @Override
                 public void closeAndCreateEntity (@Nullable Bitmap bitmap, @Nullable Rect position, @Nullable Integer color, @Nullable Integer sizeInPixel) {

@@ -2,6 +2,8 @@ package at.csae0.reactnative.utils;
 
 import android.support.annotation.Nullable;
 
+import com.sketchView.tools.Blueprints.SketchTool;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +25,21 @@ public enum TOOL_TYPE {
 
     public String getName() {
         return this.name;
+    }
+
+    @Nullable
+    public Integer getInt() {
+        switch (this) {
+            case PEN_TOOL:
+                return SketchTool.TYPE_PEN;
+            case ERASER_TOOL:
+                return SketchTool.TYPE_ERASE;
+            case CIRCLE_TOOL:
+                return SketchTool.TYPE_CIRCLE;
+            case ARROW_TOOL:
+                return SketchTool.TYPE_ARROW;
+        }
+        return null;
     }
 
     public Set<String> getKeySet() {

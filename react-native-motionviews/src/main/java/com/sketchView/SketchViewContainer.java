@@ -138,6 +138,10 @@ public class SketchViewContainer extends RelativeLayout {
                            arrow.setTypeface(typeface);
                        }
                    }
+
+                   if (config.hasInitialToolSelection()) {
+                       setToolType(config.getInitialToolSelection().getInt());
+                   }
                }
 
                @Override
@@ -469,6 +473,7 @@ public class SketchViewContainer extends RelativeLayout {
         addView(buttons);
         addView(toolButtons);
     }
+
     private void addToolThicknessSlider (Context context) {
         // boxed vertical seekbar
         boxedVertical = new BoxedVertical(context);

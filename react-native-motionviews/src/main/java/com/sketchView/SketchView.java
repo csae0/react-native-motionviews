@@ -358,26 +358,31 @@ public class SketchView extends View {
         invalidate();
     }
 
+    public void destroy() {
+        clear();
+        instance = null;
+    }
     /**
      *  getters and setters
      */
-    public void setToolType(int toolType) {
-        switch (toolType) {
-            case SketchTool.TYPE_PEN:
-                currentTool = penTool;
-                break;
-            case SketchTool.TYPE_ERASE:
-                currentTool = eraseTool;
-                break;
-            case SketchTool.TYPE_CIRCLE:
-                currentTool = circleTool;
-                break;
-            case SketchTool.TYPE_ARROW:
-                currentTool = arrowTool;
-                break;
-            default:
-                currentTool = penTool;
+    public void setToolType(@Nullable Integer toolType) {
+        if (toolType != null) {
+            switch (toolType) {
+                case SketchTool.TYPE_PEN:
+                    currentTool = penTool;
+                    return;
+                case SketchTool.TYPE_ERASE:
+                    currentTool = eraseTool;
+                    return;
+                case SketchTool.TYPE_CIRCLE:
+                    currentTool = circleTool;
+                    return;
+                case SketchTool.TYPE_ARROW:
+                    currentTool = arrowTool;
+                    return;
+            }
         }
+        currentTool = penTool;
     }
     public void setToolColor(int toolColor) {
         ((ToolColor) penTool).setToolColor(toolColor);
