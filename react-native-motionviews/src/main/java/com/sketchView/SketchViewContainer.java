@@ -253,7 +253,7 @@ public class SketchViewContainer extends RelativeLayout {
                                            }
                                            if (tempTint != null) {
                                                tempButton.setBackgroundTintList(ColorStateList.valueOf(tempTint));
-                                               // tempButton.setTextColor(tempTint);
+                                               tempButton.setTextColor(tempTint);
                                            }
                                        } else if (tempButton.getParent() != null) {
                                            ((LinearLayout) tempButton.getParent()).removeView(tempButton);

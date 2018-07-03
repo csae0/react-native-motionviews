@@ -274,7 +274,7 @@ public class TextEditorDialogFragment extends DialogFragment {
                                             if (config.hasLabel() && !config.hasIcon()) {
                                                 tempButton.setText(config.getLabel());
                                             }
-                                            if (config.hasIcon() || defaultDrawable != null) {
+                                            if (config.hasIcon() || (!config.hasLabel() && defaultDrawable != null)) {
                                                 tempButton.setText("");
                                                 tempButton.setBackground(config.hasIcon() ? config.getIcon() : defaultDrawable);
                                                 ViewGroup.LayoutParams layoutParams = tempButton.getLayoutParams();
@@ -284,6 +284,7 @@ public class TextEditorDialogFragment extends DialogFragment {
                                             }
                                             if (config.hasTint()) {
                                                 tempButton.setBackgroundTintList(ColorStateList.valueOf(config.getTintColor()));
+                                                tempButton.setTextColor(config.getTintColor());
                                             }
                                         } else if (tempButton.getParent() != null) {
                                             ((LinearLayout) tempButton.getParent()).removeView(tempButton);
