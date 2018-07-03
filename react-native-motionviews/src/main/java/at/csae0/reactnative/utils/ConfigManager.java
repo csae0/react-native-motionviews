@@ -19,6 +19,128 @@ import at.csae0.reactnative.model.ScreenConfig;
 import at.csae0.reactnative.model.SizeConfig;
 import team.uptech.motionviews.utils.RessourceUtils;
 
+/**
+ * EXAMPLE CONFIG
+ *
+ const defaultOptions = {
+     generalConfig: {
+         backgroundImage: 'path to image',
+         imageSaveName: 'path where image is saved to / image name ?',
+         fontFamily: 'pero_regular.otf',
+         initialToolSelection: 'pen',
+         initialText: 'test',
+         initialTool: 'penTool'
+     },
+     buttonConfigs: [{
+         screen: 'allScreens',
+         configs: [
+                {
+                 id: 'cancelButtonConfig',
+                 enabled: true,
+                 icon: {},
+                 label: '',
+                 tint: '#000000'
+                }, {
+                 id: 'clearButtonConfig',
+                 enabled: true,
+                 icon: {},
+                 label: '',
+                 tint: '#000000'
+                }, {
+                 id: 'saveButtonConfig',
+                 enabled: true,
+                 icon: {},
+                 label: null,
+                 tint: '#000000'
+                }, {
+                 id: 'penToolConfig',
+                 enabled: true,
+                 icon: {},
+                 label: null,
+                 tint: '#000000'
+                }, {
+                 id: 'eraseToolConfig',
+                 enabled: true,
+                 icon: {},
+                 label: null,
+                 tint: '#000000'
+                }, {
+                 id: 'circleToolConfig',
+                 enabled: true,
+                 icon: {},
+                 label: null,
+                 tint: '#000000'
+                }, {
+                 id: 'arrowToolConfig',
+                 enabled: true,
+                 icon: {},
+                 label: '',
+                 tint: '#000000'
+                }
+        ]}, {
+         screen: 'textEntityScreen',
+         configs: [
+             {
+                 id: 'cancelButtonConfig',
+                 enabled: true,
+                 icon: {},
+                 label: '',
+                 tint: '#FFFFFF'
+             }, {
+                 id: 'clearButtonConfig',
+                 enabled: true,
+                 icon: {},
+                 label: null,
+                 tint: '#FFFFFF'
+             }, {
+                 id: 'saveButtonConfig',
+                 enabled: true,
+                 icon: {},
+                 label: '',
+                 tint: '#FFFFFF'
+             }
+         ]
+     }],
+     colorConfig: [
+        {
+         screen: 'allScreens',
+         enabled: true,
+         initialColor: '#000000',
+         colors: ['#000000', '#20BBFC', '#2DFD2F', '#FD28F9', '#EA212E', '#FD7E24', '#FFFA38', '#FFFFFF'],
+         pickerConfig: {
+         enabled: true,
+         icon: {},
+         pickerLabel: 'Some label',
+         cancelText: 'cancel',
+         submitText: 'ok'
+         }
+     }
+     ],
+     sizeConfig: [
+     {
+     screen: 'sketchEntityScreen',
+     enabled: true,
+     backgroundColor: null,
+     progressColor: null,
+     initialValue: 5,
+     min: 2,
+     max: 40,
+     step: 1
+     },
+     {
+     screen: 'textEntityScreen',
+     enabled: true,
+     backgroundColor: null,
+     progressColor: null,
+     initialValue: 30,
+     min: 15,
+     max: 70,
+     step: 1
+     }
+     ]
+ }
+ */
+
 public class ConfigManager implements ConfigManagerActions {
     private static ConfigManager instance = null;
 

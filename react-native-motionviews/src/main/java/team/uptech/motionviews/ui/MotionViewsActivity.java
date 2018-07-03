@@ -40,6 +40,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 
     public static final int SELECT_STICKER_REQUEST_CODE = 123;
     protected MotionView motionView;
+    private String defaultText;
 
     private final MotionViewCallback motionViewCallback = new MotionViewCallback() {
         @Override
@@ -74,6 +75,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         Bundle options = bundle.getBundle(RNMotionViewModule.OPTIONS_ID);
 
         this.fontProvider = new FontProvider(getResources());
+        this.defaultText = "";
 
         motionView = findViewById(R.id.main_motion_view);
         motionView.setMotionViewCallback(motionViewCallback);
@@ -89,9 +91,13 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
             ConfigManager.getInstance().apply(new ConfigActions() {
                 @Override
                 public void applyGeneralConfig(GeneralConfig config) {
-                    if (config.hasFontFamily()) {
+                    if (config.hasFontFamily() && fontProvider != null) {
                         fontProvider.addTypeface(config.getFontFamily(), config.getFontFamily());
                         fontProvider.setDefaultFontName(config.getFontFamily());
+                    }
+
+                    if (config.hasInitialText()) {
+                       defaultText = config.getInitialText();
                     }
                 }
 
@@ -174,7 +180,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         font.setTypeface(fontProvider.getDefaultFontName());
 
         textLayer.setFont(font);
-        textLayer.setText("DEBUG");
+        textLayer.setText(defaultText);
 
         return textLayer;
     }
