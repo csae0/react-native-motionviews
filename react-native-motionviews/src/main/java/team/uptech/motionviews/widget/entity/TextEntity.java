@@ -100,7 +100,7 @@ public class TextEntity extends MotionEntity implements TextEntityActions {
      * @param reuseBmp  the bitmap that will be reused
      * @return bitmap with the text
      */
-    @NonNull
+    @Nullable
     private Bitmap createBitmap(@NonNull TextLayer textLayer, @Nullable Bitmap reuseBmp) {
 
         // init params - size, color, typeface
@@ -140,8 +140,10 @@ public class TextEntity extends MotionEntity implements TextEntityActions {
             // if previous bitmap exists, and it's width/height is the same - reuse it
             bmp = reuseBmp;
             bmp.eraseColor(Color.TRANSPARENT); // erase color when reusing
-        } else {
+        } else if (boundsHeight > 0 && boundsWidth > 0) {
             bmp = Bitmap.createBitmap(boundsWidth, boundsHeight, Bitmap.Config.ARGB_8888);
+        } else {
+            return null;
         }
         Canvas canvas = new Canvas(bmp);
         canvas.save();

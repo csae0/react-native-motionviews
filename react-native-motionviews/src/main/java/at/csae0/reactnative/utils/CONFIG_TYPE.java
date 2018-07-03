@@ -36,6 +36,7 @@ public enum CONFIG_TYPE {
 
     // screen types
     ALL_SCREENS("allScreens"),
+    MAIN_SCREEN("mainScreen"),
     TEXT_ENTITY_SCREEN("textEntityScreen"),
     IMAGE_ENTITY_SCREEN("imageEntityScreen"),
     SKETCH_ENTITY_SCREEN("sketchEntityScreen");

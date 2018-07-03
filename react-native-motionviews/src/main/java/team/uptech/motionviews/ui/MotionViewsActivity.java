@@ -38,10 +38,13 @@ import team.uptech.motionviews.widget.entity.TextEntity;
 
 public class MotionViewsActivity extends AppCompatActivity implements EditCallback {
 
+    private static final CONFIG_TYPE SCREEN_TYPE = CONFIG_TYPE.MAIN_SCREEN;
     public static final int SELECT_STICKER_REQUEST_CODE = 123;
     protected MotionView motionView;
     private String defaultText;
-
+    private RelativeLayout buttons;
+    private LinearLayout addButtons;
+    private Button addText, addImage, addSketch, cancel, submit;
     private final MotionViewCallback motionViewCallback = new MotionViewCallback() {
         @Override
         public void onEntitySelected(@Nullable MotionEntity entity) {

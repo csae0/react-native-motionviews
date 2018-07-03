@@ -287,7 +287,7 @@ public class TextEditorDialogFragment extends DialogFragment {
                                                 tempButton.setTextColor(config.getTintColor());
                                             }
                                         } else if (tempButton.getParent() != null) {
-                                            ((LinearLayout) tempButton.getParent()).removeView(tempButton);
+                                            ((ViewGroup) tempButton.getParent()).removeView(tempButton);
                                         }
                                     }
                                 }
