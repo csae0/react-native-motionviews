@@ -16,6 +16,8 @@ import com.sketchView.utils.ToolUtils;
 public class EraseSketchTool extends PathTrackingSketchTool implements ToolThickness {
 
     private static final float DEFAULT_THICKNESS = 10;
+    private static final float THICKNESS_MULTIPLICATOR = 2.5f;
+
 
     private Paint paint = new Paint();
 
@@ -44,7 +46,7 @@ public class EraseSketchTool extends PathTrackingSketchTool implements ToolThick
 
     @Override
     public void setToolThickness(float thickness) {
-        toolThickness = thickness;
+        toolThickness = thickness * THICKNESS_MULTIPLICATOR;
         paint.setStrokeWidth(ToolUtils.ConvertDPToPixels(touchView.getContext(), toolThickness));
     }
 

@@ -6,7 +6,9 @@
         android:allowBackup="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="team.uptech.motionviews.ui.MotionViewsActivity">
+        <activity
+            android:name="team.uptech.motionviews.ui.MotionViewsActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
