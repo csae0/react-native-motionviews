@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,121 +32,139 @@ import team.uptech.motionviews.utils.RessourceUtils;
  * EXAMPLE CONFIG
  *
  const defaultOptions = {
-     generalConfig: {
-         backgroundImage: 'path to image',
-         imageSaveName: 'path where image is saved to / image name ?',
-         fontFamily: 'pero_regular.otf',
-         initialToolSelection: 'pen',
-         initialText: 'test',
-         initialTool: 'penTool'
-     },
-     buttonConfigs: [{
-         screen: 'allScreens',
-         configs: [
-                {
-                 id: 'cancelButtonConfig',
-                 enabled: true,
-                 icon: {},
-                 label: '',
-                 tint: '#000000'
-                }, {
-                 id: 'clearButtonConfig',
-                 enabled: true,
-                 icon: {},
-                 label: '',
-                 tint: '#000000'
-                }, {
-                 id: 'saveButtonConfig',
-                 enabled: true,
-                 icon: {},
-                 label: null,
-                 tint: '#000000'
-                }, {
-                 id: 'penToolConfig',
-                 enabled: true,
-                 icon: {},
-                 label: null,
-                 tint: '#000000'
-                }, {
-                 id: 'eraseToolConfig',
-                 enabled: true,
-                 icon: {},
-                 label: null,
-                 tint: '#000000'
-                }, {
-                 id: 'circleToolConfig',
-                 enabled: true,
-                 icon: {},
-                 label: null,
-                 tint: '#000000'
-                }, {
-                 id: 'arrowToolConfig',
-                 enabled: true,
-                 icon: {},
-                 label: '',
-                 tint: '#000000'
-                }
-        ]}, {
-         screen: 'textEntityScreen',
-         configs: [
-             {
-                 id: 'cancelButtonConfig',
-                 enabled: true,
-                 icon: {},
-                 label: '',
-                 tint: '#FFFFFF'
-             }, {
-                 id: 'clearButtonConfig',
-                 enabled: true,
-                 icon: {},
-                 label: null,
-                 tint: '#FFFFFF'
-             }, {
-                 id: 'saveButtonConfig',
-                 enabled: true,
-                 icon: {},
-                 label: '',
-                 tint: '#FFFFFF'
-             }
-         ]
-     }],
-     colorConfig: [
-        {
-         screen: 'allScreens',
-         enabled: true,
-         initialColor: '#000000',
-         colors: ['#000000', '#20BBFC', '#2DFD2F', '#FD28F9', '#EA212E', '#FD7E24', '#FFFA38', '#FFFFFF'],
-         pickerConfig: {
-         enabled: true,
-         icon: {},
-         pickerLabel: 'Some label',
-         cancelText: 'cancel',
-         submitText: 'ok'
-         }
-     }
-     ],
-     sizeConfig: [
-     {
-     screen: 'sketchEntityScreen',
-     enabled: true,
-     backgroundColor: null,
-     progressColor: null,
-     initialValue: 5,
-     min: 2,
-     max: 40,
-     step: 1
-     },
-     {
-     screen: 'textEntityScreen',
-     enabled: true,
-     backgroundColor: null,
-     progressColor: null,
-     initialValue: 30,
-     min: 15,
-     max: 70,
-     step: 1
-     }
-     ]
+ generalConfig: {
+ backgroundImage: 'path to image',
+ imageSaveName: 'path where image is saved to / image name ?',
+ fontFamily: 'pero_regular.otf',
+ initialToolSelection: 'penTool',
+ initialText: ''
+ },
+ buttonConfigs: [{
+ screen: 'allScreens',
+ configs: [
+ {
+ id: 'cancelButtonConfig',
+ enabled: true,
+ icon: {},
+ label: '',
+ tint: '#000000'
+ }, {
+ id: 'clearButtonConfig',
+ enabled: true,
+ icon: {},
+ label: '',
+ tint: '#000000'
+ }, {
+ id: 'saveButtonConfig',
+ enabled: true,
+ icon: {},
+ label: null,
+ tint: '#000000'
+ }, {
+ id: 'penToolConfig',
+ enabled: true,
+ icon: {},
+ label: null,
+ tint: '#000000'
+ }, {
+ id: 'eraseToolConfig',
+ enabled: true,
+ icon: {},
+ label: null,
+ tint: '#000000'
+ }, {
+ id: 'circleToolConfig',
+ enabled: true,
+ icon: {},
+ label: null,
+ tint: '#000000'
+ }, {
+ id: 'arrowToolConfig',
+ enabled: true,
+ icon: {},
+ label: '',
+ tint: '#000000'
+ }, {
+ id: 'createTextConfig',
+ enabled: true,
+ icon: {},
+ label: '',
+ tint: '#000000'
+ }, {
+ id: 'createSketchConfig',
+ enabled: true,
+ icon: {},
+ label: '',
+ tint: '#000000'
+ }, {
+ id: 'createStickerConfig',
+ enabled: true,
+ icon: {},
+ label: '',
+ tint: '#000000'
+ }
+ ]
+ }, {
+ screen: 'textEntityScreen',
+ configs: [
+ {
+ id: 'cancelButtonConfig',
+ enabled: true,
+ icon: {},
+ label: '',
+ tint: '#FFFFFF'
+ }, {
+ id: 'clearButtonConfig',
+ enabled: true,
+ icon: {},
+ label: null,
+ tint: '#FFFFFF'
+ }, {
+ id: 'saveButtonConfig',
+ enabled: true,
+ icon: {},
+ label: '',
+ tint: '#FFFFFF'
+ }
+ ]
+ }],
+ colorConfig: [
+ {
+ screen: 'allScreens',
+ enabled: true,
+ initialColor: '#000000',
+ colors: ['#000000', '#20BBFC', '#2DFD2F', '#FD28F9', '#EA212E', '#FD7E24', '#FFFA38', '#FFFFFF'],
+ pickerConfig: {
+ enabled: true,
+ icon: {},
+ pickerLabel: 'Some label',
+ cancelText: 'cancel',
+ submitText: 'ok'
+ }
+ }
+ ],
+ sizeConfig: [
+ {
+ screen: 'sketchEntityScreen',
+ enabled: true,
+ backgroundColor: null,
+ progressColor: null,
+ initialValue: 5,
+ min: 2,
+ max: 40,
+ step: 1
+ },
+ {
+ screen: 'textEntityScreen',
+ enabled: true,
+ backgroundColor: null,
+ progressColor: null,
+ initialValue: 30,
+ min: 15,
+ max: 70,
+ step: 1
+ }
+ ]
  }
  */
 
@@ -328,12 +348,19 @@ public class ConfigManager implements ConfigManagerActions {
                                                     buildIconNameFromBundle(buttonsBundle.getBundle("icon")),
                                                     buttonsBundle.getString("label", null),
                                                     buttonsBundle.getString("tint", null),
-                                                    buttonDefaultSideLength
+                                                    buttonsBundle.getInt("sideLength", buttonDefaultSideLength),
+                                                    new int[]{
+                                                            buttonsBundle.getInt("paddingLeft", 0),
+                                                            buttonsBundle.getInt("paddingTop", 0),
+                                                            buttonsBundle.getInt("paddingRight", 0),
+                                                            buttonsBundle.getInt("paddingBottom", 0)
+                                                    }
                                             );
                                         } else {
                                             buttonsConfig = new ButtonConfig(
                                                     CONFIG_TYPE.get(key),
                                                     false,
+                                                    null,
                                                     null,
                                                     null,
                                                     null,
@@ -431,6 +458,14 @@ public class ConfigManager implements ConfigManagerActions {
                     ViewGroup.LayoutParams layoutParams = tempButton.getLayoutParams();
                     if (config.hasSideLength()) {
                         layoutParams.width = layoutParams.height = config.getSideLength();
+                    }
+
+                    if (layoutParams instanceof LinearLayout.LayoutParams) {
+                        LinearLayout.LayoutParams castedLayoutParams = ((LinearLayout.LayoutParams)tempButton.getLayoutParams());
+                        castedLayoutParams.leftMargin = config.getPaddingLeft();
+                        castedLayoutParams.topMargin = config.getPaddingTop();
+                        castedLayoutParams.rightMargin = config.getPaddingRight();
+                        castedLayoutParams.bottomMargin = config.getPaddingBottom();
                     }
                     tempButton.setLayoutParams(layoutParams);
                     tempButton.setPadding(0, 0, 0, 0);

@@ -13,19 +13,37 @@ public class ButtonConfig extends Config {
     private String label;
     private String tint;
     private Integer imageButtonSideLength;
+    private int[] padding = new int[]{0,0,0,0};
 
-    public ButtonConfig (CONFIG_TYPE id, @Nullable Boolean enabled, @Nullable String icon, @Nullable String label, @Nullable String tint, @Nullable Integer sideLength) {
+    public ButtonConfig (CONFIG_TYPE id, @Nullable Boolean enabled, @Nullable String icon, @Nullable String label, @Nullable String tint, @Nullable Integer sideLength, @Nullable int[] padding) {
         super(id, enabled);
 
         setIconName(icon);
         setLabel(label);
         setTint(tint);
         setSideLength(sideLength);
+        setPadding(padding);
     }
 
     @Nullable
     public String getIconName() {
         return iconName;
+    }
+
+    public int getPaddingLeft() {
+        return padding[0];
+    }
+    public int getPaddingTop() {
+        return padding[1];
+    }
+    public int getPaddingRight() {
+        return padding[2];
+    }
+    public int getPaddingBottom() {
+        return padding[3];
+    }
+    public int[] getPaddings() {
+        return padding;
     }
 
     @Nullable
@@ -76,6 +94,18 @@ public class ButtonConfig extends Config {
 
     public void setTint(@Nullable String tint) {
         this.tint = tint;
+    }
+
+    public void setPadding(@Nullable int[] paddings) {
+        if (paddings != null && paddings.length == 4) {
+            for (int i = 0; i < paddings.length; i++) {
+                if (paddings[i] > 0) {
+                    this.padding[i] = paddings[i];
+                } else {
+                    this.padding[i] = 0;
+                }
+            }
+        }
     }
 
     public void setSideLength(@Nullable Integer sideLength) {
