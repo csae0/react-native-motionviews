@@ -222,7 +222,7 @@ public class ConfigManager implements ConfigManagerActions {
             if (CONFIG_TYPE.get(key) == CONFIG_TYPE.GENERAL_CONFIG) { // GENERAL CONFIG
                 if (tempBundle != null) {
                     generalConfig = new GeneralConfig(
-                            tempBundle.getString("backgroundImage", null),
+                            tempBundle.getString("backgroundImagePath", null),
                             tempBundle.getString("imageSaveName", null),
                             tempBundle.getString("fontFamily", null),
                             tempBundle.getString("initialToolSelection", null),

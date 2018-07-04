@@ -1,19 +1,26 @@
 package at.csae0.reactnative.model;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
+import android.widget.RelativeLayout;
 
+import at.csae0.reactnative.R;
 import at.csae0.reactnative.utils.CONFIG_TYPE;
 import at.csae0.reactnative.utils.TOOL_TYPE;
 
 public class GeneralConfig extends Config {
 
-    private String backgroundImage, imageSaveName, fontFamily, initialText;
+    private String backgroundImagePath, imageSaveName, fontFamily, initialText;
     private TOOL_TYPE initialToolSelection;
 
-    public GeneralConfig (@Nullable String backgroundImage, @Nullable String imageSaveName, @Nullable String fontFamily, @Nullable String initialToolSelection, @Nullable String initialText) {
+    public GeneralConfig (@Nullable String backgroundImagePath, @Nullable String imageSaveName, @Nullable String fontFamily, @Nullable String initialToolSelection, @Nullable String initialText) {
         super(CONFIG_TYPE.GENERAL_CONFIG, true);
 
-        setBackgroundImage(backgroundImage);
+        setBackgroundImagePath(backgroundImagePath);
         setImageSaveName(imageSaveName);
         setFontFamily(fontFamily);
         setInitialToolSelection(initialToolSelection);
@@ -21,9 +28,19 @@ public class GeneralConfig extends Config {
     }
 
     @Nullable
-    public String getBackgroundImage() {
-        return backgroundImage;
+    public String getBackgroundImagePath() {
+        return backgroundImagePath;
     }
+
+    @Nullable
+    public Drawable getBackgroundDrawable(Context context, @Nullable BitmapFactory.Options options) {
+        Bitmap bitmap = BitmapFactory.decodeFile(backgroundImagePath, options);
+        if (bitmap != null) {
+            return new BitmapDrawable(context.getResources(), bitmap);
+        }
+        return null;
+    }
+
     @Nullable
     public String getImageSaveName() {
         return imageSaveName;
@@ -41,8 +58,8 @@ public class GeneralConfig extends Config {
             return initialText;
     }
 
-    public void setBackgroundImage(@Nullable String backgroundImage) {
-        this.backgroundImage = backgroundImage;
+    public void setBackgroundImagePath(@Nullable String backgroundImagePath) {
+        this.backgroundImagePath = backgroundImagePath;
     }
 
     public void setImageSaveName(@Nullable String imageSaveName) {
@@ -64,9 +81,16 @@ public class GeneralConfig extends Config {
     }
 
 
-    public boolean hasbackgroundImage() {
-        return backgroundImage != null;
+    public boolean hasBackgroundImagePath() {
+        return backgroundImagePath != null;
     }
+    public boolean hasBackgroundDrawable() {
+        if (hasBackgroundImagePath()) {
+            return BitmapFactory.decodeFile(backgroundImagePath) != null;
+        }
+        return false;
+    }
+
     public boolean hasImageSaveName() {
         return imageSaveName != null;
     }

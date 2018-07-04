@@ -5,18 +5,29 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import com.sketchView.SketchFile;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.UUID;
 
 import at.csae0.reactnative.R;
 import at.csae0.reactnative.RNMotionViewModule;
@@ -115,6 +126,14 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 
                     if (config.hasInitialText()) {
                        defaultText = config.getInitialText();
+                    }
+
+                    if (config.hasBackgroundDrawable()) {
+                        RelativeLayout rootView = findViewById(R.id.activity_main);
+                        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+                        bitmapOptions.outWidth = rootView.getWidth();
+                        Drawable backgroundDrawable = config.getBackgroundDrawable(getApplicationContext(), bitmapOptions);
+                        rootView.setBackground(backgroundDrawable);
                     }
                 }
 
@@ -426,4 +445,55 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
             }
         }
     }
+
+    /**
+     * Save image on device
+     *
+     * @return
+     * @throws IOException
+     */
+//    public SketchFile saveToLocalCache() throws IOException {
+//        if (sketchView != null) {
+//            Bitmap viewBitmap = Bitmap.createBitmap(sketchView.getWidth(), sketchView.getHeight(), Bitmap.Config.ARGB_8888);
+//            Canvas canvas = new Canvas(viewBitmap);
+//            draw(canvas);
+//
+//            File cacheFile = File.createTempFile("sketch_", UUID.randomUUID().toString() + ".png");
+//            FileOutputStream imageOutput = new FileOutputStream(cacheFile);
+//            viewBitmap.compress(Bitmap.CompressFormat.PNG, 100, imageOutput);
+//
+//            SketchFile sketchFile = new SketchFile();
+//            sketchFile.localFilePath = cacheFile.getAbsolutePath();
+//            ;
+//            sketchFile.width = viewBitmap.getWidth();
+//            sketchFile.height = viewBitmap.getHeight();
+//            return sketchFile;
+//        }
+//        return null;
+//    }
+//    @Nullable
+//    public String getBase64() {
+//        if (sketchView != null) {
+//            Bitmap viewBitmap = Bitmap.createBitmap(sketchView.getWidth(), sketchView.getHeight(), Bitmap.Config.ARGB_8888);
+//            Canvas canvas = new Canvas(viewBitmap);
+//            draw(canvas);
+//
+//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//            viewBitmap.compress(Bitmap.CompressFormat.PNG, 20, byteArrayOutputStream);
+//            return Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+//        }
+//        return null;
+//    }
+//    public boolean openSketchFile(String localFilePath) {
+//        if (sketchView != null) {
+//            BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+//            bitmapOptions.outWidth = sketchView.getWidth();
+//            Bitmap bitmap = BitmapFactory.decodeFile(localFilePath, bitmapOptions);
+//            if (bitmap != null) {
+//                sketchView.setViewImage(bitmap);
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 }

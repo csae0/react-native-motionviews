@@ -713,56 +713,6 @@ public class SketchViewContainer extends RelativeLayout {
             }
         }
     }
-    /**
-     * Save image on device
-     *
-     * @return
-     * @throws IOException
-     */
-    public SketchFile saveToLocalCache() throws IOException {
-        if (sketchView != null) {
-            Bitmap viewBitmap = Bitmap.createBitmap(sketchView.getWidth(), sketchView.getHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(viewBitmap);
-            draw(canvas);
-
-            File cacheFile = File.createTempFile("sketch_", UUID.randomUUID().toString() + ".png");
-            FileOutputStream imageOutput = new FileOutputStream(cacheFile);
-            viewBitmap.compress(Bitmap.CompressFormat.PNG, 100, imageOutput);
-
-            SketchFile sketchFile = new SketchFile();
-            sketchFile.localFilePath = cacheFile.getAbsolutePath();
-            ;
-            sketchFile.width = viewBitmap.getWidth();
-            sketchFile.height = viewBitmap.getHeight();
-            return sketchFile;
-        }
-        return null;
-    }
-    @Nullable
-    public String getBase64() {
-        if (sketchView != null) {
-            Bitmap viewBitmap = Bitmap.createBitmap(sketchView.getWidth(), sketchView.getHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(viewBitmap);
-            draw(canvas);
-
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            viewBitmap.compress(Bitmap.CompressFormat.PNG, 20, byteArrayOutputStream);
-            return Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
-        }
-        return null;
-    }
-    public boolean openSketchFile(String localFilePath) {
-        if (sketchView != null) {
-            BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-            bitmapOptions.outWidth = sketchView.getWidth();
-            Bitmap bitmap = BitmapFactory.decodeFile(localFilePath, bitmapOptions);
-            if (bitmap != null) {
-                sketchView.setViewImage(bitmap);
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * cleanup
