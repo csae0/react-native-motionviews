@@ -130,6 +130,10 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
         if (bitmap != null && !bitmap.isRecycled()) {
             bitmap.recycle();
         }
+
+        if (SketchViewContainer.hasInstance()) {
+            SketchViewContainer.getInstance().release();
+        }
     }
 
     @Override

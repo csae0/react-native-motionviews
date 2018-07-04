@@ -379,7 +379,9 @@ public class MotionView  extends FrameLayout {
     public void release() {
         for (MotionEntity entity : entities) {
             entity.release();
+            entities.set(entities.indexOf(entity), null);
         }
+        selectedEntity = null;
     }
 
     // Check if entity center moved into trash button

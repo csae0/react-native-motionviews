@@ -106,6 +106,14 @@ public class SketchViewContainer extends RelativeLayout {
         return instance;
     }
 
+    public static SketchViewContainer getInstance () {
+        return instance;
+    }
+
+    public static boolean hasInstance() {
+        return instance != null;
+    }
+
     /**
      * set config paramaters
      */
@@ -719,7 +727,7 @@ public class SketchViewContainer extends RelativeLayout {
      */
     public void release () {
         if (sketchView != null) {
-            sketchView.clear();
+            sketchView.destroy();
             sketchView = null;
         }
         sketchViewCallback = null;

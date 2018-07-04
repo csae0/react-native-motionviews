@@ -313,9 +313,7 @@ public abstract class MotionEntity implements EntityActions {
 
     public abstract int getHeight();
 
-    public void release() {
-        // free resources here
-    }
+    public abstract void release();
 
     @Override
     protected void finalize() throws Throwable {

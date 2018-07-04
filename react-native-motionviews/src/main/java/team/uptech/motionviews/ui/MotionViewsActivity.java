@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,13 +20,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.sketchView.SketchFile;
-
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.UUID;
 
 import at.csae0.reactnative.R;
 import at.csae0.reactnative.RNMotionViewModule;
@@ -60,27 +54,16 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 
     private static final CONFIG_TYPE SCREEN_TYPE = CONFIG_TYPE.MAIN_SCREEN;
     public static final int SELECT_STICKER_REQUEST_CODE = 123;
+    public static final int START_MOTION_VIEW_REQUEST_CODE = 111;
+    public static final int RESULT_SUBMITTED = 200;
+    public static final int RESULT_CANCELED = 204;
+    public static final String RESULT_IMAGE = "resultImage";
     protected MotionView motionView;
     private String defaultText;
     private RelativeLayout buttons;
     private LinearLayout addButtons;
     private Button addText, addImage, addSketch, cancel, submit;
-    private final MotionViewCallback motionViewCallback = new MotionViewCallback() {
-        @Override
-        public void onEntitySelected(@Nullable MotionEntity entity) {
-        }
-        @Override
-        public void onEntityDoubleTap(@NonNull MotionEntity entity) {
-        }
-        @Override
-        public void onEntitySingleTapConfirmed(@NonNull MotionEntity entity) {
-            MotionEntity motionEntity = motionView.getSelectedEntity();
-
-            if (motionEntity != null) {
-                motionEntity.startEditing(getThis());
-            }
-        }
-    };
+    private MotionViewCallback motionViewCallback;
 
     // Workaround to access this inside callback class
     private MotionViewsActivity getThis() {
@@ -99,6 +82,23 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         // Inject additional config
         Bundle injectedOptions = new Bundle();
         injectedOptions.putInt("sideLength", getResources().getDimensionPixelOffset(R.dimen.color_picker_height));
+
+        this.motionViewCallback = new MotionViewCallback() {
+            @Override
+            public void onEntitySelected(@Nullable MotionEntity entity) {
+            }
+            @Override
+            public void onEntityDoubleTap(@NonNull MotionEntity entity) {
+            }
+            @Override
+            public void onEntitySingleTapConfirmed(@NonNull MotionEntity entity) {
+                MotionEntity motionEntity = motionView.getSelectedEntity();
+
+                if (motionEntity != null) {
+                    motionEntity.startEditing(getThis());
+                }
+            }
+        };
 
         this.fontProvider = new FontProvider(getResources());
         this.defaultText = "";
@@ -288,14 +288,17 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
     }
 
     public void cancel(View v) {
-        // TODO: go back to react
-        //        Intent intent = new Intent(v.getContext(), StickerSelectActivity.class);
-        //        startActivityForResult(intent, SELECT_STICKER_REQUEST_CODE);
+        release();
+        setResult(RESULT_CANCELED);
+        finish();
     }
     public void submit(View v) {
-        // TODO: go back to react and save image if exists
-        //        Intent intent = new Intent(v.getContext(), StickerSelectActivity.class);
-        //        startActivityForResult(intent, SELECT_STICKER_REQUEST_CODE);
+        Intent intent = new Intent();
+        intent.putExtra(RESULT_IMAGE, getBase64());
+        setResult(RESULT_SUBMITTED, intent);
+        release();
+        finish();
+//        finishActivity(START_MOTION_VIEW_REQUEST_CODE);
     }
 
     private void addSticker(final int stickerResId, final boolean visible) {
@@ -437,7 +440,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         motionEntity.setVisible(true);
 
         if (motionEntity != null) {
-            if (motionEntity instanceof TextEntity){
+            if (motionEntity instanceof TextEntity) {
                 String text = ((TextEntity)motionEntity).getLayer().getText();
                 if (text == null || text.length() == 0) {
                     motionView.deleteSelectedEntity(); // includes invalidate
@@ -471,29 +474,28 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 //        }
 //        return null;
 //    }
-//    @Nullable
-//    public String getBase64() {
-//        if (sketchView != null) {
-//            Bitmap viewBitmap = Bitmap.createBitmap(sketchView.getWidth(), sketchView.getHeight(), Bitmap.Config.ARGB_8888);
-//            Canvas canvas = new Canvas(viewBitmap);
-//            draw(canvas);
-//
-//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//            viewBitmap.compress(Bitmap.CompressFormat.PNG, 20, byteArrayOutputStream);
-//            return Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
-//        }
-//        return null;
-//    }
-//    public boolean openSketchFile(String localFilePath) {
-//        if (sketchView != null) {
-//            BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-//            bitmapOptions.outWidth = sketchView.getWidth();
-//            Bitmap bitmap = BitmapFactory.decodeFile(localFilePath, bitmapOptions);
-//            if (bitmap != null) {
-//                sketchView.setViewImage(bitmap);
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+    @Nullable
+    public String getBase64() {
+        if (motionView != null) {
+            Bitmap viewBitmap = Bitmap.createBitmap(motionView.getWidth(), motionView.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(viewBitmap);
+            motionView.draw(canvas);
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            viewBitmap.compress(Bitmap.CompressFormat.PNG, 20, byteArrayOutputStream);
+            return Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+        }
+        return null;
+    }
+    // Cleanup
+    public void release () {
+        motionView.release();
+        motionView = null;
+        defaultText = null;
+        buttons = null;
+        addButtons = null;
+        addText = addImage = addSketch = cancel = submit = null;
+        motionViewCallback = null;
+        fontProvider = null;
+    }
 }
