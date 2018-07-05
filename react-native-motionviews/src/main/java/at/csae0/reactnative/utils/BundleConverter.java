@@ -3,13 +3,20 @@ package at.csae0.reactnative.utils;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.WritableMap;
+import com.sketchView.SketchFile;
 
 import java.util.ArrayList;
 
 public class BundleConverter {
+    private static final String LOCAL_FILE_PATH_KEY ="localFilePath";
+    private static final String WIDTH_KEY ="width";
+    private static final String HEIGHT_KEY ="height";
+
     public static Bundle toBundle(ReadableMap map) {
         Bundle bundle = new Bundle();
         ReadableMapKeySetIterator it = map.keySetIterator();
@@ -104,5 +111,31 @@ public class BundleConverter {
             }
         }
         return null;
+    }
+
+    @Nullable
+    public static Bundle sketchFileToBundle (@Nullable SketchFile sketchFile) {
+        if (sketchFile == null) {
+            return null;
+        }
+
+        Bundle bundle = new Bundle();
+        bundle.putString(LOCAL_FILE_PATH_KEY, sketchFile.localFilePath);
+        bundle.putInt(WIDTH_KEY, sketchFile.width);
+        bundle.putInt(HEIGHT_KEY, sketchFile.height);
+        return bundle;
+    }
+    
+    @Nullable
+    public static WritableMap sketchFileBundleToWriteableMap (@Nullable Bundle bundle) {
+        if (bundle != null) {
+            return null;
+        }
+
+        WritableMap writableMap = Arguments.createMap();
+        writableMap.putString(LOCAL_FILE_PATH_KEY, bundle.getString("localFilePath", ""));
+        writableMap.putInt(WIDTH_KEY, bundle.getInt("width", -1));
+        writableMap.putInt(HEIGHT_KEY, bundle.getInt("height",-1));
+        return writableMap;
     }
 }

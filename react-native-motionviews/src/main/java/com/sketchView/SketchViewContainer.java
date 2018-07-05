@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.AppCompatButton;
 import android.util.Base64;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -51,6 +52,7 @@ import at.csae0.reactnative.utils.ConfigManager;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
 import team.uptech.motionviews.utils.RessourceUtils;
+import team.uptech.motionviews.utils.UIUtils;
 import team.uptech.motionviews.widget.Interfaces.OnMoveGestureListener;
 import team.uptech.motionviews.widget.Interfaces.SketchViewCallback;
 
@@ -309,7 +311,7 @@ public class SketchViewContainer extends RelativeLayout {
         int padding = getResources().getDimensionPixelOffset(R.dimen.padding);
         int height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
         int marginVertical = getResources().getDimensionPixelOffset(R.dimen.slider_margin_vertical);
-        cancel = new Button(context);
+        cancel = new AppCompatButton(context);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, height);
         layoutParams.topMargin = padding;
         layoutParams.bottomMargin = padding;
@@ -327,7 +329,7 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
 
-        clear = new Button(context);
+        clear = new AppCompatButton(context);
         clear.setLayoutParams(layoutParams);
         clear.setText("CLEAR");
         clear.setOnClickListener(new OnClickListener() {
@@ -339,7 +341,7 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
 
-        save = new Button(context);
+        save = new AppCompatButton(context);
         save.setLayoutParams(layoutParams);
         save.setText("SAVE");
         save.setOnClickListener(new OnClickListener() {
@@ -352,7 +354,7 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
 
-//        Button box = new Button(context);
+//        Button box = new AppCompatButton(context);
 //        box.setLayoutParams(layoutParams);
 //        box.setText("BOX");
 //        box.setOnClickListener(new OnClickListener() {
@@ -381,7 +383,7 @@ public class SketchViewContainer extends RelativeLayout {
         editButtonsLeft.setLayoutParams(containerLayoutParams);
         editButtonsLeft.addView(cancel);
 
-        pen = new Button(context);
+        pen = new AppCompatButton(context);
         pen.setLayoutParams(layoutParams);
         pen.setText("PEN");
         pen.setOnClickListener(new OnClickListener() {
@@ -391,7 +393,7 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
 
-        eraser = new Button(context);
+        eraser = new AppCompatButton(context);
         eraser.setLayoutParams(layoutParams);
         eraser.setText("ERASE");
         eraser.setOnClickListener(new OnClickListener() {
@@ -401,7 +403,7 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
 
-        circle = new Button(context);
+        circle = new AppCompatButton(context);
         circle.setLayoutParams(layoutParams);
         circle.setText("CIRCLE");
         circle.setOnClickListener(new OnClickListener() {
@@ -411,7 +413,7 @@ public class SketchViewContainer extends RelativeLayout {
             }
         });
 
-        arrow = new Button(context);
+        arrow = new AppCompatButton(context);
         arrow.setLayoutParams(layoutParams);
         arrow.setText("ARROW");
         arrow.setOnClickListener(new OnClickListener() {
@@ -517,13 +519,14 @@ public class SketchViewContainer extends RelativeLayout {
         colorPickerSubContainer.setGravity(Gravity.CENTER);
 
         // Button
-        colorPalette = new Button(context);
+        colorPalette = new AppCompatButton(context);
         int colorCircleDiameter = getResources().getDimensionPixelSize(R.dimen.color_circle_diameter);
         layoutParams = new RelativeLayout.LayoutParams(colorCircleDiameter, colorCircleDiameter);
         colorPalette.setLayoutParams(layoutParams);
          colorPalette.setBackground(getResources().getDrawable(R.drawable.ic_border_color));
         if (sketchView != null) {
-            colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(sketchView.getToolColor()))); // TODO: solution for min API 21 needed
+            UIUtils.setButtonTint(colorPalette, ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(sketchView.getToolColor())));
+            // colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(sketchView.getToolColor()))); // TODO: solution for min API 21 needed
         }
         colorPalette.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -549,10 +552,11 @@ public class SketchViewContainer extends RelativeLayout {
             colorButtonContainer.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
             colorButtonContainer.setGravity(Gravity.CENTER);
 
-            Button colorButton = new Button(context);
+            Button colorButton = new AppCompatButton(context);
             colorButton.setLayoutParams(new LinearLayout.LayoutParams(colorCircleDiameter, colorCircleDiameter));
             colorButton.setBackgroundResource(R.drawable.circle);
-            colorButton.getBackground().mutate().setTint(parsedColor); // min API 21 needed TODO: FIND SOLUTION
+            UIUtils.setButtonTint(colorButton, ColorStateList.valueOf(parsedColor));
+//            colorButton.getBackground().mutate().setTint(parsedColor); // min API 21 needed TODO: FIND SOLUTION
             colorButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -607,7 +611,8 @@ public class SketchViewContainer extends RelativeLayout {
             setToolSelectionIndicator(sketchView.getSelectedTool());
         }
         if (colorPalette != null) {
-            colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(color))); // min API 21 needed TODO: find solution
+            UIUtils.setButtonTint(colorPalette, ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(color)));
+//            colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(color))); // min API 21 needed TODO: find solution
         }
     }
 
@@ -625,10 +630,12 @@ public class SketchViewContainer extends RelativeLayout {
         for (int i = 0; i < toolButtons.length; i++) {
             if (toolButtons[i] != null) {
                 if (toolButtonTints[i] != null) {
-                    toolButtons[i].setBackgroundTintList(ColorStateList.valueOf(toolButtonTints[i]));
+                    UIUtils.setButtonTint(toolButtons[i], ColorStateList.valueOf(toolButtonTints[i]));
+//                    toolButtons[i].setBackgroundTintList(ColorStateList.valueOf(toolButtonTints[i]));
                     toolButtons[i].setTextColor(toolButtonTints[i]);
                 } else {
-                    toolButtons[i].setBackgroundTintList(null);
+                    UIUtils.setButtonTint(toolButtons[i], null);
+//                    toolButtons[i].setBackgroundTintList(null);
                 }
             }
         }
@@ -637,28 +644,32 @@ public class SketchViewContainer extends RelativeLayout {
         switch (type) {
             case SketchTool.TYPE_PEN:
                 colorStateList = createColorStateList(sketchView.getToolColor(), penTint);
-                pen.setBackgroundTintList(colorStateList);
+                UIUtils.setButtonTint(pen, colorStateList);
+//                pen.setBackgroundTintList(colorStateList);
                 if (colorStateList != null) {
                     pen.setTextColor(colorStateList);
                 }
                 break;
             case SketchTool.TYPE_ERASE:
                 colorStateList = createColorStateList(sketchView.getToolColor(), eraserTint);
-                eraser.setBackgroundTintList(colorStateList);
+                UIUtils.setButtonTint(eraser, colorStateList);
+//                eraser.setBackgroundTintList(colorStateList);
                 if (colorStateList != null) {
                     eraser.setTextColor(colorStateList);
                 }
                 break;
             case SketchTool.TYPE_CIRCLE:
                 colorStateList = createColorStateList(sketchView.getToolColor(), circleTint);
-                circle.setBackgroundTintList(colorStateList);
+                UIUtils.setButtonTint(circle, colorStateList);
+//                circle.setBackgroundTintList(colorStateList);
                 if (colorStateList != null) {
                     circle.setTextColor(colorStateList);
                 }
                 break;
             case SketchTool.TYPE_ARROW:
                 colorStateList = createColorStateList(sketchView.getToolColor(), arrowTint);
-                arrow.setBackgroundTintList(colorStateList);
+                UIUtils.setButtonTint(arrow, colorStateList);
+//                arrow.setBackgroundTintList(colorStateList);
                 if (colorStateList != null) {
                     arrow.setTextColor(colorStateList);
                 }

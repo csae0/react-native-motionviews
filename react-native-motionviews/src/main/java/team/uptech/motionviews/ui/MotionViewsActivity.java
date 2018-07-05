@@ -13,7 +13,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +23,13 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.sketchView.SketchFile;
+
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.UUID;
 
 import at.csae0.reactnative.R;
 import at.csae0.reactnative.RNMotionViewModule;
@@ -31,6 +38,7 @@ import at.csae0.reactnative.interfaces.ConfigManagerActions;
 import at.csae0.reactnative.model.ButtonConfig;
 import at.csae0.reactnative.model.ButtonConfigs;
 import at.csae0.reactnative.model.GeneralConfig;
+import at.csae0.reactnative.utils.BundleConverter;
 import at.csae0.reactnative.utils.CONFIG_TYPE;
 import at.csae0.reactnative.utils.ConfigManager;
 
@@ -58,7 +66,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
     public static final int START_MOTION_VIEW_REQUEST_CODE = 111;
     public static final int RESULT_SUBMITTED = 200;
     public static final int RESULT_CANCELED = 204;
-    public static final String RESULT_IMAGE = "resultImage";
+    public static final String RESULT_IMAGE_KEY = "resultImage";
     protected MotionView motionView;
     private String defaultText;
     private RelativeLayout buttons;
@@ -223,7 +231,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         layoutParams.leftMargin = padding;
         layoutParams.rightMargin = padding;
 
-        cancel = new Button(context);
+        cancel = new AppCompatButton(context);
         cancel.setLayoutParams(layoutParams);
         cancel.setText("CANCEL");
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -232,7 +240,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                 cancel(v);
             }
         });
-        submit = new Button(context);
+        submit = new AppCompatButton(context);
         submit.setLayoutParams(layoutParams);
         submit.setText("SUBMIT");
         submit.setOnClickListener(new View.OnClickListener() {
@@ -258,7 +266,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         editButtonsLeft.setLayoutParams(containerLayoutParams);
         editButtonsLeft.addView(cancel);
 
-        addSketch = new Button(context);
+        addSketch = new AppCompatButton(context);
         addSketch.setLayoutParams(layoutParams);
         addSketch.setText("SKETCH");
         addSketch.setOnClickListener(new View.OnClickListener() {
@@ -268,7 +276,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
             }
         });
 
-        addText = new Button(context);
+        addText = new AppCompatButton(context);
         addText.setLayoutParams(layoutParams);
         addText.setText("TEXT");
         addText.setOnClickListener(new View.OnClickListener() {
@@ -277,7 +285,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                 addTextSticker(v);
             }
         });
-        addImage = new Button(context);
+        addImage = new AppCompatButton(context);
         addImage.setLayoutParams(layoutParams);
         addImage.setText("IMAGE");
         addImage.setOnClickListener(new View.OnClickListener() {
@@ -314,7 +322,15 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
     }
     public void submit(View v) {
         Intent intent = new Intent();
-        intent.putExtra(RESULT_IMAGE, getBase64());
+        SketchFile sketchFile = null;
+        try {
+            sketchFile = saveToLocalCache();
+        } catch (IOException ioe) {
+            Log.i("MOTION_VIEWS_SAVE_ERROR", ioe.getMessage());
+        }
+
+        intent.putExtra(RESULT_IMAGE_KEY, BundleConverter.sketchFileToBundle(sketchFile));
+
         setResult(RESULT_SUBMITTED, intent);
         release();
         finish();
@@ -475,25 +491,25 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
      * @return
      * @throws IOException
      */
-//    public SketchFile saveToLocalCache() throws IOException {
-//        if (sketchView != null) {
-//            Bitmap viewBitmap = Bitmap.createBitmap(sketchView.getWidth(), sketchView.getHeight(), Bitmap.Config.ARGB_8888);
-//            Canvas canvas = new Canvas(viewBitmap);
-//            draw(canvas);
-//
-//            File cacheFile = File.createTempFile("sketch_", UUID.randomUUID().toString() + ".png");
-//            FileOutputStream imageOutput = new FileOutputStream(cacheFile);
-//            viewBitmap.compress(Bitmap.CompressFormat.PNG, 100, imageOutput);
-//
-//            SketchFile sketchFile = new SketchFile();
-//            sketchFile.localFilePath = cacheFile.getAbsolutePath();
-//            ;
-//            sketchFile.width = viewBitmap.getWidth();
-//            sketchFile.height = viewBitmap.getHeight();
-//            return sketchFile;
-//        }
-//        return null;
-//    }
+    public SketchFile saveToLocalCache() throws IOException {
+        if (motionView != null) {
+            Bitmap viewBitmap = Bitmap.createBitmap(motionView.getWidth(), motionView.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(viewBitmap);
+            motionView.draw(canvas);
+
+            File cacheFile = File.createTempFile("sketch_", UUID.randomUUID().toString() + ".png");
+            FileOutputStream imageOutput = new FileOutputStream(cacheFile);
+            viewBitmap.compress(Bitmap.CompressFormat.PNG, 100, imageOutput);
+
+            SketchFile sketchFile = new SketchFile();
+            sketchFile.localFilePath = cacheFile.getAbsolutePath();
+            sketchFile.width = viewBitmap.getWidth();
+            sketchFile.height = viewBitmap.getHeight();
+            return sketchFile;
+        }
+        return null;
+    }
+
     @Nullable
     public String getBase64() {
         if (motionView != null) {

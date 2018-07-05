@@ -4,17 +4,16 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 
 import at.csae0.reactnative.utils.BundleConverter;
 import team.uptech.motionviews.ui.MotionViewsActivity;
-import team.uptech.motionviews.widget.MotionView;
 
 public class RNMotionViewModule extends ReactContextBaseJavaModule {
 
@@ -76,11 +75,11 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
         public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
             if (requestCode == MotionViewsActivity.START_MOTION_VIEW_REQUEST_CODE) {
                 if (resultCode == MotionViewsActivity.RESULT_SUBMITTED) {
-                    Bundle result = data.getExtras();
-                    String base64Image = result.getString(MotionViewsActivity.RESULT_IMAGE, null);
+                    Bundle resultImage = data.getExtras().getBundle(MotionViewsActivity.RESULT_IMAGE_KEY);
+                    WritableMap writableMap = BundleConverter.sketchFileBundleToWriteableMap(resultImage);
                     if (promise != null) {
-                        if (base64Image != null) {
-                            promise.resolve(base64Image);
+                        if (writableMap != null) {
+                            promise.resolve(writableMap);
                         } else {
                             promise.reject(E_NO_IMAGE_DATA_FOUND, "No image data found.");
                         }

@@ -27,6 +27,7 @@ import at.csae0.reactnative.model.PickerConfig;
 import at.csae0.reactnative.model.ScreenConfig;
 import at.csae0.reactnative.model.SizeConfig;
 import team.uptech.motionviews.utils.RessourceUtils;
+import team.uptech.motionviews.utils.UIUtils;
 
 /**
  * EXAMPLE CONFIG
@@ -473,7 +474,8 @@ public class ConfigManager implements ConfigManagerActions {
                 }
                 if (config.hasTint()) {
                     Integer tintColor = config.getTintColor();
-                    tempButton.setBackgroundTintList(ColorStateList.valueOf(tintColor));
+                    UIUtils.setButtonTint(tempButton, ColorStateList.valueOf(tintColor));
+//                    tempButton.setBackgroundTintList(ColorStateList.valueOf(tintColor));
                     tempButton.setTextColor(tintColor);
                 }
             } else if (tempButton.getParent() != null) {

@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.AppCompatButton;
 import android.text.Selection;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -51,6 +52,7 @@ import at.csae0.reactnative.utils.ConfigManager;
 import team.uptech.motionviews.utils.ConversionUtils;
 import team.uptech.motionviews.utils.FontProvider;
 import team.uptech.motionviews.utils.RessourceUtils;
+import team.uptech.motionviews.utils.UIUtils;
 import team.uptech.motionviews.widget.Interfaces.EditCallback;
 import team.uptech.motionviews.widget.Interfaces.Limits;
 
@@ -273,7 +275,7 @@ public class TextEditorDialogFragment extends DialogFragment {
         int padding = getResources().getDimensionPixelOffset(R.dimen.padding);
         int height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
 
-        cancel = new Button(context);
+        cancel = new AppCompatButton(context);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, height);
         layoutParams.topMargin = padding;
         layoutParams.bottomMargin = padding;
@@ -292,7 +294,7 @@ public class TextEditorDialogFragment extends DialogFragment {
             }
         });
 
-        clear = new Button(context);
+        clear = new AppCompatButton(context);
         clear.setLayoutParams(layoutParams);
         clear.setText("CLEAR");
         clear.setOnClickListener(new View.OnClickListener() {
@@ -304,7 +306,7 @@ public class TextEditorDialogFragment extends DialogFragment {
             }
         });
 
-        save = new Button(context);
+        save = new AppCompatButton(context);
         save.setLayoutParams(layoutParams);
         save.setText("SAVE");
         save.setOnClickListener(new View.OnClickListener() {
@@ -378,7 +380,8 @@ public class TextEditorDialogFragment extends DialogFragment {
         LinearLayout colorPicker = context.findViewById(R.id.color_picker);
         colorPalette = context.findViewById(R.id.color_pallette);
         if (editText != null) {
-            colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(editText.getCurrentTextColor()))); // min API 21 needed
+            UIUtils.setButtonTint(colorPalette, ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(editText.getCurrentTextColor())));
+//            colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(editText.getCurrentTextColor()))); // min API 21 needed
         }
         colorPalette.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -396,7 +399,8 @@ public class TextEditorDialogFragment extends DialogFragment {
             Button colorButton = new Button(context.getContext());
             colorButton.setLayoutParams(new LinearLayout.LayoutParams(colorCircleDiameter, colorCircleDiameter));
             colorButton.setBackgroundResource(R.drawable.circle);
-            colorButton.getBackground().mutate().setTint(parsedColor); // min API 21 needed
+            UIUtils.setButtonTint(colorButton, ColorStateList.valueOf(parsedColor));
+//            colorButton.getBackground().mutate().setTint(parsedColor); // min API 21 needed
             colorButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -457,7 +461,8 @@ public class TextEditorDialogFragment extends DialogFragment {
         if (editText != null) {
             editText.setTextColor(color);
             if (colorPalette != null) {
-                colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(editText.getCurrentTextColor()))); // min API 21 needed
+                UIUtils.setButtonTint(colorPalette, ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(editText.getCurrentTextColor())));
+//                colorPalette.setBackgroundTintList(ColorStateList.valueOf(ConversionUtils.transformAlphaUpperTwoThirds(editText.getCurrentTextColor()))); // min API 21 needed
             }
         }
     }
