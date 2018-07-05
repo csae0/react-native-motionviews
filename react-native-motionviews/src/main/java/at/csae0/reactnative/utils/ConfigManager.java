@@ -467,6 +467,7 @@ public class ConfigManager implements ConfigManagerActions {
                         castedLayoutParams.rightMargin = config.getPaddingRight();
                         castedLayoutParams.bottomMargin = config.getPaddingBottom();
                     }
+
                     tempButton.setLayoutParams(layoutParams);
                     tempButton.setPadding(0, 0, 0, 0);
                 }

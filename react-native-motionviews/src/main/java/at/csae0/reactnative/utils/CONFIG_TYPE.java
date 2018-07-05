@@ -14,10 +14,12 @@ public enum CONFIG_TYPE {
     COLOR_CONFIG("colorConfig"),
     PICKER_CONFIG("pickerConfig"),
     SIZE_CONFIG("sizeConfig"),
-
-    // BUTTONS config key
     BUTTONS_CONFIG("buttonsConfig"),
     BUTTON_CONFIGS("buttonConfigs"),
+
+    // BUTTONS
+    // motionView
+    TRASH_BUTTON("trashButton"),
 
     // general (sketchview, motionview)
     SAVE_BUTTON_CONFIG("saveButtonConfig"),

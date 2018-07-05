@@ -24,7 +24,7 @@ public class PickerConfig extends Config {
     }
 
     @Nullable
-    public Drawable geticon() {
+    public Drawable getIcon() {
         if (this.iconName != null) {
             String[] iconNameArray = this.iconName.split("\\.");
             if (iconNameArray.length == 2) {

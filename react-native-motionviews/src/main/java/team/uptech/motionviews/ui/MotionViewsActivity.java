@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -175,6 +176,25 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                                         case CREATE_STICKER_CONFIG:
                                             tempButton = addImage;
                                             defaultDrawable = RessourceUtils.getImageRessource("ic_add");
+                                            break;
+                                        case TRASH_BUTTON:
+                                            tempButton = findViewById(R.id.trash_button);
+                                            LayerDrawable trashCircle = (LayerDrawable) getResources().getDrawable(R.drawable.trash_circle).mutate();
+                                            if (config.hasIcon()) {
+                                                trashCircle.setDrawableByLayerId(R.id.inner_trash_image, config.getIcon());
+                                            } else {
+                                                trashCircle.setDrawableByLayerId(R.id.inner_trash_image, RessourceUtils.getImageRessource("ic_trash"));
+                                            }
+                                            defaultDrawable = trashCircle;
+                                            config.setIconName(null); // use default drawable
+
+                                            ViewGroup.LayoutParams layoutParams = tempButton.getLayoutParams();
+                                            if (!config.hasLabel() && config.hasSideLength() && config.getSideLength() != getResources().getDimensionPixelOffset(R.dimen.color_picker_height)) {
+                                                layoutParams.width = config.getSideLength() * 2;
+                                                layoutParams.height = config.getSideLength();
+                                                tempButton.setLayoutParams(layoutParams);
+                                            }
+                                            config.setSideLength(null); // skip set side length in manager
                                             break;
                                     }
                                     manager.configureButton(tempButton, config, defaultDrawable);

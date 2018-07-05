@@ -18,9 +18,9 @@ public class RessourceUtils {
     public static Drawable getImageRessource(String imageName) {
         ReactApplicationContext reactContext = RNMotionViewModule.getReactContext();
 
-        int ressourceId = getRessourceId(reactContext, imageName, RESSOURCE_TYPE.DRAWABLE);
+        Integer ressourceId = getRessourceId(reactContext, imageName, RESSOURCE_TYPE.DRAWABLE);
 
-        if (ressourceId != 0) {
+        if (ressourceId != null && ressourceId != 0) {
             return reactContext.getResources().getDrawable(ressourceId);
         }
         return null;
