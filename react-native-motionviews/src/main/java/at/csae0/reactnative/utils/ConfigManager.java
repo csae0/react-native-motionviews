@@ -227,10 +227,12 @@ public class ConfigManager implements ConfigManagerActions {
                             tempBundle.getString("imageSaveName", null),
                             tempBundle.getString("fontFamily", null),
                             tempBundle.getString("initialToolSelection", null),
-                            tempBundle.getString("initialText", null)
+                            tempBundle.getString("initialText", null),
+                            tempBundle.getString("backgroundColor", null)
                     );
                 } else {
                     generalConfig = new GeneralConfig(
+                            null,
                             null,
                             null,
                             null,
