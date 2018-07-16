@@ -127,8 +127,8 @@ public class BundleConverter {
     }
     
     @Nullable
-    public static WritableMap sketchFileBundleToWriteableMap (@Nullable Bundle bundle) {
-        if (bundle != null) {
+    public static WritableMap sketchFileBundleToWritableMap (@Nullable Bundle bundle) {
+        if (bundle == null) {
             return null;
         }
 

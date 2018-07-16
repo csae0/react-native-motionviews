@@ -68,7 +68,6 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
         //        reactApplicationContext = null;
         onActivityResultListener = null;
         promise = null;
-
     }
 
     private class OnActivityResultListener extends BaseActivityEventListener {
@@ -76,13 +75,13 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
             if (requestCode == MotionViewsActivity.START_MOTION_VIEW_REQUEST_CODE) {
                 if (resultCode == MotionViewsActivity.RESULT_SUBMITTED) {
                     Bundle resultImage = data.getExtras().getBundle(MotionViewsActivity.RESULT_IMAGE_KEY);
-                    WritableMap writableMap = BundleConverter.sketchFileBundleToWriteableMap(resultImage);
+                    WritableMap writableMap = BundleConverter.sketchFileBundleToWritableMap(resultImage);
                     if (promise != null) {
-                        if (writableMap != null) {
+//                        if (writableMap != null) {
                             promise.resolve(writableMap);
-                        } else {
-                            promise.reject(E_NO_IMAGE_DATA_FOUND, "No image data found.");
-                        }
+//                        } else {
+//                            promise.se(E_NO_IMAGE_DATA_FOUND, "No image data found.");
+//                        }
                     }
                     release();
                 } else if (resultCode == MotionViewsActivity.RESULT_CANCELED) {
