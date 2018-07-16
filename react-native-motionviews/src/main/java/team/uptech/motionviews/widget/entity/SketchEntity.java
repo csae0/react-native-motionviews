@@ -167,7 +167,7 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
     }
 
     @Override
-    public void updateState(@Nullable Bitmap bitmap, @Nullable Rect position, @Nullable Integer color, @Nullable Integer sizeInPixel) {
+    public void updateState(@Nullable Bitmap bitmap, @Nullable Rect bitmapPosition, @Nullable Integer color, @Nullable Integer sizeInPixel, @Nullable int[] offset) {
 
         SketchLayer sketchLayer = getLayer();
         Stroke stroke = sketchLayer.getStroke();
@@ -178,10 +178,16 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
         }
 
         // Set image position
-        if (position != null) {
+        if (bitmapPosition != null) {
             float[] center = entityCenter();
-            float topLeftX = layer.getX() + position.left;
-            float topLeftY = layer.getY() + position.top;
+
+            float topLeftX = bitmapPosition.left;
+            float topLeftY = bitmapPosition.top;
+
+            if (offset != null) {
+                topLeftX += offset[0];
+                topLeftY += offset[1];
+            }
 
             layer.postTranslate(1.0F * (topLeftX - center[0]) / canvasWidth,
                     1.0F * (topLeftY - center[1]) / canvasHeight);

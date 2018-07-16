@@ -13,12 +13,14 @@ import android.widget.RelativeLayout;
 import at.csae0.reactnative.R;
 import at.csae0.reactnative.utils.CONFIG_TYPE;
 import at.csae0.reactnative.utils.TOOL_TYPE;
+import team.uptech.motionviews.utils.ConversionUtils;
 
 public class GeneralConfig extends Config {
 
     private String backgroundImagePath, imageSaveName, fontFamily, initialText;
     private TOOL_TYPE initialToolSelection;
     private Integer backgroundColor;
+    private int[] imageBounds;
     public GeneralConfig (@Nullable String backgroundImagePath, @Nullable String imageSaveName, @Nullable String fontFamily, @Nullable String initialToolSelection, @Nullable String initialText, @Nullable String backgroundColor) {
         super(CONFIG_TYPE.GENERAL_CONFIG, true);
 
@@ -28,11 +30,17 @@ public class GeneralConfig extends Config {
         setInitialToolSelection(initialToolSelection);
         setInitialText(initialText);
         setBackgroundColor(backgroundColor);
+        setImageBounds();
     }
 
     @Nullable
     public String getBackgroundImagePath() {
         return backgroundImagePath;
+    }
+
+    @Nullable
+    public int[] getImageBounds() {
+        return imageBounds;
     }
 
     @Nullable
@@ -79,6 +87,17 @@ public class GeneralConfig extends Config {
         this.backgroundImagePath = backgroundImagePath;
     }
 
+    public void setImageBounds () {
+        Bitmap backgroundImage = getBackgroundBitmap(null);
+        int[] screenDimensions = ConversionUtils.getScreenDimensions();
+
+        if (backgroundImage != null) {
+            imageBounds = ConversionUtils.transformImageSizeToFitScreen(backgroundImage.getWidth(), backgroundImage.getHeight(), screenDimensions[0], screenDimensions[1], true);
+        } else {
+            imageBounds = screenDimensions;
+        }
+    }
+
     public void setImageSaveName(@Nullable String imageSaveName) {
         this.imageSaveName = imageSaveName;
     }
@@ -103,6 +122,9 @@ public class GeneralConfig extends Config {
 
     public void setBackgroundColor(@Nullable String backgroundColor) {
         this.backgroundColor = backgroundColor != null ? Color.parseColor(backgroundColor) : null;
+    }
+    public boolean hasImageBounds() {
+        return imageBounds != null;
     }
     public boolean hasBackgroundImagePath() {
         return backgroundImagePath != null;

@@ -6,24 +6,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="team.uptech.motionviews.ui.MotionViewsActivity">
-    <team.uptech.motionviews.widget.MotionView
-        android:id="@+id/main_motion_view"
+    <ImageView
+        android:id="@+id/background_image"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"/>
     <RelativeLayout
+        android:id="@+id/content_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
-        <Button
-            android:id="@+id/trash_button"
-            android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true">
+        <team.uptech.motionviews.widget.MotionView
+            android:id="@+id/main_motion_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="@dimen/padding"
-            android:background="@drawable/trash_circle"
-            android:backgroundTint="@android:color/black"
-            android:alpha="0"
-            android:clickable="false">
-        </Button>
+            android:layout_alignParentBottom="true">
+            <Button
+                android:id="@+id/trash_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/padding"
+                android:background="@drawable/trash_circle"
+                android:backgroundTint="@android:color/black"
+                android:alpha="0"
+                android:clickable="false">
+            </Button>
+        </RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>

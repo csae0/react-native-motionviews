@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
@@ -16,10 +17,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Base64;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -69,6 +72,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
     public static final String RESULT_IMAGE_KEY = "resultImage";
     protected MotionView motionView;
     private String defaultText;
+    private int[] sketchViewBounds;
     private RelativeLayout buttons;
     private LinearLayout addButtons;
     private Button addText, addImage, addSketch, cancel, submit;
@@ -137,12 +141,20 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                        defaultText = config.getInitialText();
                     }
 
+                    if (config.hasBackgroundColor()) {
+                        RelativeLayout rootContainer = findViewById(R.id.activity_main);
+                        rootContainer.setBackgroundColor(config.getBackgroundColor());
+                    }
+
                     if (config.hasBackgroundDrawable()) {
-                        RelativeLayout rootView = findViewById(R.id.activity_main);
-                        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-                        bitmapOptions.outWidth = rootView.getWidth();
-                        Drawable backgroundDrawable = config.getBackgroundDrawable(getApplicationContext(), bitmapOptions);
-                        rootView.setBackground(backgroundDrawable);
+                        ImageView backgroundContainer= findViewById(R.id.background_image);
+                        backgroundContainer.setImageBitmap(config.getBackgroundBitmap(null));
+                    }
+
+                    if (config.hasImageBounds()) {
+                        sketchViewBounds = config.getImageBounds();
+                    } else {
+                        sketchViewBounds = null;
                     }
                 }
 
@@ -375,7 +387,6 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         Stroke stroke = new Stroke();
         stroke.setColor(Limits.INITIAL_SKETCH_COLOR);
         stroke.setSize(ConversionUtils.dpToPx(Limits.FONT_SIZE_INITIAL_DP));
-
         sketchLayer.setStroke(stroke);
 
         return sketchLayer;
@@ -462,7 +473,18 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                 motionView.deleteSelectedEntity(); // includes invalidate
                 motionView.setHideAllEntities(false);
             } else {
-                ((SketchEntity) motionEntity).updateState(bitmap, position, color, sizeInPixel);
+                int[] offset = new int[]{0, 0};
+                 if (sketchViewBounds != null) {
+                    int[] screenBounds1, screenBounds;
+                    screenBounds1 = ConversionUtils.getScreenDimensions();
+
+                    RelativeLayout view = findViewById(R.id.activity_main);
+                    screenBounds = new int[]{view.getWidth(), view.getHeight()};
+
+                     offset[0] = (screenBounds[0] - sketchViewBounds[0]) / 2;
+                    offset[1] = (screenBounds[1] - sketchViewBounds[1]) / 2;
+                 }
+                ((SketchEntity) motionEntity).updateState(bitmap, position, color, sizeInPixel, offset);
                 motionView.invalidate();
             }
         }

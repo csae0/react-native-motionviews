@@ -1,5 +1,6 @@
 package com.sketchView;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
@@ -7,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
@@ -19,6 +21,7 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -153,6 +156,15 @@ public class SketchViewContainer extends RelativeLayout {
                    if (config.hasInitialToolSelection()) {
                        setToolType(config.getInitialToolSelection().getInt());
                    }
+
+                   if (config.hasImageBounds()) {
+                       int[] bounds = config.getImageBounds();
+
+                       RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) sketchView.getLayoutParams();
+                       layoutParams.width = bounds[0];
+                       layoutParams.height = bounds[1];
+                       sketchView.setLayoutParams(layoutParams);
+                   }
                }
 
                @Override
@@ -170,7 +182,6 @@ public class SketchViewContainer extends RelativeLayout {
                        addDynamicColorSelections(colorPickerContainer, colorCircleDiameter, config.getColors());
                        return;
                    }
-
                    addDynamicColorSelections(colorPickerContainer, colorCircleDiameter, null);
                }
 
@@ -303,6 +314,11 @@ public class SketchViewContainer extends RelativeLayout {
                 return false;
             }
         });
+
+
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+        sketchView.setLayoutParams(layoutParams);
         addView(sketchView, 0);
     }
 

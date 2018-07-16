@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
@@ -292,7 +293,7 @@ public class SketchView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if (incrementalImage != null) {
-            canvas.drawBitmap(incrementalImage, getLeft(), getTop(), null);
+            canvas.drawBitmap(incrementalImage, 0, 0, null);
         }
         if (currentTool != null) {
             currentTool.render(canvas);
