@@ -71,19 +71,16 @@ public class ConversionUtils {
     }
 
     public static int[] transformImageSizeToFitScreen (float width, float height, float screenWidth, float screenHeight, boolean isPortrait) {
-        boolean smallerScreenX = width <= screenWidth;
-        boolean smallerScreenY = height <= screenHeight;
-        float dx = Math.abs(screenWidth - width);
-        float dy = Math.abs(screenHeight - height);
-
-        boolean touchX = (!smallerScreenX && smallerScreenY) || (!smallerScreenX && smallerScreenX == smallerScreenY && dx >= dy) || (smallerScreenX && smallerScreenX == smallerScreenY && dx <= dy);
-        float scale;
-
-        if (touchX) {
-            scale = screenWidth / width;
+        float ratioX = screenWidth / width;
+        float ratioY = screenHeight / height;
+        float scaledWidth, scaledHeight;
+        if (ratioY <= ratioX) {
+            scaledWidth = width * ratioY;
+            scaledHeight = height * ratioY;
         } else {
-            scale = screenHeight / height;
+            scaledWidth = width * ratioX;
+            scaledHeight = height * ratioX;
         }
-        return new int[]{Math.round(width * scale), Math.round(height * scale)};
+        return new int[]{Math.round(scaledWidth), Math.round(scaledHeight)};
     }
 }

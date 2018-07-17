@@ -475,14 +475,14 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
             } else {
                 int[] offset = new int[]{0, 0};
                  if (sketchViewBounds != null) {
-                    int[] screenBounds1, screenBounds;
-                    screenBounds1 = ConversionUtils.getScreenDimensions();
-
                     RelativeLayout view = findViewById(R.id.activity_main);
-                    screenBounds = new int[]{view.getWidth(), view.getHeight()};
-
-                     offset[0] = (screenBounds[0] - sketchViewBounds[0]) / 2;
-                    offset[1] = (screenBounds[1] - sketchViewBounds[1]) / 2;
+                    int[] screenBounds = new int[]{view.getWidth(), view.getHeight()};
+                     if (screenBounds[0] - sketchViewBounds[0] > 0) {
+                         offset[0] = (screenBounds[0] - sketchViewBounds[0]) / 2;
+                     }
+                     if (screenBounds[1] - sketchViewBounds[1] > 0) {
+                         offset[1] = (screenBounds[1] - sketchViewBounds[1]) / 1;
+                     }
                  }
                 ((SketchEntity) motionEntity).updateState(bitmap, position, color, sizeInPixel, offset);
                 motionView.invalidate();
