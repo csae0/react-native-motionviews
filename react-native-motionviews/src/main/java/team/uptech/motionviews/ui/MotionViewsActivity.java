@@ -69,13 +69,14 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
     public static final int START_MOTION_VIEW_REQUEST_CODE = 111;
     public static final int RESULT_SUBMITTED = 200;
     public static final int RESULT_CANCELED = 204;
+    public static final int RESULT_DELETED = 202;
     public static final String RESULT_IMAGE_KEY = "resultImage";
     protected MotionView motionView;
     private String defaultText;
     private int[] sketchViewBounds;
     private RelativeLayout buttons;
     private LinearLayout addButtons;
-    private Button addText, addImage, addSketch, cancel, submit;
+    private Button addText, addImage, addSketch, cancel, submit, delete, clear;
     private MotionViewCallback motionViewCallback;
 
     // Workaround to access this inside callback class
@@ -185,6 +186,14 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                                             tempButton = submit;
                                             defaultDrawable = RessourceUtils.getImageRessource("ic_save");
                                             break;
+                                        case CLEAR_BUTTON_CONFIG:
+                                            tempButton = clear;
+                                            defaultDrawable = RessourceUtils.getImageRessource("ic_erase_tool");
+                                            break;
+                                        case DELETE_BUTTON_CONFIG:
+                                            tempButton = delete;
+                                            defaultDrawable = RessourceUtils.getImageRessource("ic_trash");
+                                            break;
                                         case CREATE_SKETCH_CONFIG:
                                             tempButton = addSketch;
                                             defaultDrawable = RessourceUtils.getImageRessource("ic_touch");
@@ -231,7 +240,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
     private void addButtons(Context context) {
         buttons = null;
         addButtons = null;
-        addText = addImage = addSketch = cancel = submit = null;
+        addText = addImage = addSketch = cancel = submit = delete = clear = null;
 
         int padding = getResources().getDimensionPixelOffset(R.dimen.padding);
         int height = getResources().getDimensionPixelOffset(R.dimen.color_picker_height);
@@ -252,6 +261,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                 cancel(v);
             }
         });
+        
         submit = new AppCompatButton(context);
         submit.setLayoutParams(layoutParams);
         submit.setText("SUBMIT");
@@ -262,6 +272,26 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
             }
         });
 
+        delete  = new AppCompatButton(context);
+        delete.setLayoutParams(layoutParams);
+        delete.setText("DELETE");
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                delete(v);
+            }
+        });
+
+        clear  = new AppCompatButton(context);
+        clear.setLayoutParams(layoutParams);
+        clear.setText("CLEAR");
+        clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clear(v);
+            }
+        });
+        
         buttons = new RelativeLayout(context);
         buttons.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         buttons.setPadding(padding, padding, padding, padding);
@@ -270,6 +300,8 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         RelativeLayout.LayoutParams containerLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         containerLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         editButtonsRight.setLayoutParams(containerLayoutParams);
+        editButtonsRight.addView(clear);
+        editButtonsRight.addView(delete);
         editButtonsRight.addView(submit);
 
         LinearLayout editButtonsLeft = new LinearLayout(context);
@@ -332,6 +364,22 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         setResult(RESULT_CANCELED);
         finish();
     }
+
+    public void clear(View v) {
+        motionView.deleteAllEntities();
+//        release();
+//        setResult(RESULT_CANCELED);
+//        finish();
+        // TODO: implement and call clear callback to replace background image and set notEdited boolean
+    }
+
+    public void delete(View v) {
+        // TODO: implement and call clear callback to delete image
+        release();
+        setResult(RESULT_DELETED);
+        finish();
+    }
+
     public void submit(View v) {
         Intent intent = new Intent();
         SketchFile sketchFile = null;
@@ -552,7 +600,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         defaultText = null;
         buttons = null;
         addButtons = null;
-        addText = addImage = addSketch = cancel = submit = null;
+        addText = addImage = addSketch = cancel = submit = delete = clear = null;
         motionViewCallback = null;
         fontProvider = null;
     }

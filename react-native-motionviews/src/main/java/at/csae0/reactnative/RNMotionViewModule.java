@@ -77,14 +77,10 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
                     Bundle resultImage = data.getExtras().getBundle(MotionViewsActivity.RESULT_IMAGE_KEY);
                     WritableMap writableMap = BundleConverter.sketchFileBundleToWritableMap(resultImage);
                     if (promise != null) {
-//                        if (writableMap != null) {
                             promise.resolve(writableMap);
-//                        } else {
-//                            promise.se(E_NO_IMAGE_DATA_FOUND, "No image data found.");
-//                        }
                     }
                     release();
-                } else if (resultCode == MotionViewsActivity.RESULT_CANCELED) {
+                } else if (resultCode == MotionViewsActivity.RESULT_CANCELED || resultCode == MotionViewsActivity.RESULT_DELETED) {
                     if (promise != null) {
                         promise.resolve(null);
                     }

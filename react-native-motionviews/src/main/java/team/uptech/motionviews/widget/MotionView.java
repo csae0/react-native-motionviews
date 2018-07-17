@@ -375,12 +375,24 @@ public class MotionView  extends FrameLayout {
         }
     }
 
+    public void deleteAllEntities() {
+        selectedEntity = null;
+
+        for (MotionEntity entity : entities) {
+            entity.release();
+            entities.set(entities.indexOf(entity), null);
+        }
+        entities.clear();
+        invalidate();
+    }
+
     // memory
     public void release() {
         for (MotionEntity entity : entities) {
             entity.release();
             entities.set(entities.indexOf(entity), null);
         }
+        entities.clear();
         selectedEntity = null;
         ShrinkWorker.release();
     }

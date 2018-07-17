@@ -25,6 +25,7 @@ public enum CONFIG_TYPE {
     SAVE_BUTTON_CONFIG("saveButtonConfig"),
     CLEAR_BUTTON_CONFIG("clearButtonConfig"),
     CANCEL_BUTTON_CONFIG("cancelButtonConfig"),
+    DELETE_BUTTON_CONFIG("deleteButtonConfig"),
 
     // motionView main actions
     CREATE_TEXT_CONFIG("createTextConfig"),
