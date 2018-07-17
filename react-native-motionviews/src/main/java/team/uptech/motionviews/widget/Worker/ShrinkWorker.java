@@ -21,10 +21,10 @@ public class ShrinkWorker {
     private static boolean delete = false;
     private static boolean started = false;
     private static boolean hasCallback = false;
-    private static boolean hasUpdateListener;
+    private static boolean hasUpdateListener = false;
 
-    private static float minScale;
-    private static float initialScale;
+    private static float minScale = 0;
+    private static float initialScale = 0;
 
     private static ShrinkWorkerCallback callback = null;
     private static ValueAnimator.AnimatorUpdateListener updateListener = null;
@@ -118,6 +118,25 @@ public class ShrinkWorker {
             instance.shrinkAnimator.setFloatValues(initialScale, minScale);
             shrinkAnimator.start();
         }
+    }
+
+    public static void reset () {
+        instance = null;
+        selectedEntity = null;
+        callback = null;
+        updateListener = null;
+
+        delete = false;
+        started = false;
+        hasCallback = false;
+        hasUpdateListener = false;
+
+        minScale = 0;
+        initialScale = 0;
+    }
+
+    public static void release() {
+        reset();
     }
 
     public boolean isStarted() {

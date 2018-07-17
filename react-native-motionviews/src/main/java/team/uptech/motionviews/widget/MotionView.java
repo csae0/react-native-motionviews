@@ -382,6 +382,7 @@ public class MotionView  extends FrameLayout {
             entities.set(entities.indexOf(entity), null);
         }
         selectedEntity = null;
+        ShrinkWorker.release();
     }
 
     // Check if entity center moved into trash button
