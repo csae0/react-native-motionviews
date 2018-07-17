@@ -481,7 +481,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                          offset[0] = (screenBounds[0] - sketchViewBounds[0]) / 2;
                      }
                      if (screenBounds[1] - sketchViewBounds[1] > 0) {
-                         offset[1] = (screenBounds[1] - sketchViewBounds[1]) / 1;
+                         offset[1] = (screenBounds[1] - sketchViewBounds[1]) / 2;
                      }
                  }
                 ((SketchEntity) motionEntity).updateState(bitmap, position, color, sizeInPixel, offset);
