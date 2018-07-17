@@ -557,8 +557,8 @@ public class MotionView  extends FrameLayout {
             }
 
             if (entity != null) {
-                fadeOutTrashButton();
                 handleTrashDelete();
+                fadeOutTrashButton();
             }
         }
     }
