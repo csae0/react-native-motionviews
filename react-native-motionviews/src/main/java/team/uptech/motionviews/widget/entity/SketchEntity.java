@@ -140,7 +140,7 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
     public void startEditing(final Activity activity) {
         if (bitmap == null) {
             setVisible(false);
-            callEntityCallback(true);
+            // callEntityCallback(true); leave entities visible
 
             RelativeLayout main = activity.findViewById(R.id.activity_main);
             if (main == null) {
@@ -203,7 +203,7 @@ public class SketchEntity extends MotionEntity implements SketchEntityActions {
         }
 
         setVisible(true);
-        callEntityCallback(false);
+        // callEntityCallback(false);
         updateEntity(false);
     }
 }
