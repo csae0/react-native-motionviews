@@ -365,7 +365,9 @@ public class SketchViewContainer extends RelativeLayout {
             public void onClick(View v) {
                 if (sketchView != null) {
                     sketchViewCallback.closeAndCreateEntity(sketchView.getImage(), sketchView.getCroppedImageBounds(), sketchView.getToolColor(), (int) sketchView.getToolThickness());
-                    sketchView.clear();
+                    if (sketchView != null) {
+                        sketchView.clear();
+                    }
                 }
             }
         });
