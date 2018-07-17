@@ -16,9 +16,18 @@ public class ConversionUtils {
 
     public static int[] getScreenDimensions() {
         // Calculate ActionBar height
-        return new int[]{ Resources.getSystem().getDisplayMetrics().widthPixels, Resources.getSystem().getDisplayMetrics().heightPixels };
+        return new int[]{ Resources.getSystem().getDisplayMetrics().widthPixels, Resources.getSystem().getDisplayMetrics().heightPixels - getStatusBarHeight() };
     }
 
+    private static int getStatusBarHeight() {
+        int height = 0;
+        int actionBarId = Resources.getSystem().getIdentifier("status_bar_height", "dimen", "android");
+
+        if (actionBarId > 0) {
+            return Resources.getSystem().getDimensionPixelSize(actionBarId);
+        }
+        return height;
+    }
 
     public static int getDensity() {
         return (int)Resources.getSystem().getDisplayMetrics().density;
