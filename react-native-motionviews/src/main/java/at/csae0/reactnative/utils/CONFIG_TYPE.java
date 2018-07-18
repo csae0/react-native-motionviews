@@ -14,12 +14,12 @@ public enum CONFIG_TYPE {
     COLOR_CONFIG("colorConfig"),
     PICKER_CONFIG("pickerConfig"),
     SIZE_CONFIG("sizeConfig"),
-    BUTTONS_CONFIG("buttonsConfig"),
+    // BUTTONS_CONFIG("buttonsConfig"), not used due to refactor??
     BUTTON_CONFIGS("buttonConfigs"),
 
     // BUTTONS
     // motionView
-    TRASH_BUTTON("trashButton"),
+    TRASH_BUTTON_CONFIG("trashButtonConfig"),
 
     // general (sketchview, motionview)
     SAVE_BUTTON_CONFIG("saveButtonConfig"),

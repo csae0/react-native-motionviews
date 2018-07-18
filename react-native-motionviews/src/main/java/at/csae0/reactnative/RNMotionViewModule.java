@@ -12,14 +12,26 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import at.csae0.reactnative.utils.BundleConverter;
+import at.csae0.reactnative.utils.CONFIG_TYPE;
+import at.csae0.reactnative.utils.TOOL_TYPE;
 import team.uptech.motionviews.ui.MotionViewsActivity;
+
+import static at.csae0.reactnative.utils.TOOL_TYPE.ARROW_TOOL;
 
 public class RNMotionViewModule extends ReactContextBaseJavaModule {
 
     private static final String E_ACTIVITY_DOES_NOT_EXIST = "E_ACTIVITY_DOES_NOT_EXIST";
     private static final String E_FAILED_TO_SHOW_PICKER = "E_FAILED_TO_SHOW_PICKER";
     private static final String E_NO_IMAGE_DATA_FOUND = "E_NO_IMAGE_DATA_FOUND";
+
+    private static final String TOOLS = "tools";
+    private static final String CONFIG = "config";
+    private static final String SCREENS = "screens";
 
     public static final String OPTIONS_ID = "OPTIONS";
     private static ReactApplicationContext reactApplicationContext = null;
@@ -34,6 +46,67 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
         super(reactContext);
         reactApplicationContext = reactContext;
 
+    }
+
+    @Override
+    public Map<String, Object> getConstants() {
+        return Collections.unmodifiableMap(new HashMap<String, Object>() {
+            {
+                put(TOOLS, getToolConstants());
+                put(CONFIG, getSettingConstants());
+                put(SCREENS, getScreenConstants());
+            }
+
+            private Map<String, Object> getToolConstants() {
+                return Collections.unmodifiableMap(new HashMap<String, Object>() {
+                    {
+                        put(TOOL_TYPE.PEN_TOOL.getName(), TOOL_TYPE.PEN_TOOL.getName());
+                        put(TOOL_TYPE.ERASER_TOOL.getName(), TOOL_TYPE.ERASER_TOOL.getName());
+                        put(TOOL_TYPE.CIRCLE_TOOL.getName(), TOOL_TYPE.CIRCLE_TOOL.getName());
+                        put(TOOL_TYPE.ARROW_TOOL.getName(), TOOL_TYPE.ARROW_TOOL.getName());
+                    }
+                });
+            }
+
+            private Map<String, Object> getSettingConstants() {
+                return Collections.unmodifiableMap(new HashMap<String, Object>() {
+                    {
+                        //CONFIG CATEGORIES
+                        put(CONFIG_TYPE.GENERAL_CONFIG.getName(), CONFIG_TYPE.GENERAL_CONFIG.getName());
+                        put(CONFIG_TYPE.COLOR_CONFIG.getName(), CONFIG_TYPE.COLOR_CONFIG.getName());
+                        put(CONFIG_TYPE.PICKER_CONFIG.getName(), CONFIG_TYPE.PICKER_CONFIG.getName());
+                        put(CONFIG_TYPE.SIZE_CONFIG.getName(), CONFIG_TYPE.SIZE_CONFIG.getName());
+                        put(CONFIG_TYPE.BUTTON_CONFIGS.getName(), CONFIG_TYPE.BUTTON_CONFIGS.getName());
+
+                        //CONFIG NAMES
+                        put(CONFIG_TYPE.PEN_TOOL_CONFIG.getName(), CONFIG_TYPE.PEN_TOOL_CONFIG.getName());
+                        put(CONFIG_TYPE.ERASE_TOOL_CONFIG.getName(), CONFIG_TYPE.ERASE_TOOL_CONFIG.getName());
+                        put(CONFIG_TYPE.CIRCLE_TOOL_CONFIG.getName(), CONFIG_TYPE.CIRCLE_TOOL_CONFIG.getName());
+                        put(CONFIG_TYPE.ARROW_TOOL_CONFIG.getName(), CONFIG_TYPE.ARROW_TOOL_CONFIG.getName());
+                        put(CONFIG_TYPE.TRASH_BUTTON_CONFIG.getName(), CONFIG_TYPE.TRASH_BUTTON_CONFIG.getName());
+                        put(CONFIG_TYPE.SAVE_BUTTON_CONFIG.getName(), CONFIG_TYPE.SAVE_BUTTON_CONFIG.getName());
+                        put(CONFIG_TYPE.CLEAR_BUTTON_CONFIG.getName(), CONFIG_TYPE.CLEAR_BUTTON_CONFIG.getName());
+                        put(CONFIG_TYPE.CANCEL_BUTTON_CONFIG.getName(), CONFIG_TYPE.CANCEL_BUTTON_CONFIG.getName());
+                        put(CONFIG_TYPE.DELETE_BUTTON_CONFIG.getName(), CONFIG_TYPE.DELETE_BUTTON_CONFIG.getName());
+                        put(CONFIG_TYPE.CREATE_TEXT_CONFIG.getName(), CONFIG_TYPE.CREATE_TEXT_CONFIG.getName());
+                        put(CONFIG_TYPE.CREATE_SKETCH_CONFIG.getName(), CONFIG_TYPE.CREATE_SKETCH_CONFIG.getName());
+                        put(CONFIG_TYPE.CREATE_STICKER_CONFIG.getName(), CONFIG_TYPE.CREATE_STICKER_CONFIG.getName());
+                    }
+                });
+            }
+
+            private Map<String, Object> getScreenConstants() {
+                return Collections.unmodifiableMap(new HashMap<String, Object>() {
+                    {
+                        put(CONFIG_TYPE.ALL_SCREENS.getName(), CONFIG_TYPE.ALL_SCREENS.getName());
+                        put(CONFIG_TYPE.MAIN_SCREEN.getName(), CONFIG_TYPE.MAIN_SCREEN.getName());
+                        put(CONFIG_TYPE.TEXT_ENTITY_SCREEN.getName(), CONFIG_TYPE.TEXT_ENTITY_SCREEN.getName());
+                        put(CONFIG_TYPE.IMAGE_ENTITY_SCREEN.getName(), CONFIG_TYPE.IMAGE_ENTITY_SCREEN.getName());
+                        put(CONFIG_TYPE.SKETCH_ENTITY_SCREEN.getName(), CONFIG_TYPE.SKETCH_ENTITY_SCREEN.getName());
+                    }
+                });
+            }
+        });
     }
 
     @ReactMethod

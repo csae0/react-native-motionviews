@@ -209,7 +209,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                                             tempButton = addImage;
                                             defaultDrawable = RessourceUtils.getImageRessource("ic_add");
                                             break;
-                                        case TRASH_BUTTON:
+                                        case TRASH_BUTTON_CONFIG:
                                             tempButton = findViewById(R.id.trash_button);
                                             LayerDrawable trashCircle = (LayerDrawable) getResources().getDrawable(R.drawable.trash_circle).mutate();
                                             if (config.hasIcon()) {
