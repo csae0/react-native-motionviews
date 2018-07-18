@@ -2,6 +2,7 @@ package team.uptech.motionviews.ui;
 
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +12,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +34,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.UUID;
 
 import at.csae0.reactnative.R;
@@ -384,13 +387,12 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         Intent intent = new Intent();
         SketchFile sketchFile = null;
         try {
-            sketchFile = saveToLocalCache();
+            sketchFile = saveToLocalCache(); // saveToLocalCache();
         } catch (IOException ioe) {
             Log.i("MOTION_VIEWS_SAVE_ERROR", ioe.getMessage());
         }
 
         intent.putExtra(RESULT_IMAGE_KEY, BundleConverter.sketchFileToBundle(sketchFile));
-
         setResult(RESULT_SUBMITTED, intent);
         release();
         finish();
@@ -522,16 +524,16 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                 motionView.setHideAllEntities(false);
             } else {
                 int[] offset = new int[]{0, 0};
-                 if (sketchViewBounds != null) {
+                if (sketchViewBounds != null) {
                     RelativeLayout view = findViewById(R.id.activity_main);
                     int[] screenBounds = new int[]{view.getWidth(), view.getHeight()};
-                     if (screenBounds[0] - sketchViewBounds[0] > 0) {
-                         offset[0] = (screenBounds[0] - sketchViewBounds[0]) / 2;
-                     }
-                     if (screenBounds[1] - sketchViewBounds[1] > 0) {
-                         offset[1] = (screenBounds[1] - sketchViewBounds[1]) / 2;
-                     }
-                 }
+                    if (screenBounds[0] - sketchViewBounds[0] > 0) {
+                        offset[0] = (screenBounds[0] - sketchViewBounds[0]) / 2;
+                    }
+                    if (screenBounds[1] - sketchViewBounds[1] > 0) {
+                        offset[1] = (screenBounds[1] - sketchViewBounds[1]) / 2;
+                    }
+                }
                 ((SketchEntity) motionEntity).updateState(bitmap, position, color, sizeInPixel, offset);
                 motionView.invalidate();
             }
@@ -567,15 +569,42 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
             Canvas canvas = new Canvas(viewBitmap);
             motionView.draw(canvas);
 
-            File cacheFile = File.createTempFile("sketch_", UUID.randomUUID().toString() + ".png");
-            FileOutputStream imageOutput = new FileOutputStream(cacheFile);
-            viewBitmap.compress(Bitmap.CompressFormat.PNG, 100, imageOutput);
 
-            SketchFile sketchFile = new SketchFile();
-            sketchFile.localFilePath = cacheFile.getAbsolutePath();
-            sketchFile.width = viewBitmap.getWidth();
-            sketchFile.height = viewBitmap.getHeight();
-            return sketchFile;
+            Bitmap resultBitmap = getResultBitmap(viewBitmap);
+            viewBitmap.recycle();
+
+            if (resultBitmap != null) {
+                File cacheFile = File.createTempFile("sketch_", UUID.randomUUID().toString() + ".png");
+                FileOutputStream imageOutput = new FileOutputStream(cacheFile);
+                resultBitmap.compress(Bitmap.CompressFormat.PNG, 100, imageOutput);
+
+                SketchFile sketchFile = new SketchFile();
+                sketchFile.localFilePath = cacheFile.getAbsolutePath();
+                sketchFile.width = viewBitmap.getWidth();
+                sketchFile.height = viewBitmap.getHeight();
+                return sketchFile;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private Bitmap getResultBitmap (@Nullable Bitmap motionViewBitmap) {
+        if (motionViewBitmap != null) {
+            int[] offset = new int[]{0, 0};
+            if (sketchViewBounds != null) {
+                RelativeLayout view = findViewById(R.id.activity_main);
+                int[] screenBounds = new int[]{view.getWidth(), view.getHeight()};
+                if (screenBounds[0] - sketchViewBounds[0] > 0) {
+                    offset[0] = (screenBounds[0] - sketchViewBounds[0]) / 2;
+                }
+                if (screenBounds[1] - sketchViewBounds[1] > 0) {
+                    offset[1] = (screenBounds[1] - sketchViewBounds[1]) / 2;
+                }
+
+                Bitmap resultBitmap = Bitmap.createBitmap(motionViewBitmap, offset[0], offset[1], sketchViewBounds[0], sketchViewBounds[1]);
+                return resultBitmap;
+            }
         }
         return null;
     }
@@ -593,6 +622,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         }
         return null;
     }
+
     // Cleanup
     public void release () {
         motionView.release();
