@@ -28,6 +28,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.sketchView.SketchFile;
 
 import java.io.ByteArrayOutputStream;
@@ -71,24 +74,27 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
     public static final int SELECT_STICKER_REQUEST_CODE = 123;
     public static final int START_MOTION_VIEW_REQUEST_CODE = 111;
     public static final int RESULT_SUBMITTED = 200;
-    public static final int RESULT_CANCELED = 204;
     public static final int RESULT_DELETED = 202;
+    public static final int RESULT_CLEARED = 203;
+    public static final int RESULT_CANCELED = 204;
+
     public static final String RESULT_IMAGE_KEY = "resultImage";
+    public static final String RESULT_EDITED_KEY = "resultEdited";
+
     protected MotionView motionView;
     private String defaultText;
-    private int[] sketchViewBounds;
     private RelativeLayout buttons;
     private LinearLayout addButtons;
     private Button addText, addImage, addSketch, cancel, submit, delete, clear;
     private MotionViewCallback motionViewCallback;
-
     // Workaround to access this inside callback class
     private MotionViewsActivity getThis() {
         return this;
     }
 
     private FontProvider fontProvider;
-
+    private GeneralConfig generalConfig;
+    private boolean cleared;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,6 +125,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 
         this.fontProvider = new FontProvider(getResources());
         this.defaultText = "";
+        this.cleared = false;
 
         addButtons(this.getApplicationContext());
 
@@ -136,6 +143,8 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
             ConfigManager.getInstance().apply(new ConfigActions() {
                 @Override
                 public void applyGeneralConfig(GeneralConfig config) {
+                    generalConfig = config;
+
                     if (config.hasFontFamily() && fontProvider != null) {
                         fontProvider.addTypeface(config.getFontFamily(), config.getFontFamily());
                         fontProvider.setDefaultFontName(config.getFontFamily());
@@ -149,17 +158,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                         RelativeLayout rootContainer = findViewById(R.id.activity_main);
                         rootContainer.setBackgroundColor(config.getBackgroundColor());
                     }
-
-                    if (config.hasBackgroundDrawable()) {
-                        ImageView backgroundContainer= findViewById(R.id.background_image);
-                        backgroundContainer.setImageBitmap(config.getBackgroundBitmap(null));
-                    }
-
-                    if (config.hasImageBounds()) {
-                        sketchViewBounds = config.getImageBounds();
-                    } else {
-                        sketchViewBounds = null;
-                    }
+                    setBackgroundImage(false);
                 }
 
                 @Override
@@ -362,6 +361,31 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         rootView.addView(addButtons);
     }
 
+    private void setBackgroundImage(boolean original) {
+        if (generalConfig != null) {
+            Bitmap backgroundImage = null;
+
+            if (!original && generalConfig.hasBackgroundDrawable(false)) {
+                backgroundImage = generalConfig.getBackgroundBitmap(null, false);
+            } else if (generalConfig.hasBackgroundDrawable(true)) {
+                backgroundImage = generalConfig.getBackgroundBitmap(null, true);
+            }
+
+            if (backgroundImage != null) {
+                ImageView backgroundContainer = findViewById(R.id.background_image);
+                backgroundContainer.setImageBitmap(backgroundImage);
+            }
+
+        }
+    }
+
+    private boolean canClear() {
+        if (generalConfig != null) {
+            return generalConfig.hasBackgroundDrawable(false);
+        }
+        return false;
+    }
+
     public void cancel(View v) {
         release();
         setResult(RESULT_CANCELED);
@@ -370,33 +394,47 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 
     public void clear(View v) {
         motionView.deleteAllEntities();
-//        release();
-//        setResult(RESULT_CANCELED);
-//        finish();
-        // TODO: implement and call clear callback to replace background image and set notEdited boolean
+        cleared = canClear();
+        if (cleared) {
+            setBackgroundImage(true);
+        }
     }
 
     public void delete(View v) {
-        // TODO: implement and call clear callback to delete image
         release();
         setResult(RESULT_DELETED);
         finish();
     }
 
     public void submit(View v) {
-        Intent intent = new Intent();
         SketchFile sketchFile = null;
+        boolean edited = isEdited();
         try {
-            sketchFile = saveToLocalCache(); // saveToLocalCache();
+            if (edited) {
+                sketchFile = saveToLocalCache();
+            }
         } catch (IOException ioe) {
             Log.i("MOTION_VIEWS_SAVE_ERROR", ioe.getMessage());
         }
 
+        Intent intent = new Intent();
         intent.putExtra(RESULT_IMAGE_KEY, BundleConverter.sketchFileToBundle(sketchFile));
-        setResult(RESULT_SUBMITTED, intent);
+        intent.putExtra(RESULT_EDITED_KEY, isEdited());
+        if (!cleared) {
+            setResult(RESULT_SUBMITTED, intent);
+        } else {
+            setResult(RESULT_CLEARED, intent);
+        }
+
         release();
         finish();
-//        finishActivity(START_MOTION_VIEW_REQUEST_CODE);
+    }
+
+    private boolean isEdited () {
+        if (motionView != null && motionView.getEntities() != null) {
+            return motionView.getEntities().size() > 0;
+        }
+        return false;
     }
 
     private void addSticker(final int stickerResId, final boolean visible) {
@@ -523,18 +561,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                 motionView.deleteSelectedEntity(); // includes invalidate
                 motionView.setHideAllEntities(false);
             } else {
-                int[] offset = new int[]{0, 0};
-                if (sketchViewBounds != null) {
-                    RelativeLayout view = findViewById(R.id.activity_main);
-                    int[] screenBounds = new int[]{view.getWidth(), view.getHeight()};
-                    if (screenBounds[0] - sketchViewBounds[0] > 0) {
-                        offset[0] = (screenBounds[0] - sketchViewBounds[0]) / 2;
-                    }
-                    if (screenBounds[1] - sketchViewBounds[1] > 0) {
-                        offset[1] = (screenBounds[1] - sketchViewBounds[1]) / 2;
-                    }
-                }
-                ((SketchEntity) motionEntity).updateState(bitmap, position, color, sizeInPixel, offset);
+                ((SketchEntity) motionEntity).updateState(bitmap, position, color, sizeInPixel, getOffset());
                 motionView.invalidate();
             }
         }
@@ -557,6 +584,22 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         }
     }
 
+    private int[] getOffset () {
+        int[] offset = new int[]{0, 0};
+        if (generalConfig != null && generalConfig.hasImageBounds()) {
+            int[] sketchViewBounds = generalConfig.getImageBounds();
+            RelativeLayout view = findViewById(R.id.activity_main);
+            int[] screenBounds = new int[]{view.getWidth(), view.getHeight()};
+            if (screenBounds[0] - sketchViewBounds[0] > 0) {
+                offset[0] = (screenBounds[0] - sketchViewBounds[0]) / 2;
+            }
+            if (screenBounds[1] - sketchViewBounds[1] > 0) {
+                offset[1] = (screenBounds[1] - sketchViewBounds[1]) / 2;
+            }
+            return offset;
+        }
+        return offset;
+    }
     /**
      * Save image on device
      *
@@ -580,8 +623,8 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 
                 SketchFile sketchFile = new SketchFile();
                 sketchFile.localFilePath = cacheFile.getAbsolutePath();
-                sketchFile.width = viewBitmap.getWidth();
-                sketchFile.height = viewBitmap.getHeight();
+                sketchFile.width = resultBitmap.getWidth();
+                sketchFile.height = resultBitmap.getHeight();
                 return sketchFile;
             }
         }
@@ -590,21 +633,12 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 
     @Nullable
     private Bitmap getResultBitmap (@Nullable Bitmap motionViewBitmap) {
-        if (motionViewBitmap != null) {
-            int[] offset = new int[]{0, 0};
-            if (sketchViewBounds != null) {
-                RelativeLayout view = findViewById(R.id.activity_main);
-                int[] screenBounds = new int[]{view.getWidth(), view.getHeight()};
-                if (screenBounds[0] - sketchViewBounds[0] > 0) {
-                    offset[0] = (screenBounds[0] - sketchViewBounds[0]) / 2;
-                }
-                if (screenBounds[1] - sketchViewBounds[1] > 0) {
-                    offset[1] = (screenBounds[1] - sketchViewBounds[1]) / 2;
-                }
+        if (motionViewBitmap != null && generalConfig != null && generalConfig.hasImageBounds()) {
+            int[] offset = getOffset();
+            int[] sketchViewBounds = generalConfig.getImageBounds();
 
-                Bitmap resultBitmap = Bitmap.createBitmap(motionViewBitmap, offset[0], offset[1], sketchViewBounds[0], sketchViewBounds[1]);
-                return resultBitmap;
-            }
+            Bitmap resultBitmap = Bitmap.createBitmap(motionViewBitmap, offset[0], offset[1], sketchViewBounds[0], sketchViewBounds[1]);
+            return resultBitmap;
         }
         return null;
     }
@@ -633,5 +667,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         addText = addImage = addSketch = cancel = submit = delete = clear = null;
         motionViewCallback = null;
         fontProvider = null;
+        cleared = false;
+        generalConfig = null;
     }
 }

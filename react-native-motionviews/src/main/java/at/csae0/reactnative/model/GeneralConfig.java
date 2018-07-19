@@ -17,14 +17,15 @@ import team.uptech.motionviews.utils.ConversionUtils;
 
 public class GeneralConfig extends Config {
 
-    private String backgroundImagePath, imageSaveName, fontFamily, initialText;
+    private String originalBackgroundImagePath, editedBackgroundImagePath, imageSaveName, fontFamily, initialText;
     private TOOL_TYPE initialToolSelection;
     private Integer backgroundColor;
     private int[] imageBounds;
-    public GeneralConfig (@Nullable String backgroundImagePath, @Nullable String imageSaveName, @Nullable String fontFamily, @Nullable String initialToolSelection, @Nullable String initialText, @Nullable String backgroundColor) {
+    public GeneralConfig (@Nullable String originalBackgroundImagePath, @Nullable String editedBackgroundImagePath, @Nullable String imageSaveName, @Nullable String fontFamily, @Nullable String initialToolSelection, @Nullable String initialText, @Nullable String backgroundColor) {
         super(CONFIG_TYPE.GENERAL_CONFIG, true);
 
-        setBackgroundImagePath(backgroundImagePath);
+        setBackgroundImagePath(originalBackgroundImagePath, true);
+        setBackgroundImagePath(editedBackgroundImagePath, false);
         setImageSaveName(imageSaveName);
         setFontFamily(fontFamily);
         setInitialToolSelection(initialToolSelection);
@@ -34,8 +35,8 @@ public class GeneralConfig extends Config {
     }
 
     @Nullable
-    public String getBackgroundImagePath() {
-        return backgroundImagePath;
+    public String getBackgroundImagePath(boolean original) {
+        return original ? originalBackgroundImagePath : editedBackgroundImagePath;
     }
 
     @Nullable
@@ -44,8 +45,8 @@ public class GeneralConfig extends Config {
     }
 
     @Nullable
-    public Bitmap getBackgroundBitmap(@Nullable BitmapFactory.Options options) {
-        Bitmap bitmap = BitmapFactory.decodeFile(backgroundImagePath, options);
+    public Bitmap getBackgroundBitmap(@Nullable BitmapFactory.Options options, boolean original) {
+        Bitmap bitmap = BitmapFactory.decodeFile(original ? originalBackgroundImagePath : editedBackgroundImagePath, options);
 
         if (bitmap != null) {
             return bitmap;
@@ -53,8 +54,8 @@ public class GeneralConfig extends Config {
         return null;
     }
     @Nullable
-    public Drawable getBackgroundDrawable(Context context, @Nullable BitmapFactory.Options options) {
-        Bitmap bitmap = BitmapFactory.decodeFile(backgroundImagePath, options);
+    public Drawable getBackgroundDrawable(Context context, @Nullable BitmapFactory.Options options, boolean original) {
+        Bitmap bitmap = BitmapFactory.decodeFile(original ? originalBackgroundImagePath : editedBackgroundImagePath, options);
 
         if (bitmap != null) {
             return new BitmapDrawable(context.getResources(), bitmap);
@@ -83,12 +84,16 @@ public class GeneralConfig extends Config {
         return backgroundColor;
     }
 
-    public void setBackgroundImagePath(@Nullable String backgroundImagePath) {
-        this.backgroundImagePath = backgroundImagePath;
+    public void setBackgroundImagePath(@Nullable String backgroundImagePath, boolean original) {
+        if (original) {
+            originalBackgroundImagePath = backgroundImagePath;
+        } else {
+            editedBackgroundImagePath = backgroundImagePath;
+        }
     }
 
     public void setImageBounds () {
-        Bitmap backgroundImage = getBackgroundBitmap(null);
+        Bitmap backgroundImage = getBackgroundBitmap(null, true);
         int[] screenDimensions = ConversionUtils.getScreenDimensions();
 
         if (backgroundImage != null) {
@@ -126,12 +131,13 @@ public class GeneralConfig extends Config {
     public boolean hasImageBounds() {
         return imageBounds != null;
     }
-    public boolean hasBackgroundImagePath() {
-        return backgroundImagePath != null;
+    public boolean hasBackgroundImagePath(boolean original) {
+
+        return original ? originalBackgroundImagePath != null : editedBackgroundImagePath != null;
     }
-    public boolean hasBackgroundDrawable() {
-        if (hasBackgroundImagePath()) {
-            return BitmapFactory.decodeFile(backgroundImagePath) != null;
+    public boolean hasBackgroundDrawable(boolean original) {
+        if (hasBackgroundImagePath(original)) {
+            return original ? BitmapFactory.decodeFile(originalBackgroundImagePath) != null : BitmapFactory.decodeFile(editedBackgroundImagePath) != null;
         }
         return false;
     }

@@ -3,14 +3,18 @@ package at.csae0.reactnative;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,13 +31,20 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
 
     private static final String E_ACTIVITY_DOES_NOT_EXIST = "E_ACTIVITY_DOES_NOT_EXIST";
     private static final String E_FAILED_TO_SHOW_PICKER = "E_FAILED_TO_SHOW_PICKER";
-    private static final String E_NO_IMAGE_DATA_FOUND = "E_NO_IMAGE_DATA_FOUND";
+    private static final String STATUS_KEY = "status";
+    private static final String EDITED_KEY = "edited";
+    public static final String OPTIONS_ID = "OPTIONS";
+
+    private static final String EVENT_CLEAR = "clearEvent";
+    private static final String EVENT_DELETE = "deleteEvent";
+    private static final String EVENT_CHECK_PERMISSION = "checkPermissionEvent";
 
     private static final String TOOLS = "tools";
     private static final String CONFIG = "config";
     private static final String SCREENS = "screens";
+    private static final String EVENTS = "events";
+    private static final String RESULTS = "results";
 
-    public static final String OPTIONS_ID = "OPTIONS";
     private static ReactApplicationContext reactApplicationContext = null;
     public static ReactApplicationContext getReactContext () {
         return reactApplicationContext;
@@ -55,6 +66,8 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
                 put(TOOLS, getToolConstants());
                 put(CONFIG, getSettingConstants());
                 put(SCREENS, getScreenConstants());
+                put(EVENTS, getEventConstants());
+                put(RESULTS, getResultConstants());
             }
 
             private Map<String, Object> getToolConstants() {
@@ -106,6 +119,27 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
                     }
                 });
             }
+
+            private Map<String, Object> getEventConstants() {
+                return Collections.unmodifiableMap(new HashMap<String, Object>() {
+                    {
+                        put(EVENT_DELETE, EVENT_DELETE);
+                        put(EVENT_CHECK_PERMISSION, EVENT_CHECK_PERMISSION);
+                        put(EVENT_CLEAR, EVENT_CLEAR);
+                    }
+                });
+            }
+
+            private Map<String, Object> getResultConstants() {
+                return Collections.unmodifiableMap(new HashMap<String, Object>() {
+                    {
+                        put("submittedResult", MotionViewsActivity.RESULT_SUBMITTED);
+                        put("deletedResult", MotionViewsActivity.RESULT_DELETED);
+                        put("canceledResult", MotionViewsActivity.RESULT_CANCELED);
+                        put("clearedResult", MotionViewsActivity.RESULT_CLEARED);
+                    }
+                });
+            }
         });
     }
 
@@ -143,19 +177,30 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
         promise = null;
     }
 
+    public void sendEvent (String eventName, @Nullable WritableMap params) {
+        getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
+    }
+
     private class OnActivityResultListener extends BaseActivityEventListener {
         public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
             if (requestCode == MotionViewsActivity.START_MOTION_VIEW_REQUEST_CODE) {
-                if (resultCode == MotionViewsActivity.RESULT_SUBMITTED) {
-                    Bundle resultImage = data.getExtras().getBundle(MotionViewsActivity.RESULT_IMAGE_KEY);
+                if (resultCode == MotionViewsActivity.RESULT_SUBMITTED || resultCode == MotionViewsActivity.RESULT_CLEARED) {
+                    Bundle extras = data.getExtras();
+
+                    Bundle resultImage = extras.getBundle(MotionViewsActivity.RESULT_IMAGE_KEY);
                     WritableMap writableMap = BundleConverter.sketchFileBundleToWritableMap(resultImage);
+                    writableMap.putBoolean(EDITED_KEY, extras.getBoolean(MotionViewsActivity.RESULT_EDITED_KEY, false));
+                    writableMap.putInt(STATUS_KEY, resultCode);
+
                     if (promise != null) {
                             promise.resolve(writableMap);
                     }
                     release();
                 } else if (resultCode == MotionViewsActivity.RESULT_CANCELED || resultCode == MotionViewsActivity.RESULT_DELETED) {
                     if (promise != null) {
-                        promise.resolve(null);
+                        WritableMap writableMap = Arguments.createMap();
+                        writableMap.putInt(STATUS_KEY, resultCode);
+                        promise.resolve(writableMap);
                     }
                     release();
                 }

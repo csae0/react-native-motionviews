@@ -126,10 +126,9 @@ public class BundleConverter {
         return bundle;
     }
     
-    @Nullable
     public static WritableMap sketchFileBundleToWritableMap (@Nullable Bundle bundle) {
         if (bundle == null) {
-            return null;
+            return Arguments.createMap();
         }
 
         WritableMap writableMap = Arguments.createMap();
