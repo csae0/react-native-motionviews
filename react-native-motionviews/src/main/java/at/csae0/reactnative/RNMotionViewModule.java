@@ -35,9 +35,8 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
     private static final String EDITED_KEY = "edited";
     public static final String OPTIONS_ID = "OPTIONS";
 
-    private static final String EVENT_CLEAR = "clearEvent";
-    private static final String EVENT_DELETE = "deleteEvent";
-    private static final String EVENT_CHECK_PERMISSION = "checkPermissionEvent";
+    public static final String EVENT_DELETE = "deleteEvent";
+    public static final String EVENT_CHECK_PERMISSION = "checkPermissionEvent";
 
     private static final String TOOLS = "tools";
     private static final String CONFIG = "config";
@@ -125,7 +124,6 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
                     {
                         put(EVENT_DELETE, EVENT_DELETE);
                         put(EVENT_CHECK_PERMISSION, EVENT_CHECK_PERMISSION);
-                        put(EVENT_CLEAR, EVENT_CLEAR);
                     }
                 });
             }
@@ -177,8 +175,10 @@ public class RNMotionViewModule extends ReactContextBaseJavaModule {
         promise = null;
     }
 
-    public void sendEvent (String eventName, @Nullable WritableMap params) {
-        getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
+    public static void sendEvent (String eventName, @Nullable WritableMap params) {
+        if (reactApplicationContext != null) {
+            reactApplicationContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
+        }
     }
 
     private class OnActivityResultListener extends BaseActivityEventListener {

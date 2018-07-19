@@ -409,25 +409,31 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
     public void submit(View v) {
         SketchFile sketchFile = null;
         boolean edited = isEdited();
-        try {
-            if (edited) {
-                sketchFile = saveToLocalCache();
+        boolean permissionGranted = false;
+        if (generalConfig != null && generalConfig.getSavePermission() != null) {
+           permissionGranted = generalConfig.getSavePermission().checkPermission(MotionViewsActivity.this);
+        }
+
+        if (permissionGranted) {
+            try {
+                if (edited) {
+                    sketchFile = saveToLocalCache();
+                }
+            } catch (IOException ioe) {
+                Log.i("MOTION_VIEWS_SAVE_ERROR", ioe.getMessage());
             }
-        } catch (IOException ioe) {
-            Log.i("MOTION_VIEWS_SAVE_ERROR", ioe.getMessage());
-        }
 
-        Intent intent = new Intent();
-        intent.putExtra(RESULT_IMAGE_KEY, BundleConverter.sketchFileToBundle(sketchFile));
-        intent.putExtra(RESULT_EDITED_KEY, isEdited());
-        if (!cleared) {
-            setResult(RESULT_SUBMITTED, intent);
-        } else {
-            setResult(RESULT_CLEARED, intent);
+            Intent intent = new Intent();
+            intent.putExtra(RESULT_IMAGE_KEY, BundleConverter.sketchFileToBundle(sketchFile));
+            intent.putExtra(RESULT_EDITED_KEY, isEdited());
+            if (!cleared) {
+                setResult(RESULT_SUBMITTED, intent);
+            } else {
+                setResult(RESULT_CLEARED, intent);
+            }
+            release();
+            finish();
         }
-
-        release();
-        finish();
     }
 
     private boolean isEdited () {

@@ -21,7 +21,16 @@ public class GeneralConfig extends Config {
     private TOOL_TYPE initialToolSelection;
     private Integer backgroundColor;
     private int[] imageBounds;
-    public GeneralConfig (@Nullable String originalBackgroundImagePath, @Nullable String editedBackgroundImagePath, @Nullable String imageSaveName, @Nullable String fontFamily, @Nullable String initialToolSelection, @Nullable String initialText, @Nullable String backgroundColor) {
+    private SavePermission savePermission;
+
+    public GeneralConfig (@Nullable String originalBackgroundImagePath,
+                          @Nullable String editedBackgroundImagePath,
+                          @Nullable String imageSaveName,
+                          @Nullable String fontFamily,
+                          @Nullable String initialToolSelection,
+                          @Nullable String initialText,
+                          @Nullable String backgroundColor,
+                          @Nullable SavePermission savePermission) {
         super(CONFIG_TYPE.GENERAL_CONFIG, true);
 
         setBackgroundImagePath(originalBackgroundImagePath, true);
@@ -32,6 +41,7 @@ public class GeneralConfig extends Config {
         setInitialText(initialText);
         setBackgroundColor(backgroundColor);
         setImageBounds();
+        setSavePermission(savePermission);
     }
 
     @Nullable
@@ -82,6 +92,14 @@ public class GeneralConfig extends Config {
     @Nullable
     public Integer getBackgroundColor() {
         return backgroundColor;
+    }
+    @Nullable
+    public SavePermission getSavePermission() {
+        return savePermission;
+    }
+
+    public void setSavePermission(@Nullable SavePermission savePermission) {
+        this.savePermission = savePermission;
     }
 
     public void setBackgroundImagePath(@Nullable String backgroundImagePath, boolean original) {
@@ -156,5 +174,8 @@ public class GeneralConfig extends Config {
     }
     public boolean hasBackgroundColor() {
         return backgroundColor != null;
+    }
+    public boolean hasSavePermission() {
+        return savePermission != null;
     }
 }

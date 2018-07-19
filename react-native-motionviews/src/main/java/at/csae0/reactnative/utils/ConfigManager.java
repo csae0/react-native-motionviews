@@ -24,6 +24,7 @@ import at.csae0.reactnative.model.ColorConfig;
 import at.csae0.reactnative.model.Config;
 import at.csae0.reactnative.model.GeneralConfig;
 import at.csae0.reactnative.model.PickerConfig;
+import at.csae0.reactnative.model.SavePermission;
 import at.csae0.reactnative.model.ScreenConfig;
 import at.csae0.reactnative.model.SizeConfig;
 import team.uptech.motionviews.utils.RessourceUtils;
@@ -229,10 +230,12 @@ public class ConfigManager implements ConfigManagerActions {
                             tempBundle.getString("fontFamily", null),
                             tempBundle.getString("initialToolSelection", null),
                             tempBundle.getString("initialText", null),
-                            tempBundle.getString("backgroundColor", null)
+                            tempBundle.getString("backgroundColor", null),
+                            new SavePermission(tempBundle.getBundle("savePermission"))
                     );
                 } else {
                     generalConfig = new GeneralConfig(
+                            null,
                             null,
                             null,
                             null,
