@@ -30,6 +30,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 import at.csae0.reactnative.R;
@@ -136,6 +138,26 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 //        addSketch(false);
         ConfigManager.create(options, injectedOptions);
         applyConfig(this.getApplicationContext());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // TODO: find and solve timing issue
+        Timer timer = new Timer(false); // true = daemon !
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (generalConfig != null && !generalConfig.hasBackgroundDrawable(false) && addSketch != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            addSketch.performClick();
+                        }
+                    });
+                }
+            }
+        }, 0);
     }
 
     private void applyConfig(final Context context) {
