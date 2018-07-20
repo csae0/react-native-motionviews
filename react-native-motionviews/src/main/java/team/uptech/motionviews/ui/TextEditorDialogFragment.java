@@ -88,22 +88,22 @@ public class TextEditorDialogFragment extends DialogFragment {
 
     /**
      * deprecated
-     * use {@link TextEditorDialogFragment#getInstance(String, int, int, String)}
      */
     @Deprecated
     public TextEditorDialogFragment() {
         // empty, use getInstance
     }
 
-    public static TextEditorDialogFragment getInstance(String text, int size, int color, String typefaceName) {
+    public static TextEditorDialogFragment getInstance(@Nullable String text,@Nullable Integer size,@Nullable Integer color, @Nullable String typefaceName) {
         @SuppressWarnings("deprecation")
         TextEditorDialogFragment fragment = new TextEditorDialogFragment();
 
         Bundle args = new Bundle();
-        args.putString(ARG_TEXT, text);
-        args.putString(ARG_SIZE, size+"");
-        args.putString(ARG_COLOR, color+"");
-        args.putString(ARG_TYPEFACE, typefaceName);
+        if (text != null) args.putString(ARG_TEXT, text);
+        if (size != null) args.putString(ARG_SIZE, size+"");
+        if (color != null) args.putString(ARG_COLOR, color+"");
+        if (typefaceName != null) args.putString(ARG_TYPEFACE, typefaceName);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -130,17 +130,21 @@ public class TextEditorDialogFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         Bundle args = getArguments();
-        String text = "";
+        String text = "DEBUG";
         int size = ConversionUtils.dpToPx(Limits.FONT_SIZE_INITIAL_DP);
         int color = Limits.INITIAL_FONT_COLOR;
         String typefaceName = "";
 
+        Integer argsSize = null, argsColor = null;
+        String argsText = null;
+
         if (args != null) {
-            text = args.getString(ARG_TEXT);
-            size = Integer.parseInt(args.getString(ARG_SIZE));
-            color = Integer.parseInt(args.getString(ARG_COLOR));
-            typefaceName = args.getString(ARG_TYPEFACE);
+            argsText = args.getString(ARG_TEXT, null);
+            argsSize = Integer.parseInt(args.getString(ARG_SIZE, null));
+            argsColor = Integer.parseInt(args.getString(ARG_COLOR, null));
+            typefaceName = args.getString(ARG_TYPEFACE, null);
         }
+
         editText = view.findViewById(R.id.edit_text_view);
 
         DisplayMetrics displayMetrics = view.getResources().getDisplayMetrics();
@@ -160,15 +164,16 @@ public class TextEditorDialogFragment extends DialogFragment {
 
         // Slider values
         boxedVertical = view.findViewById(R.id.boxed_vertical);
-        boxedVertical.setValue(ConversionUtils.pxToDp(size));
+//        boxedVertical.setValue(ConversionUtils.pxToDp(size));
+        if(argsSize == null) setTextSize(ConversionUtils.pxToDp(size));
 
 //        createColorSelections(view, color);
         addButtons(view);
         initListeners(view);
 
-        initWithTextEntity(text);
+        if (argsText == null) initWithTextEntity(text);
 
-        setTextColor(color);
+        if (argsColor == null) setTextColor(color);
 
         if (fontProvider != null) {
             Typeface typeface = fontProvider.getTypeface(!typefaceName.equals("") || typefaceName != null ? typefaceName : fontProvider.getDefaultFontName());
@@ -176,6 +181,12 @@ public class TextEditorDialogFragment extends DialogFragment {
         }
 
         applyConfig(view);
+
+        if (args != null) {
+            if (argsSize != null) setTextSize(ConversionUtils.pxToDp(argsSize));
+            if (argsColor != null) setTextColor(argsColor);
+            if (argsText != null) initWithTextEntity(argsText);
+        }
     }
 
     private void applyConfig(final View view) {

@@ -57,7 +57,9 @@ public class TextEntity extends MotionEntity implements TextEntityActions {
     private void updateEntity(boolean moveToPreviousCenter) {
 
         // save previous center
-        PointF oldCenter = canvasCenter();
+        PointF canvasCenter = canvasCenter();
+        float[] prevoiusCenter = entityCenter();
+        PointF previousCenterPoint = new PointF(prevoiusCenter[0], prevoiusCenter[1]);
 
         Bitmap newBmp = createBitmap(getLayer(), bitmap);
         if (newBmp == null) {
@@ -87,9 +89,13 @@ public class TextEntity extends MotionEntity implements TextEntityActions {
         srcPoints[8] = 0;
         srcPoints[9] = 0;
 
-        if (moveToPreviousCenter && newCreated) {
+        if (moveToPreviousCenter) {
             // move to previous center
-            moveCenterTo(oldCenter);
+            if (newCreated) {
+                moveCenterTo(canvasCenter);
+            } else {
+                moveCenterTo(previousCenterPoint);
+            }
         }
     }
 
