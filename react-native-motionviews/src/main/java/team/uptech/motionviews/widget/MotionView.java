@@ -338,6 +338,9 @@ public class MotionView  extends FrameLayout {
         // removing and adding brings layer to front
         if (entities.remove(entity)) {
             entities.add(entity);
+            if (motionViewCallback != null) {
+                motionViewCallback.updateCancelTapped();
+            }
             invalidate();
         }
     }
@@ -369,6 +372,9 @@ public class MotionView  extends FrameLayout {
             return;
         }
         if (entities.remove(selectedEntity)) {
+            if (motionViewCallback != null) {
+                motionViewCallback.updateCancelTapped();
+            }
             selectedEntity.release();
             selectedEntity = null;
             invalidate();
@@ -377,7 +383,6 @@ public class MotionView  extends FrameLayout {
 
     public void deleteAllEntities() {
         selectedEntity = null;
-
         for (MotionEntity entity : entities) {
             entity.release();
             entities.set(entities.indexOf(entity), null);
@@ -541,6 +546,9 @@ public class MotionView  extends FrameLayout {
         @Override
         public boolean onMove(MoveGestureDetector detector) {
             handleTranslate(detector.getFocusDelta());
+            if (motionViewCallback != null) {
+                motionViewCallback.updateCancelTapped();
+            }
             return true;
         }
 

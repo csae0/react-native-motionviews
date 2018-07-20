@@ -2,24 +2,20 @@ package team.uptech.motionviews.ui;
 
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Base64;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,16 +24,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.sketchView.SketchFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.UUID;
 
 import at.csae0.reactnative.R;
@@ -94,7 +86,10 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 
     private FontProvider fontProvider;
     private GeneralConfig generalConfig;
+    private ButtonConfig cancelButtonConfig;
     private boolean cleared;
+    private boolean cancelTapped;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,11 +116,16 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                     motionEntity.startEditing(getThis());
                 }
             }
+            @Override
+            public void updateCancelTapped() {
+               mUpdateCancelTapped();
+            }
         };
 
         this.fontProvider = new FontProvider(getResources());
         this.defaultText = "";
         this.cleared = false;
+        this.cancelTapped = true;
 
         addButtons(this.getApplicationContext());
 
@@ -174,7 +174,8 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                     ButtonConfigs configs = (ButtonConfigs) manager.getScreenConfig(SCREEN_TYPE, BUTTON);
 
                     if (configs != null && configs.hasButtonsConfig()) {
-                        for (ButtonConfig config : configs.getButtonsConfig()) {
+                        for (ButtonConfig tempConfig : configs.getButtonsConfig()) {
+                            ButtonConfig config = tempConfig;
                             if (config != null) {
                                 Button tempButton = null;
                                 Drawable defaultDrawable = null;
@@ -182,7 +183,8 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                                     switch (config.getId()) {
                                         case CANCEL_BUTTON_CONFIG:
                                             tempButton = cancel;
-                                            defaultDrawable = RessourceUtils.getImageRessource("ic_close");
+                                            manager.injectDefaultIcons(config, "ic_close", "ic_back");
+                                            cancelButtonConfig = config;
                                             break;
                                         case SAVE_BUTTON_CONFIG:
                                             tempButton = submit;
@@ -217,7 +219,8 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                                                 trashCircle.setDrawableByLayerId(R.id.inner_trash_image, RessourceUtils.getImageRessource("ic_trash"));
                                             }
                                             defaultDrawable = trashCircle;
-                                            config.setIconName(null); // use default drawable
+                                            config.setIconName(null, true); // use default drawable
+                                            config.setIconName(null, false); // remove optional drawable
 
                                             ViewGroup.LayoutParams layoutParams = tempButton.getLayoutParams();
                                             if (!config.hasLabel() && config.hasSideLength() && config.getSideLength() != getResources().getDimensionPixelOffset(R.dimen.color_picker_height)) {
@@ -379,6 +382,19 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         }
     }
 
+    private void cancelTapped (boolean tapped) {
+        if (cancelTapped != tapped) {
+            cancelTapped = tapped;
+            if (cancelButtonConfig.hasIcon(tapped)) {
+                cancel.setBackground(cancelButtonConfig.getIcon(tapped));
+            }
+        }
+    }
+
+    private void mUpdateCancelTapped () {
+        cancelTapped(!cleared && motionView.getEntities().size() == 0);
+    }
+
     private boolean canClear() {
         if (generalConfig != null) {
             return generalConfig.hasBackgroundDrawable(false);
@@ -387,14 +403,22 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
     }
 
     public void cancel(View v) {
-        release();
-        setResult(RESULT_CANCELED);
-        finish();
+        if (!cancelTapped) {
+            cancelTapped(true);
+        } else {
+            // cancelButtonConfig
+            release();
+            setResult(RESULT_CANCELED);
+            finish();
+        }
     }
 
     public void clear(View v) {
-        motionView.deleteAllEntities();
         cleared = canClear();
+        motionView.deleteAllEntities();
+
+        mUpdateCancelTapped();
+
         if (cleared) {
             setBackgroundImage(true);
         }
@@ -555,6 +579,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                 motionView.invalidate();
             }
         }
+        mUpdateCancelTapped();
     }
 
     @Override
@@ -571,6 +596,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                 motionView.invalidate();
             }
         }
+        mUpdateCancelTapped();
     }
 
     @Override
@@ -675,5 +701,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         fontProvider = null;
         cleared = false;
         generalConfig = null;
+        cancelButtonConfig = null;
+        cancelTapped = true;
     }
 }

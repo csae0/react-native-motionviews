@@ -16,4 +16,5 @@ public interface ConfigManagerActions {
     ScreenConfig getScreenConfig(CONFIG_TYPE screenType, CONFIG_TYPE configType);
     void configureButton(@Nullable Button button, @Nullable ButtonConfig config, @Nullable Drawable defaultDrawable);
     void configureSize(@Nullable BoxedVertical boxedVertical, @Nullable SizeConfig config, SetSizeAction setSizeAction);
+    void injectDefaultIcons(@Nullable ButtonConfig config, @Nullable String defaultDrawable, @Nullable String optionalDefaultDrawable);
 }

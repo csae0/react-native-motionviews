@@ -249,6 +249,7 @@ public class TextEditorDialogFragment extends DialogFragment {
                                         case CANCEL_BUTTON_CONFIG:
                                             tempButton = cancel;
                                             defaultDrawable = RessourceUtils.getImageRessource("ic_close");
+                                            // optionalDefaultDrawable = RessourceUtils.getImageRessource("ic_back");
                                             break;
                                         case CLEAR_BUTTON_CONFIG:
                                             tempButton = clear;

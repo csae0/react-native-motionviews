@@ -9,16 +9,16 @@ import at.csae0.reactnative.utils.CONFIG_TYPE;
 
 public class ButtonConfig extends Config {
 
-    private String iconName;
+    private String baseIconName, optionalIconName;
     private String label;
     private String tint;
     private Integer imageButtonSideLength;
     private int[] padding = new int[]{0,0,0,0};
 
-    public ButtonConfig (CONFIG_TYPE id, @Nullable Boolean enabled, @Nullable String icon, @Nullable String label, @Nullable String tint, @Nullable Integer sideLength, @Nullable int[] padding) {
+    public ButtonConfig (CONFIG_TYPE id, @Nullable Boolean enabled, @Nullable String[] icons, @Nullable String label, @Nullable String tint, @Nullable Integer sideLength, @Nullable int[] padding) {
         super(id, enabled);
 
-        setIconName(icon);
+        setIconNames(icons);
         setLabel(label);
         setTint(tint);
         setSideLength(sideLength);
@@ -27,7 +27,16 @@ public class ButtonConfig extends Config {
 
     @Nullable
     public String getIconName() {
-        return iconName;
+        return getIconName(true);
+    }
+
+    @Nullable
+    public String getIconName(boolean baseIcon) {
+        if (baseIcon) {
+            return baseIconName;
+        } else {
+            return optionalIconName;
+        }
     }
 
     public int getPaddingLeft() {
@@ -53,10 +62,17 @@ public class ButtonConfig extends Config {
 
     @Nullable
     public Drawable getIcon() {
-        if (this.iconName != null) {
-            String[] icon = this.iconName.split("\\.");
+        return getIcon(true);
+    }
+
+    @Nullable
+    public Drawable getIcon(boolean baseIcon) {
+        if (getIconName(baseIcon) != null) {
+            String[] icon = getIconName(baseIcon).split("\\.");
             if (icon.length == 2) {
                 return RessourceUtils.getImageAsset(icon[0], icon[1]);
+            } else {
+                return RessourceUtils.getImageRessource(icon[0]);
             }
         }
         return null;
@@ -80,8 +96,24 @@ public class ButtonConfig extends Config {
         return tint;
     }
 
+    public void setIconNames(@Nullable String[] icons) {
+        if (icons != null && icons.length > 0) {
+            setIconName(icons[0], true);
+            if (icons.length > 1) {
+                setIconName(icons[1], false);
+            }
+        }
+    }
+
     public void setIconName(@Nullable String icon) {
-        this.iconName = icon;
+        setIconName(icon, true);
+    }
+    public void setIconName(@Nullable String icon, boolean baseIcon) {
+        if (baseIcon) {
+            this.baseIconName = icon;
+        } else {
+            this.optionalIconName = icon;
+        }
     }
 
     public void setLabel(@Nullable String label) {
@@ -117,10 +149,15 @@ public class ButtonConfig extends Config {
     }
 
     public boolean hasIcon() {
-        if (this.iconName != null) {
-            String[] icon = this.iconName.split("\\.");
+        return hasIcon(true);
+    }
+    public boolean hasIcon(boolean baseIcon) {
+        if (getIconName(baseIcon) != null) {
+            String[] icon = getIconName(baseIcon).split("\\.");
             if (icon.length == 2) {
                 return RessourceUtils.getImageAsset(icon[0], icon[1]) != null;
+            } else {
+                return RessourceUtils.getImageRessource(icon[0]) != null;
             }
         }
         return false;

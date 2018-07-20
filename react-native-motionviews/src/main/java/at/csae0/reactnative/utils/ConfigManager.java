@@ -353,7 +353,7 @@ public class ConfigManager implements ConfigManagerActions {
                                             buttonsConfig = new ButtonConfig(
                                                     CONFIG_TYPE.get(buttonsBundle.getString("id")),
                                                     buttonsBundle.getBoolean("enabled", true),
-                                                    buildIconNameFromBundle(buttonsBundle.getBundle("icon")),
+                                                    buildIconNameArrayFromBundle(buttonsBundle.getBundle("icon")),
                                                     buttonsBundle.getString("label", null),
                                                     buttonsBundle.getString("tint", null),
                                                     buttonsBundle.getInt("sideLength", buttonDefaultSideLength),
@@ -395,6 +395,31 @@ public class ConfigManager implements ConfigManagerActions {
                 }
             }
         }
+    }
+
+    @Nullable
+    private String[] buildIconNameArrayFromBundle(Bundle icon) {
+        ArrayList<String> iconStrings = new ArrayList<>();
+        if (icon != null) {
+            ArrayList<Bundle> icons = (ArrayList<Bundle>) BundleConverter.bundleToArrayList(icon);
+            if (icons != null) {
+                for(Bundle b: icons) {
+                    String iconString = buildIconNameFromBundle(b);
+                    if (iconString != null) {
+                        iconStrings.add(iconString);
+                    }
+                }
+            } else {
+                String iconString = buildIconNameFromBundle(icon);
+                if(iconString != null) {
+                    iconStrings.add(iconString);
+                }
+            }
+        }
+        if (iconStrings.isEmpty()) {
+            return null;
+        }
+        return iconStrings.toArray(new String[iconStrings.size()]);
     }
 
     @Nullable
@@ -453,6 +478,17 @@ public class ConfigManager implements ConfigManagerActions {
     }
 
     @Override
+    public void injectDefaultIcons (@Nullable ButtonConfig config, @Nullable String defaultDrawable, @Nullable String optionalDefaultDrawable) {
+        // RessourceUtils.getImageRessource();
+        if (!config.hasIcon(true) && defaultDrawable != null) {
+            config.setIconName(defaultDrawable, true);
+        }
+        if (!config.hasIcon(false) && optionalDefaultDrawable != null) {
+            config.setIconName(optionalDefaultDrawable, false);
+        }
+    }
+
+    @Override
     public void configureButton(@Nullable Button tempButton, @Nullable ButtonConfig config, @Nullable Drawable defaultDrawable) {
         if (tempButton != null && config != null) {
             if (config.hasEnabled() && config.isEnabled()) {
@@ -463,6 +499,7 @@ public class ConfigManager implements ConfigManagerActions {
                 if (config.hasIcon() || (!config.hasLabel() && defaultDrawable != null)) {
                     tempButton.setText("");
                     tempButton.setBackground(config.hasIcon() ? config.getIcon() : defaultDrawable);
+
                     ViewGroup.LayoutParams layoutParams = tempButton.getLayoutParams();
                     if (config.hasSideLength()) {
                         layoutParams.width = layoutParams.height = config.getSideLength();
@@ -479,6 +516,7 @@ public class ConfigManager implements ConfigManagerActions {
                     tempButton.setLayoutParams(layoutParams);
                     tempButton.setPadding(0, 0, 0, 0);
                 }
+
                 if (config.hasTint()) {
                     Integer tintColor = config.getTintColor();
                     UIUtils.setButtonTint(tempButton, ColorStateList.valueOf(tintColor));

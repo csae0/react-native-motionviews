@@ -13,6 +13,7 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 
+import team.uptech.motionviews.ui.MotionViewsActivity;
 import team.uptech.motionviews.ui.TextEditorDialogFragment;
 import team.uptech.motionviews.utils.FontProvider;
 import team.uptech.motionviews.viewmodel.Font;
@@ -198,6 +199,8 @@ public class TextEntity extends MotionEntity implements TextEntityActions {
 
     @Override
     public void startEditing(Activity activity) {
+        ((MotionViewsActivity)activity).showButtons(false);
+
         setVisible(false);
         TextLayer textLayer = getLayer();
         Font font = textLayer.getFont();

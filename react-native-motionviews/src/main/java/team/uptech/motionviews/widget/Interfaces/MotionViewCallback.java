@@ -9,4 +9,5 @@ public interface MotionViewCallback {
     void onEntitySelected(@Nullable MotionEntity entity);
     void onEntityDoubleTap(@NonNull MotionEntity entity);
     void onEntitySingleTapConfirmed(@NonNull MotionEntity entity);
+    void updateCancelTapped();
 }
