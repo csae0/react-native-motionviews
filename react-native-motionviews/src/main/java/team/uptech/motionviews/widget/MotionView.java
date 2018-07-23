@@ -25,6 +25,7 @@ import android.widget.FrameLayout;
 
 import com.almeros.android.multitouch.MoveGestureDetector;
 import com.almeros.android.multitouch.RotateGestureDetector;
+import com.sketchView.SketchViewContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -400,6 +401,10 @@ public class MotionView  extends FrameLayout {
         entities.clear();
         selectedEntity = null;
         ShrinkWorker.release();
+
+        if (SketchViewContainer.hasInstance()) {
+            SketchViewContainer.getInstance().release();
+        }
     }
 
     // Check if entity center moved into trash button

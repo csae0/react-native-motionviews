@@ -398,8 +398,7 @@ public class SketchView extends View {
     }
     public void setViewImage(Bitmap bitmap) {
         incrementalImage = bitmap;
-        invalidate();
-    }
+        }
 
     public int getSelectedTool() {
         return currentTool.getTypeId();
