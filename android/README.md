@@ -12,15 +12,35 @@ check out config object structure in index.js
 
 To use button icons use font linking syntax (since react-native link only links fonts i used https://github.com/csae0/react-native-asset#filterAndRename to perform asset linking):
 
-  "rnpm": {
-    "assets": [
-      "./fonts",
-      "./App/Images/Icons"
-    ]
-  }
+"rnpm": {
+"assets": [
+"./fonts",
+"./App/Images/Icons"
+]
+}
 
+Link to project:
 
+add to settings.gadle:
 
+include ':BoxedVerticalSeekBarLib'
+project(':BoxedVerticalSeekBarLib').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-motionviews/android/BoxedVerticalSeekBar/BoxedVerticalSeekBarLib')
+include ':react-native-motionviews'
+project(':react-native-motionviews').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-motionviews/android/react-native-motionviews')
+include ':react-native-merge-images'
+
+add to MainApplication.java:
+
+import at.csae0.reactnative.RNMotionViewPackage;
+...
+@Override
+protected List<ReactPackage> getPackages() {
+return Arrays.<ReactPackage>asList(
+...
+new RNMotionViewPackage()
+...
+);
+}
 
 # MotionViews-Android
 
@@ -63,3 +83,4 @@ Check out the app on [Google Play](https://play.google.com/store/apps/details?id
 Play with the online app emulator on [Appetize.io](https://appetize.io/app/kd51amwzp7fg4f8wrrb5mz673w).
 
 The video of what we got in the end on the YouTube: [Image Stickers](https://www.youtube.com/watch?v=6IkmFmlrLPA) and [Text Stickers](https://www.youtube.com/watch?v=9q86Dx9-xTA).
+
