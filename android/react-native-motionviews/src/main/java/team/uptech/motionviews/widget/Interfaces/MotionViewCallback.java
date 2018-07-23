@@ -10,4 +10,5 @@ public interface MotionViewCallback {
     void onEntityDoubleTap(@NonNull MotionEntity entity);
     void onEntitySingleTapConfirmed(@NonNull MotionEntity entity);
     void updateCancelTapped();
+    void onMeasure();
 }

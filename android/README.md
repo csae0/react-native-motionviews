@@ -28,6 +28,7 @@ project(':BoxedVerticalSeekBarLib').projectDir = new File(rootProject.projectDir
 include ':react-native-motionviews'
 project(':react-native-motionviews').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-motionviews/android/react-native-motionviews')
 
+
 add to MainApplication.java:
 
 import at.csae0.reactnative.RNMotionViewPackage;

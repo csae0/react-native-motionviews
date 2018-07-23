@@ -246,6 +246,14 @@ public class MotionView  extends FrameLayout {
         invalidate();
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (motionViewCallback != null) {
+            motionViewCallback.onMeasure();
+        }
+    }
+
     private void handleTranslate(PointF delta) {
         if (selectedEntity != null) {
             float newCenterX = selectedEntity.absoluteCenterX() + delta.x;

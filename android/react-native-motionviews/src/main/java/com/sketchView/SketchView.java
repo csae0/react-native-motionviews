@@ -338,10 +338,6 @@ public class SketchView extends View {
 
         return value;
     }
-    @Override
-    public boolean performClick() {
-        return super.performClick();
-    }
 
     /**
      *  cleanup

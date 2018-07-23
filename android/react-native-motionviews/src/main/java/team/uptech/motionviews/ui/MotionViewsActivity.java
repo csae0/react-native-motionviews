@@ -122,6 +122,13 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
             public void updateCancelTapped() {
                mUpdateCancelTapped();
             }
+
+            @Override
+            public void onMeasure() {
+                if (generalConfig != null && !generalConfig.hasBackgroundDrawable(false) && addSketch != null) {
+                    addSketch(false);
+                }
+            }
         };
 
         this.fontProvider = new FontProvider(getResources());
@@ -134,30 +141,11 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
         motionView = findViewById(R.id.main_motion_view);
         motionView.setMotionViewCallback(motionViewCallback);
         motionView.setTrashButton((Button)findViewById(R.id.trash_button));
+
         // addSticker(R.drawable.pikachu_2, true);
 //        addSketch(false);
         ConfigManager.create(options, injectedOptions);
         applyConfig(this.getApplicationContext());
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // TODO: find and solve timing issue
-        Timer timer = new Timer(false); // true = daemon !
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (generalConfig != null && !generalConfig.hasBackgroundDrawable(false) && addSketch != null) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            addSketch.performClick();
-                        }
-                    });
-                }
-            }
-        }, 0);
     }
 
     private void applyConfig(final Context context) {
@@ -514,6 +502,8 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 
     protected void addSketch(boolean visible) {
         SketchLayer sketchLayer = createSketchLayer();
+        int width = motionView.getWidth();
+        int height = motionView.getHeight();
         SketchEntity sketchEntity = new SketchEntity(sketchLayer, motionView.getWidth(), motionView.getHeight(), visible);
         motionView.addEntityAndPosition(sketchEntity);
 
