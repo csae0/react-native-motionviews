@@ -27,7 +27,6 @@ include ':BoxedVerticalSeekBarLib'
 project(':BoxedVerticalSeekBarLib').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-motionviews/android/BoxedVerticalSeekBar/BoxedVerticalSeekBarLib')
 include ':react-native-motionviews'
 project(':react-native-motionviews').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-motionviews/android/react-native-motionviews')
-include ':react-native-merge-images'
 
 add to MainApplication.java:
 
