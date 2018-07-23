@@ -211,7 +211,7 @@ public class SketchViewContainer extends RelativeLayout {
                                    switch (config.getId()) {
                                        case CANCEL_BUTTON_CONFIG:
                                            tempButton = cancel;
-                                           defaultDrawable = RessourceUtils.getImageRessource("ic_close");
+                                           defaultDrawable = RessourceUtils.getImageRessource("ic_back");
                                            // optionalDefaultDrawable = RessourceUtils.getImageRessource("ic_back");
                                            break;
                                        case CLEAR_BUTTON_CONFIG:
