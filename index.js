@@ -3,7 +3,7 @@ import { NativeModules } from 'react-native'
 
 const { RNMotionViews } = NativeModules
 
-export const startWithOptions = async ({ icons, fontFamily, originalBackgroundImagePath, editedBackgroundImagePath, savePermission }) => {
+export const startWithOptions = async ({ icons, fontFamily, originalBackgroundImagePath, editedBackgroundImagePath, savePermission, deleteDialog }) => {
   // DeviceEventEmitter.addListener(RNMotionViews.events.checkPermissionEvent, async (event) => {
   //   if (savePermissionCallback && typeof savePermissionCallback === 'function') {
   //     const premissionGranted = await savePermissionCallback()
@@ -18,7 +18,8 @@ export const startWithOptions = async ({ icons, fontFamily, originalBackgroundIm
       initialToolSelection: 'penTool',
       initialText: '',
       backgroundColor: '#192d2e',
-      savePermission
+      savePermission,
+      deleteDialog
     },
     buttonConfigs: [{
       screen: 'allScreens',

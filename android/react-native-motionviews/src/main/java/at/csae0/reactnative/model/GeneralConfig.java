@@ -4,13 +4,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
-import android.widget.RelativeLayout;
 
-import at.csae0.reactnative.R;
 import at.csae0.reactnative.utils.CONFIG_TYPE;
 import at.csae0.reactnative.utils.TOOL_TYPE;
 import team.uptech.motionviews.utils.ConversionUtils;
@@ -21,7 +18,8 @@ public class GeneralConfig extends Config {
     private TOOL_TYPE initialToolSelection;
     private Integer backgroundColor;
     private int[] imageBounds;
-    private SavePermission savePermission;
+    private SavePermissionDialog savePermission;
+    private DeleteDialog deleteDialog;
 
     public GeneralConfig (@Nullable String originalBackgroundImagePath,
                           @Nullable String editedBackgroundImagePath,
@@ -30,7 +28,8 @@ public class GeneralConfig extends Config {
                           @Nullable String initialToolSelection,
                           @Nullable String initialText,
                           @Nullable String backgroundColor,
-                          @Nullable SavePermission savePermission) {
+                          @Nullable SavePermissionDialog savePermission,
+                          @Nullable DeleteDialog deleteDialog) {
         super(CONFIG_TYPE.GENERAL_CONFIG, true);
 
         setBackgroundImagePath(originalBackgroundImagePath, true);
@@ -42,6 +41,7 @@ public class GeneralConfig extends Config {
         setBackgroundColor(backgroundColor);
         setImageBounds();
         setSavePermission(savePermission);
+        setDeleteDialog(deleteDialog);
     }
 
     @Nullable
@@ -94,12 +94,20 @@ public class GeneralConfig extends Config {
         return backgroundColor;
     }
     @Nullable
-    public SavePermission getSavePermission() {
+    public DeleteDialog getDeleteDialog() {
+        return deleteDialog;
+    }
+    @Nullable
+    public SavePermissionDialog getSavePermission() {
         return savePermission;
     }
 
-    public void setSavePermission(@Nullable SavePermission savePermission) {
+    public void setSavePermission(@Nullable SavePermissionDialog savePermission) {
         this.savePermission = savePermission;
+    }
+    
+    public void setDeleteDialog(@Nullable DeleteDialog deleteDialog) {
+        this.deleteDialog = deleteDialog;
     }
 
     public void setBackgroundImagePath(@Nullable String backgroundImagePath, boolean original) {
@@ -178,4 +186,8 @@ public class GeneralConfig extends Config {
     public boolean hasSavePermission() {
         return savePermission != null;
     }
+    public boolean hasDeleteDialog() {
+        return deleteDialog != null;
+    }
+
 }

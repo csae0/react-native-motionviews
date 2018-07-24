@@ -7,13 +7,10 @@ import android.support.annotation.Nullable;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import abak.tr.com.boxedverticalseekbar.BoxedVertical;
-import at.csae0.reactnative.R;
 import at.csae0.reactnative.interfaces.ConfigActions;
 import at.csae0.reactnative.interfaces.ConfigManagerActions;
 import at.csae0.reactnative.interfaces.MergeConfig;
@@ -21,10 +18,10 @@ import at.csae0.reactnative.interfaces.SetSizeAction;
 import at.csae0.reactnative.model.ButtonConfig;
 import at.csae0.reactnative.model.ButtonConfigs;
 import at.csae0.reactnative.model.ColorConfig;
-import at.csae0.reactnative.model.Config;
+import at.csae0.reactnative.model.DeleteDialog;
 import at.csae0.reactnative.model.GeneralConfig;
 import at.csae0.reactnative.model.PickerConfig;
-import at.csae0.reactnative.model.SavePermission;
+import at.csae0.reactnative.model.SavePermissionDialog;
 import at.csae0.reactnative.model.ScreenConfig;
 import at.csae0.reactnative.model.SizeConfig;
 import team.uptech.motionviews.utils.RessourceUtils;
@@ -231,10 +228,12 @@ public class ConfigManager implements ConfigManagerActions {
                             tempBundle.getString("initialToolSelection", null),
                             tempBundle.getString("initialText", null),
                             tempBundle.getString("backgroundColor", null),
-                            new SavePermission(tempBundle.getBundle("savePermission"))
+                            new SavePermissionDialog(tempBundle.getBundle("savePermission")),
+                            new DeleteDialog(tempBundle.getBundle("deleteDialog"))
                     );
                 } else {
                     generalConfig = new GeneralConfig(
+                            null,
                             null,
                             null,
                             null,

@@ -6,29 +6,38 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-public abstract class Permission {
+public abstract class Dialog {
 
-    private boolean granted;
     private String title, body;
 
     protected String positiveLabel , negativeLabel;
     protected DialogInterface.OnClickListener positiveAction, negativeAction;
 
-    public Permission (@Nullable Bundle bundle) {
+    public Dialog(@Nullable Bundle bundle) {
+        basicReset();
         reset();
 
         if (bundle != null) {
-            granted = bundle.getBoolean("granted", false);
             title = bundle.getString("title", "");
             body = bundle.getString("body", "");
         }
+        setAlertButtonData(bundle);
     }
 
-    public abstract void setAlertButtonData ();
+    protected abstract void setAlertButtonData (@Nullable Bundle bundle);
 
-    private void showDialog (Context context) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);;
+    public void showDialog (Context context, @Nullable DialogInterface.OnClickListener positiveAction, @Nullable DialogInterface.OnClickListener negativeAction) {
+        if (positiveAction != null) {
+            this.positiveAction = positiveAction;
+        }
+        if (negativeAction != null) {
+            this.negativeAction = negativeAction;
+        }
+        showDialog(context);
+    }
 
+    public void showDialog (Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 //            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
 //        } else {
@@ -51,14 +60,11 @@ public abstract class Permission {
         builder.show();
     }
 
-    public boolean checkPermission (Context context) {
-        if (!granted) {
-            showDialog(context);
-        }
-        return granted;
+    protected void reset(){
+        // May be implemented
     }
 
-    private void reset() {
+    private void basicReset() {
         positiveLabel = negativeLabel = title = body = "";
         positiveAction = negativeAction = new DialogInterface.OnClickListener() {
             @Override
@@ -66,6 +72,5 @@ public abstract class Permission {
 
             }
         };
-        granted = false;
     }
 }

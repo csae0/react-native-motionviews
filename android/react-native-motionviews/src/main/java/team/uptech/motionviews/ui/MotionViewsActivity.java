@@ -2,6 +2,7 @@ package team.uptech.motionviews.ui;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -435,17 +436,25 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
     }
 
     public void delete(View v) {
-        release();
-        setResult(RESULT_DELETED);
-        finish();
+        if (generalConfig != null && generalConfig.hasDeleteDialog()) {
+            generalConfig.getDeleteDialog().showDialog(MotionViewsActivity.this, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    release();
+                    setResult(RESULT_DELETED);
+                    finish();
+                }
+            }, null);
+        }
     }
 
     public void submit(View v) {
         SketchFile sketchFile = null;
         boolean edited = isEdited();
         boolean permissionGranted = false;
-        if (generalConfig != null && generalConfig.getSavePermission() != null) {
-           permissionGranted = generalConfig.getSavePermission().checkPermission(MotionViewsActivity.this);
+        if (generalConfig != null && generalConfig.hasSavePermission()) {
+            permissionGranted = generalConfig.getSavePermission().getPermission();
+            generalConfig.getSavePermission().showDialog(MotionViewsActivity.this);
         }
 
         if (permissionGranted) {
