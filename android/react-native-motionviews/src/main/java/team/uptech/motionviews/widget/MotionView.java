@@ -250,7 +250,7 @@ public class MotionView  extends FrameLayout {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         if (motionViewCallback != null) {
-            motionViewCallback.onMeasure();
+            motionViewCallback.onMeasure(widthMeasureSpec, heightMeasureSpec);
         }
     }
 

@@ -124,11 +124,16 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
                mUpdateCancelTapped();
             }
 
+            int prevWidth = 0, prevHeight = 0;
             @Override
-            public void onMeasure() {
-                if (generalConfig != null && !generalConfig.hasBackgroundDrawable(false) && addSketch != null) {
-                    addSketch(false);
+            public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                int width = View.MeasureSpec.getSize(widthMeasureSpec);
+                int height = View.MeasureSpec.getSize(heightMeasureSpec);
+                if (generalConfig != null && !generalConfig.hasBackgroundDrawable(false) && addSketch != null && width > 0 && height > 0 && prevWidth != width && prevHeight != height) {
+                    addSketch(false, width, height);
                 }
+                prevWidth = width;
+                prevHeight = height;
             }
         };
 
@@ -437,6 +442,7 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
 
     public void delete(View v) {
         if (generalConfig != null && generalConfig.hasDeleteDialog()) {
+            mUpdateCancelTapped();
             generalConfig.getDeleteDialog().showDialog(MotionViewsActivity.this, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -510,15 +516,20 @@ public class MotionViewsActivity extends AppCompatActivity implements EditCallba
     }
 
     protected void addSketch(boolean visible) {
-        SketchLayer sketchLayer = createSketchLayer();
         int width = motionView.getWidth();
         int height = motionView.getHeight();
-        SketchEntity sketchEntity = new SketchEntity(sketchLayer, motionView.getWidth(), motionView.getHeight(), visible);
-        motionView.addEntityAndPosition(sketchEntity);
+       addSketch(false, width, height);
+    }
+    protected void addSketch(boolean visible, int width, int height) {
+        if (width > 0 && height > 0) {
+            SketchLayer sketchLayer = createSketchLayer();
 
-        showButtons(false);
-        sketchEntity.startEditing(this);
+            SketchEntity sketchEntity = new SketchEntity(sketchLayer, width, height, visible);
+            motionView.addEntityAndPosition(sketchEntity);
 
+            showButtons(false);
+            sketchEntity.startEditing(this);
+        }
     }
 
     private SketchLayer createSketchLayer() {
