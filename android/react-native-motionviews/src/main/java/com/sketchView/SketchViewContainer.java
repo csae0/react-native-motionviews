@@ -259,7 +259,7 @@ public class SketchViewContainer extends RelativeLayout {
         // Container layout
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         setLayoutParams(layoutParams);
-        setBackgroundColor(Color.TRANSPARENT);
+        setBackgroundColor(Color.argb(127, 0, 0, 0));
         setClickable(true);
         setFitsSystemWindows(true);
 //        ((Activity)vg.getContext()).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE); //TODO: needed ???
